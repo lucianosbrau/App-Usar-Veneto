@@ -84,6 +84,15 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 2. Gli addestramenti li inserisce l'admin o li autocertifica l'operatore (con approvazione admin)?
 3. Esistono tipi di addestramento diversi (NBCR, SAF, cinofilo, guida...) con requisiti diversi?
 
+### Registrazione dell'operatore al bot Telegram (decisa, illustrata in `presentazione.html`)
+
+1. L'operatore accede alla web app → pagina **Profilo** → voce "Collega Telegram"
+2. L'app mostra un **codice numerico** (es. 48-21) valido 15 minuti, con pulsante di copia
+3. Su Telegram cerca il bot ufficiale (es. @usarveneto_bot) e preme AVVIA
+4. Invia il codice al bot → "✅ Account collegato"
+
+Il codice dimostra la titolarità dell'account (impedisce a estranei di ricevere le allerte), scade in 15 minuti e non viene mai inviato in giro. Dopo il collegamento: conferme delle risposte, calendario, comunicazioni, accesso Mini App senza login. Gestione errori: nuovo codice da Profilo se scaduto/errato; procedura da ripetere su nuovo telefono; l'admin vede chi è collegato.
+
 ## 7. Report e resoconti
 
 - **Statistiche del personale**: assegnazioni Alpha/Bravo per operatore, totale impieghi, media mensile, operatore con più/meno interventi, storico filtrabile per periodo e squadra
