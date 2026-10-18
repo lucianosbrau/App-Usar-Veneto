@@ -164,6 +164,38 @@
   .app-nav .nav { flex:1; padding:10px 0 14px; text-align:center; font-size:10px; color:var(--grigio); }
   .app-nav .nav .ic { font-size:20px; display:block; margin-bottom:2px; }
   .app-nav .nav.attiva { color:var(--royal); font-weight:700; }
+  /* Maschera manifesto */
+  .mani-indicatore { background:#fff; border-radius:12px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); border-left:5px solid #DC2626; margin-bottom:16px; }
+  .mani-indicatore .v { font-size:22px; font-weight:800; color:#DC2626; }
+  .mani-indicatore .m { font-size:12px; color:var(--grigio); margin-top:2px; }
+  .mani-scelta { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  .mani-scelta .opt { background:#fff; border:2px solid var(--bordo); border-radius:12px; padding:14px; text-align:center; font-size:14px; font-weight:700; color:var(--antracite); }
+  .mani-scelta .opt.selected { border-color:var(--royal); background:#EFF6FF; color:var(--royal-dark); }
+  .mani-sez { background:#fff; border-radius:14px; padding:18px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-bottom:20px; border:1px solid var(--bordo); border-top:5px solid var(--royal); }
+  .mani-sez h5 { font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#fff; margin:-18px -16px 14px; padding:10px 16px; background:var(--royal); border-radius:14px 14px 0 0; text-align:center; }
+  .mani-sez.aranc h5 { background:var(--arancio); } .mani-sez.aranc { border-top-color:var(--arancio); }
+  .mani-sez.verde2 h5 { background:#059669; } .mani-sez.verde2 { border-top-color:#059669; }
+  .mani-sez.viola2 h5 { background:#7C3AED; } .mani-sez.viola2 { border-top-color:#7C3AED; }
+  .mani-row { display:grid; grid-template-columns:36px 1fr auto 30px; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--perla); }
+  .mani-row:last-child { border-bottom:none; }
+  .mani-num { width:30px; height:30px; border-radius:50%; background:var(--notte); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .mani-ruolo { font-size:13px; font-weight:600; color:var(--antracite); }
+  .mani-ruolo .obb { color:#DC2626; font-size:10px; font-weight:700; margin-left:4px; white-space:nowrap; }
+  .mani-dd { height:40px; background:#fff; border:1.5px solid var(--grigio-ch); border-radius:8px; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 12px; font-size:12.5px; font-weight:600; color:var(--antracite); min-width:150px; box-shadow:inset 0 1px 2px rgba(0,0,0,0.05); }
+  .mani-dd.vuoto { color:#94A3B8; font-weight:400; }
+  .mani-dd .fre { color:var(--grigio); }
+  .mani-dd .ido { color:#059669; font-size:10px; font-weight:700; margin-left:4px; }
+  .mani-clear { width:30px; height:30px; border:none; background:transparent; color:#94A3B8; font-size:15px; display:flex; align-items:center; justify-content:center; border-radius:8px; }
+  .mani-lista { background:#fff; border:1px solid var(--bordo); border-radius:10px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.2); padding:8px; margin-top:6px; }
+  .mani-lista .voce-dd { padding:8px 10px; border-radius:8px; font-size:12px; color:var(--antracite); display:flex; justify-content:space-between; align-items:center; }
+  .mani-lista .voce-dd:hover { background:var(--perla); }
+  .mani-lista .voce-dd.sel { background:#EFF6FF; color:var(--royal-dark); font-weight:700; }
+  .mani-lista .voce-dd .ido2 { color:#059669; font-size:10px; font-weight:700; }
+  .mani-lista .voce-dd .altro-posto { color:#94A3B8; font-size:10px; font-style:italic; }
+  .mani-lista .sep { font-size:10px; color:var(--grigio); text-transform:uppercase; letter-spacing:0.5px; padding:6px 10px 2px; border-bottom:1px solid var(--perla); margin-bottom:4px; }
+  .mani-nota { font-size:11px; color:var(--grigio); background:var(--bg-input); border-radius:8px; padding:10px 12px; margin-bottom:16px; }
+  .btn-esporta { width:100%; height:52px; background:var(--royal); color:#fff; border-radius:10px; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 15px -3px rgba(37,99,235,0.4); margin-top:4px; }
+
   footer { text-align:center; color:var(--grigio); font-size:12px; padding:28px 16px 40px; }
 </style>
 </head>
@@ -527,13 +559,13 @@
 
         <div class="mani-sez">
           <h5>Direzione e Comando (1-6)</h5>
-          <div class="mani-row"><span class="mani-num">1</span><span class="mani-ruolo">Team Leader</span><span class="mani-dd">CICIRELLO F. <span class="fre">▾</span></span></div>
-          <div class="mani-row"><span class="mani-num">2</span><span class="mani-ruolo">Vice Team Leader</span><span class="mani-dd">PIOMBINI G. <span class="fre">▾</span></span></div>
-          <div class="mani-row"><span class="mani-num">3</span><span class="mani-ruolo">Ufficiale di Collegamento</span><span class="mani-dd">FUNES J. <span class="fre">▾</span></span></div>
-          <div class="mani-row"><span class="mani-num">4-6</span><span class="mani-ruolo">Staff Comando</span><span class="mani-dd">BORELLO · TENAN · ZANAGA <span class="fre">▾</span></span></div>
+          <div class="mani-row"><span class="mani-num">1</span><span class="mani-ruolo">Team Leader</span><span class="mani-dd">CICIRELLO F. <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
+          <div class="mani-row"><span class="mani-num">2</span><span class="mani-ruolo">Vice Team Leader</span><span class="mani-dd">PIOMBINI G. <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
+          <div class="mani-row"><span class="mani-num">3</span><span class="mani-ruolo">Ufficiale di Collegamento</span><span class="mani-dd">FUNES J. <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
+          <div class="mani-row"><span class="mani-num">4-6</span><span class="mani-ruolo">Staff Comando</span><span class="mani-dd">BORELLO · TENAN · ZANAGA <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
         </div>
 
-        <div class="mani-sez">
+        <div class="mani-sez verde2">
           <h5>Valutazione e Sicurezza (7-10)</h5>
           <div class="mani-row"><span class="mani-num">7</span><span class="mani-ruolo">Strutturista <span class="obb">● OBBL.</span></span><span class="mani-dd">DI SALVO A.<span class="ido">★</span> <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
           <div class="mani-row"><span class="mani-num">8</span><span class="mani-ruolo">NBCR <span class="obb">● OBBL.</span></span><span class="mani-dd vuoto">Seleziona… <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto" style="visibility:hidden;">✕</button></div>
@@ -553,27 +585,27 @@
 
         <div class="mani-nota">ℹ️ Dopo la compilazione automatica: gli elenchi mostrano <b>tutti i nomi non ancora assegnati</b> e anche chi è già in un altro posto (si sposta automaticamente). Il pulsante ✕ libera il posto senza riassegnare.</div>
 
-        <div class="mani-sez">
+        <div class="mani-sez viola2">
           <h5>Operazione — Ricerca (11-16)</h5>
-          <div class="mani-row"><span class="mani-num">11-14</span><span class="mani-ruolo">Unità Cinofile <span class="obb">● OBBL.</span></span><span class="mani-dd">TOMASELLA · CASAROTTO · ANAFI · SCARPA <span class="fre">▾</span></span></div>
-          <div class="mani-row"><span class="mani-num">15-16</span><span class="mani-ruolo">Ricerca strumentale</span><span class="mani-dd">CONTESSO A. · ROSSO E. <span class="fre">▾</span></span></div>
+          <div class="mani-row"><span class="mani-num">11-14</span><span class="mani-ruolo">Unità Cinofile <span class="obb">● OBBL.</span></span><span class="mani-dd">TOMASELLA · CASAROTTO · ANAFI · SCARPA <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
+          <div class="mani-row"><span class="mani-num">15-16</span><span class="mani-ruolo">Ricerca strumentale</span><span class="mani-dd">CONTESSO A. · ROSSO E. <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
         </div>
 
-        <div class="mani-sez">
+        <div class="mani-sez aranc">
           <h5>Operazione — Soccorso (17-32)</h5>
           <div class="mani-row"><span class="mani-num">17</span><span class="mani-ruolo">Capo Squadra <span class="obb">● OBBL.</span></span><span class="mani-dd">IPPOLITO C.<span class="ido">★</span> <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
-          <div class="mani-row"><span class="mani-num">18-21</span><span class="mani-ruolo">Soccorritori Tecnici</span><span class="mani-dd">CASAPINTA · BARBERO · PIANON · DE MIN <span class="fre">▾</span></span></div>
+          <div class="mani-row"><span class="mani-num">18-21</span><span class="mani-ruolo">Soccorritori Tecnici</span><span class="mani-dd">CASAPINTA · BARBERO · PIANON · DE MIN <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
           <div class="mani-row"><span class="mani-num">22</span><span class="mani-ruolo">SAF 2A <span class="obb">● OBBL.</span></span><span class="mani-dd">FERRI L.<span class="ido">★</span> <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
-          <div class="mani-row"><span class="mani-num">23</span><span class="mani-ruolo">Addetto Sicurezza</span><span class="mani-dd">FANTIN C. <span class="fre">▾</span></span></div>
-          <div class="mani-row"><span class="mani-num">24</span><span class="mani-ruolo">Sentinella</span><span class="mani-dd vuoto">Seleziona… <span class="fre">▾</span></span></div>
-          <div class="mani-row"><span class="mani-num">25-32</span><span class="mani-ruolo">Turnazione 2</span><span class="mani-dd">7 assegnati su 8 <span class="fre">▾</span></span></div>
+          <div class="mani-row"><span class="mani-num">23</span><span class="mani-ruolo">Addetto Sicurezza</span><span class="mani-dd">FANTIN C. <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
+          <div class="mani-row"><span class="mani-num">24</span><span class="mani-ruolo">Sentinella</span><span class="mani-dd vuoto">Seleziona… <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
+          <div class="mani-row"><span class="mani-num">25-32</span><span class="mani-ruolo">Turnazione 2</span><span class="mani-dd">7 assegnati su 8 <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
         </div>
 
-        <div class="mani-sez">
+        <div class="mani-sez aranc">
           <h5>Logistica (33-38)</h5>
-          <div class="mani-row"><span class="mani-num">33</span><span class="mani-ruolo">Capo Logistica</span><span class="mani-dd">BILLIO D. <span class="fre">▾</span></span></div>
-          <div class="mani-row"><span class="mani-num">34-37</span><span class="mani-ruolo">Vice e addetti logistica</span><span class="mani-dd">RUBIN · LORENZET · FRISO · CREMA <span class="fre">▾</span></span></div>
-          <div class="mani-row"><span class="mani-num">38</span><span class="mani-ruolo">Logista</span><span class="mani-dd vuoto">Seleziona… <span class="fre">▾</span></span></div>
+          <div class="mani-row"><span class="mani-num">33</span><span class="mani-ruolo">Capo Logistica</span><span class="mani-dd">BILLIO D. <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
+          <div class="mani-row"><span class="mani-num">34-37</span><span class="mani-ruolo">Vice e addetti logistica</span><span class="mani-dd">RUBIN · LORENZET · FRISO · CREMA <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
+          <div class="mani-row"><span class="mani-num">38</span><span class="mani-ruolo">Logista</span><span class="mani-dd vuoto">Seleziona… <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
         </div>
 
         <div class="btn-esporta">📄 Esporta PDF del Manifesto</div>

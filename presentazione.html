@@ -80,7 +80,7 @@
   .arch .blocco { background: #1E293B; border: 1px solid #334155; border-radius: 12px; padding: 18px; margin-bottom: 14px; }
   .arch .blocco b { color: #93C5FD; font-size: 14px; display: block; margin-bottom: 6px; }
   .arch .blocco span { font-size: 13px; color: #CBD5E1; }
-  .arch .freccia { text-align: center; font-size: 18px; color: #64748B; margin: 2px 0 12px; }
+  .arch .freccia { text-align: center; font-size: 30px; color: #60A5FA; margin: 8px 0 14px; line-height:1; }
 
   /* FLUSSO ATTIVAZIONE */
   .flusso { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
@@ -125,7 +125,7 @@
   <p class="desc">Un sistema unico per organizzare mensilmente il personale in due squadre operative e gestirne l'attivazione in emergenza.</p>
   <div class="grid g3">
     <div class="card bordo-blu">
-      <div class="num-big">2×38</div>
+      <div class="num-big">2×38<small style="font-size:20px;"> unità</small></div>
       <p><b>Squadre operative</b> — Team Alpha e Team Bravo, ciascuno un modulo USAR Medium da 38 unità. Bravo parte quando Alpha è già stata attivata. Composizione su disponibilità, specializzazioni e abilitazioni.</p>
     </div>
     <div class="card bordo-arancio">
@@ -150,7 +150,7 @@
     </div>
     <div class="freccia">↓</div>
     <div class="blocco"><b>🗄️ Backend — Supabase (regione Frankfurt)</b>
-      <span>PostgreSQL + autenticazione + API automatiche + <b>Realtime</b>: durante un'attivazione la dashboard si aggiorna da sola (contatore SÌ/NO in tempo reale) senza ricaricare la pagina. Dati primari nell'UE. Architettura progettata per poter migrare altrove senza rifare l'app.</span>
+      <span>PostgreSQL + autenticazione + API automatiche + <b>Realtime</b> — durante un'attivazione la dashboard si aggiorna da sola (contatore SÌ/NO in tempo reale) senza ricaricare la pagina. Dati primari nell'UE. <b>Nessun lock-in irreversibile</b> (nessun "sistema chiuso" che trattiene dati e codice): l'app resta migrabile altrove senza essere rifatta.</span>
     </div>
     <div class="freccia">↓</div>
     <div class="blocco"><b>🤖 Telegram — Bot + Mini App</b>
