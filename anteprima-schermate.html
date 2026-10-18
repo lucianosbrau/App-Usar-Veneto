@@ -132,6 +132,26 @@
   .r-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--bordo); font-size:14px; }
   .r-row:last-child { border-bottom:none; }
   .r-row .ora { font-size:12px; color:var(--grigio); }
+  .r-spec { display:flex; gap:5px; margin-left:8px; }
+  .r-spec span { font-size:14px; }
+
+  /* Copertura requisiti modulo */
+  .copertura { background:#fff; border-radius:12px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-top:16px; }
+  .copertura h4 { font-size:14px; font-weight:700; color:var(--notte); margin-bottom:2px; }
+  .copertura .sotto { font-size:12px; color:var(--grigio); margin-bottom:14px; }
+  .c-row { padding:10px 0; border-bottom:1px solid var(--bordo); }
+  .c-row:last-child { border-bottom:none; }
+  .c-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .c-label { font-size:13px; font-weight:600; color:var(--antracite); display:flex; align-items:center; gap:7px; }
+  .c-count { font-size:13px; font-weight:700; }
+  .c-count.ok { color:#059669; } .c-count.ko { color:#DC2626; }
+  .omini { display:flex; gap:4px; flex-wrap:wrap; }
+  .omino { font-size:17px; line-height:1; }
+  .omino.pieno { color:#059669; }
+  .omino.vuoto { color:#CBD5E1; opacity:0.65; }
+  .c-barra { height:6px; background:var(--bordo); border-radius:99px; overflow:hidden; margin-top:6px; }
+  .c-barra > div { height:100%; border-radius:99px; background:#10B981; }
+  .c-barra > div.ko { background:#DC2626; }
   .app-nav { background:#fff; border-top:1px solid var(--bordo); display:flex; }
   .app-nav .nav { flex:1; padding:10px 0 14px; text-align:center; font-size:10px; color:var(--grigio); }
   .app-nav .nav .ic { font-size:20px; display:block; margin-bottom:2px; }
@@ -319,10 +339,125 @@
 
         <div class="risposte">
           <h4>Risposte in tempo reale — 7/20</h4>
-          <div class="r-row"><span><b>Mario Rossi</b> <span class="ora">risposto 20:32</span></span><span class="pill verde">✅ SÌ</span></div>
-          <div class="r-row"><span><b>Luca Bianchi</b> <span class="ora">risposto 20:33</span></span><span class="pill verde">✅ SÌ</span></div>
-          <div class="r-row"><span><b>Giulia Verdi</b> <span class="ora">risposto 20:34</span></span><span class="pill" style="background:#FEE2E2;color:#991B1B;">❌ NO</span></div>
-          <div class="r-row"><span><b>Paolo Neri</b> <span class="ora">—</span></span><span class="pill" style="background:#E2E8F0;color:#475569;">⏳ In attesa</span></div>
+          <div class="r-row">
+            <span style="display:flex; align-items:center;"><b>Mario Rossi</b> <span class="ora">risposto 20:32</span>
+              <span class="r-spec"><span title="Autista">🚛</span><span title="Strutturista">🏗️</span></span>
+            </span>
+            <span class="pill verde">✅ SÌ</span>
+          </div>
+          <div class="r-row">
+            <span style="display:flex; align-items:center;"><b>Luca Bianchi</b> <span class="ora">risposto 20:33</span>
+              <span class="r-spec"><span title="Autista">🚛</span><span title="SAF">🧯</span></span>
+            </span>
+            <span class="pill verde">✅ SÌ</span>
+          </div>
+          <div class="r-row">
+            <span style="display:flex; align-items:center;"><b>Giulia Verdi</b> <span class="ora">risposto 20:34</span>
+              <span class="r-spec"><span title="Cinofila">🐕</span></span>
+            </span>
+            <span class="pill" style="background:#FEE2E2;color:#991B1B;">❌ NO</span>
+          </div>
+          <div class="r-row">
+            <span style="display:flex; align-items:center;"><b>Sara Moretti</b> <span class="ora">risposto 20:35</span>
+              <span class="r-spec"><span title="NBCR">☣️</span></span>
+            </span>
+            <span class="pill verde">✅ SÌ</span>
+          </div>
+          <div class="r-row">
+            <span style="display:flex; align-items:center;"><b>Andrea Gallo</b> <span class="ora">risposto 20:35</span>
+              <span class="r-spec"><span title="Caposquadra">⛑️</span></span>
+            </span>
+            <span class="pill verde">✅ SÌ</span>
+          </div>
+          <div class="r-row">
+            <span style="display:flex; align-items:center;"><b>Paolo Neri</b> <span class="ora">—</span>
+              <span class="r-spec"><span title="Strutturista">🏗️</span></span>
+            </span>
+            <span class="pill" style="background:#E2E8F0;color:#475569;">⏳ In attesa</span>
+          </div>
+          <div class="r-row">
+            <span style="display:flex; align-items:center;"><b>Elena Fanti</b> <span class="ora">—</span>
+              <span class="r-spec"><span title="Cinofila">🐕</span></span>
+            </span>
+            <span class="pill" style="background:#E2E8F0;color:#475569;">⏳ In attesa</span>
+          </div>
+        </div>
+
+        <div class="copertura">
+          <h4>Copertura requisiti del modulo</h4>
+          <div class="sotto">Aggiornato in tempo reale sulle risposte ✅ SÌ — le icone grigie indicano le carenze</div>
+
+          <div class="c-row">
+            <div class="c-top">
+              <span class="c-label">🚛 Autisti</span>
+              <span class="c-count ko">2/6</span>
+            </div>
+            <div class="omini">👤👤<span class="omino vuoto">👤👤👤👤</span></div>
+            <div class="c-barra"><div class="ko" style="width:33%;"></div></div>
+          </div>
+
+          <div class="c-row">
+            <div class="c-top">
+              <span class="c-label">🏗️ Strutturisti</span>
+              <span class="c-count ko">0/2</span>
+            </div>
+            <div class="omini"><span class="omino vuoto">👤👤</span></div>
+            <div class="c-barra"><div class="ko" style="width:0%;"></div></div>
+          </div>
+
+          <div class="c-row">
+            <div class="c-top">
+              <span class="c-label">⛑️ Capisquadra (elmo rosso)</span>
+              <span class="c-count ko">1/4</span>
+            </div>
+            <div class="omini">👤<span class="omino vuoto">👤👤👤</span></div>
+            <div class="c-barra"><div class="ko" style="width:25%;"></div></div>
+          </div>
+
+          <div class="c-row">
+            <div class="c-top">
+              <span class="c-label">☣️ NBCR</span>
+              <span class="c-count ko">1/3</span>
+            </div>
+            <div class="omini">👤<span class="omino vuoto">👤👤</span></div>
+            <div class="c-barra"><div class="ko" style="width:33%;"></div></div>
+          </div>
+
+          <div class="c-row">
+            <div class="c-top">
+              <span class="c-label">🐕 Cinofili</span>
+              <span class="c-count ko">0/3</span>
+            </div>
+            <div class="omini"><span class="omino vuoto">👤👤👤</span></div>
+            <div class="c-barra"><div class="ko" style="width:0%;"></div></div>
+          </div>
+
+          <div class="c-row">
+            <div class="c-top">
+              <span class="c-label">🧯 SAF</span>
+              <span class="c-count ko">1/2</span>
+            </div>
+            <div class="omini">👤<span class="omino vuoto">👤</span></div>
+            <div class="c-barra"><div class="ko" style="width:50%;"></div></div>
+          </div>
+
+          <div class="c-row">
+            <div class="c-top">
+              <span class="c-label">👤 Personale generico</span>
+              <span class="c-count ok">5/12</span>
+            </div>
+            <div class="omini">👤👤👤👤👤<span class="omino vuoto">👤👤👤👤👤👤👤</span></div>
+            <div class="c-barra"><div class="ko" style="width:42%;"></div></div>
+          </div>
+
+          <div class="c-row">
+            <div class="c-top">
+              <span class="c-label"><b>Totale modulo</b></span>
+              <span class="c-count ko">10/32</span>
+            </div>
+            <div class="omini">👤👤👤👤👤👤👤👤👤👤<span class="omino vuoto">👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤</span></div>
+            <div class="c-barra"><div class="ko" style="width:31%;"></div></div>
+          </div>
         </div>
       </div>
       <div class="app-nav">
