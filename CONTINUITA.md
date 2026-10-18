@@ -146,7 +146,14 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 **Conseguenze per l'app**:
 - La "copertura requisiti" dell'attivazione si basa sulle specializzazioni obbligatorie del modulo Medium
 - Il PDF Manifesto segue il modello a 38 voci progressivi per sezioni (Direz. e Comando 1-6, Valut. e Sicurezza 7-10, Ricerca 11-16, Soccorso 2 turnazioni 17-32, Logistica 33-38); nomi in MAIUSCOLO, ordine logico 33-38
-- **Da chiarire con l'utente**: come si dividono Alpha e Bravo rispetto al modulo da 38 (Alpha = assetto completo? Bravo = secondo assetto/riserva?)
+- **Chiarito dall'utente**: Alpha e Bravo sono **due squadre da 38 unità ciascuna**. Bravo è la seconda, che parte quando Alpha è già stata attivata.
+
+### Manifesto — flusso di compilazione deciso (in linea di massima, da rifinire)
+
+1. L'admin verifica il raggiungimento delle 38 unità (eventualmente spostando personale da Bravo o dalle Riserve ad Alpha, come da requisito del click sul nome)
+2. Si apre la **maschera di compilazione del manifesto**: per ognuna delle 38 funzioni, l'admin assegna una persona da un **elenco a discesa**; l'elenco **esclude automaticamente chi è già stato inserito in altre funzioni** ( fattibile senza problemi)
+3. Esportazione **PDF** secondo il modello `modello-team-alpha.md` (38 voci, sezioni, maiuscolo, ordine logico 33-38)
+4. Invio del PDF su chat Telegram: **opzionale, da verificare** (l'utente non è sicuro di volerla). Tecnica: fattibile — il bot può inviare documenti a chat/gruppi —; si deciderà se attivarla per gruppo, solo admin, o disattivata
 
 ## 13. Come lavorare con l'utente
 
