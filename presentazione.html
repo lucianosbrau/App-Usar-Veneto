@@ -128,8 +128,8 @@
   <p class="desc">Un sistema unico per organizzare mensilmente il personale in due squadre operative e gestirne l'attivazione in emergenza.</p>
   <div class="grid g3">
     <div class="card bordo-blu">
-      <div class="num-big">2</div>
-      <p><b>Squadre operative</b> — Team Alpha e Team Bravo, composte su base disponibilità, specializzazioni, abilitazioni e patenti.</p>
+      <div class="num-big">2×38</div>
+      <p><b>Squadre operative</b> — Team Alpha e Team Bravo, ciascuno un modulo USAR Medium da 38 unità. Bravo parte quando Alpha è già stata attivata. Composizione su disponibilità, specializzazioni e abilitazioni.</p>
     </div>
     <div class="card bordo-arancio">
       <div class="num-big">100</div>
@@ -223,7 +223,7 @@
 <!-- ============ ATTIVAZIONE ============ -->
 <section>
   <h2 class="sezione">🚨 Attivazione di emergenza</h2>
-  <p class="desc">Il cuore operativo del sistema: allertamento rapido, risposta tracciata, resoconto immediato.</p>
+  <p class="desc">Il cuore operativo del sistema: allertamento rapido, risposta tracciata, resoconto immediato. La copertura requisiti confronta le risposte SÌ con il modulo da 38 unità e le sue specializzazioni obbligatorie.</p>
   <div class="attiva-row">
     <div class="btn-attiva btn-alpha">🚨 ATTIVA ALPHA</div>
     <div class="btn-attiva btn-bravo">🚨 ATTIVA BRAVO</div>
@@ -232,7 +232,19 @@
     <div class="step"><div class="num">1</div><h4>Admin attiva</h4><p>Seleziona ATTIVA ALPHA o ATTIVA BRAVO, modifica il messaggio di emergenza e invia.</p></div>
     <div class="step"><div class="num">2</div><h4>Allertamento</h4><p>Il bot invia il messaggio al gruppo Telegram + notifica push PWA. Doppio canale.</p></div>
     <div class="step"><div class="num">3</div><h4>Risposta</h4><p>Ogni operatore risponde ✅ SÌ o ❌ NO. Il sistema registra risposta e orario.</p></div>
-    <div class="step arancio"><div class="num">4</div><h4>Resoconto + PDF</h4><p>Dashboard in tempo reale, resoconto con orari e, se coerente, Manifesto in PDF.</p></div>
+    <div class="step arancio"><div class="num">4</div><h4>Resoconto + Manifesto</h4><p>Al raggiungimento delle 38 unità, l'admin compila il Manifesto (automaticamente o manualmente) e lo esporta in PDF.</p></div>
+  </div>
+
+  <div class="card bordo-blu" style="margin-top:20px;">
+    <h3>📄 Maschera di compilazione del Manifesto</h3>
+    <ul>
+      <li>All'apertura: scelta <b>compilazione automatica</b> (precompilata da risposte e specializzazioni) o <b>manuale</b></li>
+      <li>38 funzioni con elenchi a discesa: <b>escludono i già inseriti</b> e ordinano prima gli idonei alla funzione</li>
+      <li>Funzioni obbligatorie evidenziate (2 strutturisti, 2 NBCR, 4 K9, 2 capisquadra, 2 SAF 2A)</li>
+      <li>Validazione in tempo reale: "34/38 — mancano 1 NBCR, 2 soccorritori, 1 logista"</li>
+      <li>Export incompleto solo con conferma esplicita; PDF secondo modello ufficiale (1 pagina, 38 voci, sezioni, nomi in maiuscolo)</li>
+      <li>Invio PDF su Telegram: opzionale, da valutare</li>
+    </ul>
   </div>
 </section>
 
@@ -265,23 +277,27 @@
 <!-- ============ COMPOSIZIONE SQUADRE ============ -->
 <section>
   <h2 class="sezione">⚔️ Composizione delle squadre</h2>
-  <p class="desc">Il sistema verifica i requisiti richiesti per ogni squadra sulla base delle abilitazioni registrate.</p>
+  <p class="desc">Alpha e Bravo sono due moduli USAR Medium da <b>38 unità ciascuna</b> (struttura del Manuale Formazione USAR Medium CNVVF 2024). Bravo è la seconda squadra, che parte quando Alpha è già stata attivata.</p>
   <div class="grid g2">
     <div class="card bordo-blu">
-      <h3><span class="pill blu">ALPHA</span> Requisiti verificati</h3>
+      <h3><span class="pill blu">MODULO 38 UNITÀ</span> Specializzazioni obbligatorie</h3>
       <p>
-        <span class="tag">🏗️ Ingegneri strutturisti</span>
-        <span class="tag">☣️ Operatori NBCR</span>
-        <span class="tag">🐕 Unità cinofile</span>
-        <span class="tag">🧯 Operatori SAF</span>
-        <span class="tag">🚛 Autisti</span>
-        <span class="tag">➕ Altre figure da definire</span>
+        <span class="tag">🏗️ 2 Strutturisti</span>
+        <span class="tag">☣️ 2 NBCR 3° livello</span>
+        <span class="tag">🐕 4 Unità cinofile K9</span>
+        <span class="tag">⛑️ 2 Capisquadra/Capireparto</span>
+        <span class="tag">🧗 2 SAF 2A (corda)</span>
       </p>
-      <p style="margin-top:12px;">Proposta automatica sulla base di disponibilità e requisiti + modifica manuale con drag &amp; drop (dnd-kit) dal pool dei disponibili.</p>
+      <p style="margin-top:12px;">Il resto del modulo: direzione e comando (6), ricerca strumentale (2), soccorritori tecnici (12, in 2 turnazioni da 8, con sentinelle, addetti sicurezza e logisti on site), logistica off site (6). Componente sanitaria (1 responsabile + 2 medici + 2 infermieri) esclusa dalle 38 unità CNVVF.</p>
     </div>
     <div class="card bordo-arancio">
-      <h3><span class="pill arancio">BRAVO</span> Stesso modello</h3>
-      <p>Composizione mensile speculare ad Alpha, con requisiti propri definiti dall'admin. Rotazione e bilanciamento verificabili con le statistiche di impiego di ogni operatore.</p>
+      <h3>🛠️ Come si compila la squadra</h3>
+      <ul>
+        <li>Proposta automatica sulla base di disponibilità e requisiti</li>
+        <li>Modifica manuale con drag &amp; drop dal pool dei disponibili</li>
+        <li>In emergenza: click sul nome di un operatore Bravo/Riserva per spostarlo in Alpha</li>
+        <li>Rotazione e bilanciamento verificabili con le statistiche di impiego</li>
+      </ul>
       <p style="margin-top:12px;">
         <span class="pill verde">✅ PRONTA</span>
         <span class="pill giallo">⚠️ PARZIALE</span>
