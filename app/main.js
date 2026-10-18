@@ -187,12 +187,12 @@ function pagAttivazione(el) {
     <div class="pagina-sotto">Seleziona il team da allertare</div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:600px;">
       <button class="btn-primary" style="height:80px; font-size:18px; font-weight:800;">🚨 ATTIVA ALPHA</button>
-      <button class="btn-primary" style="height:80px; font-size:18px; font-weight:800; background:var(--arancio); box-shadow:0 10px 15px -3px rgba(234,88,12,0.4);">🚨 ATTIVA BRAVO</button>
+      <button class="btn-primary" style="height:80px; font-size:18px; font-weight:800; background:var(--arancio); box-shadow:0 10px 15px -3px rgba(200,16,46,0.4);">🚨 ATTIVA BRAVO</button>
     </div>
     <div class="card" style="margin-top:20px; max-width:600px;">
       <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--grigio); margin-bottom:6px;">Messaggio di emergenza (modificabile)</div>
       <textarea id="msg" rows="4" style="width:100%; border:1.5px solid var(--grigio-ch); border-radius:10px; padding:12px; font-family:inherit; font-size:14px;">🚨 ATTIVAZIONE TEAM ALPHA — Emergenza USAR. Ritrovo: Centrale VVF Mestre. Confermare la propria disponibilità.</textarea>
-      <button class="btn-primary" style="margin-top:12px; background:var(--rosso); box-shadow:0 10px 15px -3px rgba(220,38,38,0.4);">📡 INVIA ALLERTA</button>
+      <button class="btn-primary" style="margin-top:12px; background:var(--rosso); box-shadow:0 10px 15px -3px rgba(200,16,46,0.4);">📡 INVIA ALLERTA</button>
     </div>
     <p style="color:var(--grigio); font-size:12px; margin-top:12px;">L'invio reale richiede il bot Telegram configurato (in sviluppo).</p>`;
 }

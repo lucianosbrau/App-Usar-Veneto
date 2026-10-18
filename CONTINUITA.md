@@ -110,6 +110,8 @@ Una volta validata l'app, sarebbe opportuno che **tutti gli utenti accedano con 
 
 ## 8. Stile visivo (mockup già validati)
 
+**AGGIORNAMENTO**: su richiesta dell'utente la palette è stata allineata al sito istituzionale vigili del fuoco (vigilfuoco.it): **blu istituzionale** (#0B2E59 header/menu, #155A8A blu medio, #0F4470 scuro) e **rosso VVF** (#C8102E / #E5231D) al posto del blu royal/arancione precedenti. Verificare i toni esatti con l'utente se necessario.
+
 - Palette: blu notte `#0F172A`, blu royal `#2563EB`, arancione `#EA580C`, ambra `#F59E0B`, sfondi `#F1F5F9`/`#F8FAFC`, antracite `#1E293B`, grigi `#64748B`/`#CBD5E1`
 - Stato: verde `#D1FAE5`/`#065F46`, giallo `#FEF3C7`/`#92400E`, rosso `#FEE2E2`/`#991B1B`
 - Login: gradiente blu notte→royal, card bianca 420px, angoli 20px, campi 52px arrotondati 10px
