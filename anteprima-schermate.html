@@ -152,7 +152,15 @@
   .c-barra { height:6px; background:var(--bordo); border-radius:99px; overflow:hidden; margin-top:6px; }
   .c-barra > div { height:100%; border-radius:99px; background:#10B981; }
   .c-barra > div.ko { background:#DC2626; }
-  .app-nav { background:#fff; border-top:1px solid var(--bordo); display:flex; }
+  /* Sezioni squadra Bravo / Riserve */
+  .squadra-box { background:#fff; border-radius:12px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-top:16px; border-left:5px solid var(--arancio); }
+  .squadra-box.riserve { border-left-color:#94A3B8; }
+  .squadra-box h4 { font-size:14px; font-weight:700; color:var(--notte); margin-bottom:2px; display:flex; align-items:center; gap:8px; }
+  .squadra-box .sotto { font-size:12px; color:var(--grigio); margin-bottom:12px; }
+  .s-nome-row { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--bordo); font-size:14px; }
+  .s-nome-row:last-child { border-bottom:none; }
+  .s-nome-row b { font-weight:600; }
+  .s-nome-row .r-spec { margin-left:0; }
   .app-nav .nav { flex:1; padding:10px 0 14px; text-align:center; font-size:10px; color:var(--grigio); }
   .app-nav .nav .ic { font-size:20px; display:block; margin-bottom:2px; }
   .app-nav .nav.attiva { color:var(--royal); font-weight:700; }
@@ -384,8 +392,8 @@
         </div>
 
         <div class="copertura">
-          <h4>Copertura requisiti del modulo</h4>
-          <div class="sotto">Aggiornato in tempo reale sulle risposte ✅ SÌ — le icone grigie indicano le carenze</div>
+          <h4>Copertura requisiti del modulo — <span style="color:var(--royal);">Team ALPHA</span></h4>
+          <div class="sotto">Il conteggio pesca prioritariamente dagli operatori di Alpha che hanno risposto ✅ SÌ — gli omini grigi indicano le carenze</div>
 
           <div class="c-row">
             <div class="c-top">
@@ -457,6 +465,40 @@
             </div>
             <div class="omini">👤👤👤👤👤👤👤👤👤👤<span class="omino vuoto">👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤👤</span></div>
             <div class="c-barra"><div class="ko" style="width:31%;"></div></div>
+          </div>
+        </div>
+
+        <div class="squadra-box">
+          <h4>🔶 SQUADRA BRAVO — risposte positive</h4>
+          <div class="sotto">Operatori inseriti in Bravo che hanno confermato</div>
+          <div class="s-nome-row">
+            <b>Andrea Gallo</b>
+            <span class="r-spec"><span title="Caposquadra">⛑️</span><span title="Autista">🚛</span></span>
+          </div>
+          <div class="s-nome-row">
+            <b>Sara Moretti</b>
+            <span class="r-spec"><span title="NBCR">☣️</span></span>
+          </div>
+          <div class="s-nome-row">
+            <b>Marco Fontanive</b>
+            <span class="r-spec"><span title="SAF">🧯</span><span title="Autista">🚛</span></span>
+          </div>
+        </div>
+
+        <div class="squadra-box riserve">
+          <h4>⏺ RISERVE — risposte positive</h4>
+          <div class="sotto">Non inseriti in nessuna squadra, disponibili come integrazione</div>
+          <div class="s-nome-row">
+            <b>Davide Ruggeri</b>
+            <span class="r-spec"><span title="Strutturista">🏗️</span></span>
+          </div>
+          <div class="s-nome-row">
+            <b>Chiara Boscaro</b>
+            <span class="r-spec"><span title="Cinofila">🐕</span></span>
+          </div>
+          <div class="s-nome-row">
+            <b>Fabio Trentin</b>
+            <span class="r-spec"><span title="NBCR">☣️</span><span title="SAF">🧯</span></span>
           </div>
         </div>
       </div>
