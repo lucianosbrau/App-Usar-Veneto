@@ -94,6 +94,10 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 
 Il codice dimostra la titolarità dell'account (impedisce a estranei di ricevere le allerte), scade in 15 minuti e non viene mai inviato in giro. Dopo il collegamento: conferme delle risposte, calendario, comunicazioni, accesso Mini App senza login. Gestione errori: nuovo codice da Profilo se scaduto/errato; procedura da ripetere su nuovo telefono; l'admin vede chi è collegato.
 
+### Internazionale — indicazione dell'utente
+
+La sezione conterrà gli **operatori abilitati alle missioni internazionali** e le relative **vaccinazioni**. I dettagli (quali vaccinazioni tracciare, scadenze/booster, tipi di abilitazione) verranno definiti più avanti: **l'utente fornirà uno schema preciso**, e gran parte della struttura sarà tratta dal **database esistente** da verificare (vedi sez. 10).
+
 ## 7. Report e resoconti
 
 - **Statistiche del personale**: assegnazioni Alpha/Bravo per operatore, totale impieghi, media mensile, operatore con più/meno interventi, storico filtrabile per periodo e squadra
