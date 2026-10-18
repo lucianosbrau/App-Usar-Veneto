@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USAR Veneto — Anteprima schermate</title>
+<style>
+  :root {
+    --notte: #0F172A; --notte2: #1E293B; --royal: #2563EB; --royal-dark: #1D4ED8;
+    --arancio: #EA580C; --ambra: #F59E0B; --perla: #F1F5F9; --antracite: #1E293B;
+    --grigio: #64748B; --grigio-ch: #CBD5E1; --bordo: #E2E8F0; --bg-input: #F8FAFC;
+    --verde-bg: #D1FAE5; --verde-tx: #065F46; --giallo-bg: #FEF3C7; --giallo-tx: #92400E;
+    --rosso-bg: #FEE2E2; --rosso-tx: #991B1B;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter','Roboto',-apple-system,'Segoe UI',sans-serif; background:#E2E8F0; color:var(--antracite); line-height:1.5; }
+  h1 { font-size:26px; text-align:center; padding:32px 16px 4px; color:var(--notte); }
+  p.intro { text-align:center; color:var(--grigio); font-size:14px; padding-bottom:24px; }
+  .etichetta { text-align:center; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#fff; background:var(--notte); display:inline-block; padding:8px 20px; border-radius:999px; margin:24px auto 16px; }
+  .wrap-etichetta { text-align:center; }
+  .schermo-wrap { padding:0 16px 8px; }
+  .telefono { max-width:430px; margin:0 auto; border-radius:36px; border:10px solid var(--notte); overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.35); background:#fff; }
+  .desktop { max-width:1080px; margin:0 auto; border-radius:16px; border:1px solid var(--bordo); overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); background:#fff; }
+  @media (max-width:520px){ .telefono{ border-width:6px; border-radius:22px; } }
+
+  /* ===== LOGIN ===== */
+  .login { background:linear-gradient(180deg,#0F172A 0%,#2563EB 100%); min-height:640px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; position:relative; }
+  .login::before { content:''; position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.10) 1px, transparent 1px); background-size:22px 22px; }
+  .login > * { position:relative; }
+  .login-card { background:#fff; border-radius:20px; width:100%; max-width:420px; padding:40px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); }
+  .scudo { width:72px; height:72px; margin:0 auto 16px; display:block; }
+  .login-card h2 { font-size:28px; font-weight:800; color:var(--antracite); text-align:center; }
+  .login-card .sub { font-size:14px; color:var(--grigio); text-align:center; margin:6px 0 32px; }
+  .campo { height:52px; background:var(--bg-input); border:1px solid var(--bordo); border-radius:10px; display:flex; align-items:center; padding:0 16px; color:#94A3B8; font-size:15px; margin-bottom:16px; }
+  .campo .occhio { margin-left:auto; }
+  .btn-accedi { width:100%; height:52px; background:var(--royal); color:#fff; font-size:16px; font-weight:600; text-align:center; border:none; border-radius:10px; margin-top:8px; box-shadow:0 4px 6px -1px rgba(37,99,235,0.3); display:flex; align-items:center; justify-content:center; }
+  .login-card .link { text-align:center; font-size:14px; color:var(--royal); margin-top:24px; }
+
+  /* ===== DASHBOARD (desktop) ===== */
+  .sidebar { width:260px; min-width:260px; background:var(--notte); color:#F8FAFC; display:flex; flex-direction:column; }
+  .sidebar .logo { padding:24px; font-weight:800; font-size:18px; display:flex; gap:10px; align-items:center; }
+  .sidebar .logo svg { width:28px; height:28px; }
+  .menu { flex:1; }
+  .menu .voce { height:48px; display:flex; align-items:center; gap:12px; padding:0 20px; color:#CBD5E1; font-size:14px; font-weight:500; }
+  .menu .voce.attiva { background:var(--royal); border-left:4px solid var(--ambra); color:#fff; font-weight:700; }
+  .menu .voce.allerta { color:#F87171; }
+  .menu .separatore { border-top:1px solid #334155; margin:8px 0; }
+  .contenuto { flex:1; background:var(--perla); padding:32px; min-width:0; }
+  .contenuto .h-titolo { font-size:32px; font-weight:800; color:var(--notte); }
+  .contenuto .h-sotto { font-size:14px; color:var(--grigio); margin-bottom:28px; }
+  .avatar-test { display:flex; align-items:center; gap:10px; justify-content:flex-end; margin-bottom:8px; }
+  .avatar-test .avatar { width:40px; height:40px; border-radius:50%; background:var(--royal); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; }
+  .avatar-test .nome { font-size:14px; font-weight:600; }
+  .riga-card { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+  @media (max-width:820px){ .riga-card{ grid-template-columns:1fr; } }
+  .card-squadra { background:#fff; border-radius:16px; padding:24px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+  .card-squadra.alpha { border-left:6px solid var(--royal); }
+  .card-squadra.bravo { border-left:6px solid var(--arancio); }
+  .cs-top { display:flex; align-items:center; justify-content:space-between; }
+  .cs-nome { font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; }
+  .alpha .cs-nome { color:var(--royal); } .bravo .cs-nome { color:var(--arancio); }
+  .pill { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:999px; font-size:12px; font-weight:600; }
+  .pill.verde { background:var(--verde-bg); color:var(--verde-tx); }
+  .pill.giallo { background:var(--giallo-bg); color:var(--giallo-tx); }
+  .cs-num { font-size:48px; font-weight:800; margin:10px 0 2px; }
+  .cs-num small { font-size:20px; color:var(--grigio-ch); font-weight:600; }
+  .alpha .cs-num { color:var(--royal); } .bravo .cs-num { color:var(--arancio); }
+  .cs-sotto { font-size:14px; color:var(--grigio); }
+  .barra { height:8px; background:var(--bordo); border-radius:99px; margin:14px 0; overflow:hidden; }
+  .barra > div { height:100%; border-radius:99px; }
+  .alpha .barra > div { width:75%; background:var(--royal); }
+  .bravo .barra > div { width:60%; background:var(--arancio); }
+  .cs-btn { display:inline-block; font-size:14px; font-weight:600; padding:8px 16px; border-radius:8px; border:1px solid currentColor; }
+  .alpha .cs-btn { color:var(--royal); } .bravo .cs-btn { color:var(--arancio); }
+  .sez-attiva { background:#fff; border-radius:16px; padding:24px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-bottom:24px; }
+  .sez-attiva h3 { font-size:18px; font-weight:600; color:var(--antracite); margin-bottom:16px; }
+  .btn-attiva-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:640px){ .btn-attiva-row{ grid-template-columns:1fr; } }
+  .btn-attiva { height:80px; border-radius:12px; color:#fff; font-size:18px; font-weight:800; display:flex; align-items:center; justify-content:center; letter-spacing:0.5px; }
+  .btn-attiva.alpha { background:var(--royal); box-shadow:0 10px 15px -3px rgba(37,99,235,0.4); }
+  .btn-attiva.bravo { background:var(--arancio); box-shadow:0 10px 15px -3px rgba(234,88,12,0.4); }
+  .riga-stat { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media (max-width:820px){ .riga-stat{ grid-template-columns:1fr; } }
+  .stat { background:#fff; border-radius:16px; padding:20px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+  .stat .v { font-size:32px; font-weight:800; color:var(--notte); }
+  .stat .v small { font-size:16px; color:var(--grigio-ch); font-weight:600; }
+  .stat .t { font-size:13px; color:var(--grigio); }
+  .stat .barra { margin:10px 0 0; }
+  .stat .barra > div { background:#10B981; }
+
+  /* ===== ELENCO OPERATORI ===== */
+  .toolbar { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; align-items:center; }
+  .ricerca { flex:1; min-width:200px; max-width:300px; height:44px; background:#fff; border:1px solid var(--bordo); border-radius:10px; display:flex; align-items:center; padding:0 14px; color:#94A3B8; font-size:14px; }
+  .filtro { height:44px; background:#fff; border:1px solid var(--bordo); border-radius:10px; display:flex; align-items:center; padding:0 14px; color:var(--grigio); font-size:14px; }
+  .btn-nuovo { height:44px; background:var(--royal); color:#fff; border-radius:10px; display:flex; align-items:center; padding:0 18px; font-size:14px; font-weight:600; }
+  .h-pagina { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; }
+  .h-pagina h2 { font-size:28px; font-weight:800; color:var(--notte); }
+  .h-pagina .sotto { font-size:14px; color:var(--grigio); }
+  .grid-op { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+  .card-op { background:#fff; border-radius:16px; padding:20px; box-shadow:0 1px 3px rgba(0,0,0,0.1); border-left:4px solid var(--bordo); }
+  .card-op.alpha { border-left-color:var(--royal); }
+  .card-op.bravo { border-left-color:var(--arancio); }
+  .op-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .op-avatar { width:56px; height:56px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; }
+  .op-avatar.alpha { background:var(--royal); } .op-avatar.bravo { background:var(--arancio); } .op-avatar.neutral { background:#94A3B8; }
+  .op-nome { font-size:18px; font-weight:700; color:var(--notte); }
+  .op-ruolo { font-size:14px; color:var(--grigio); margin:2px 0 10px; }
+  .op-icone { display:flex; gap:8px; margin-bottom:12px; font-size:18px; }
+  .op-adr { background:var(--bg-input); border-radius:8px; padding:12px; margin-bottom:12px; }
+  .op-adr .t { font-size:12px; font-weight:600; color:#475569; }
+  .op-adr .v { font-size:16px; font-weight:700; }
+  .op-adr .v.ok { color:#059669; } .op-adr .v.ko { color:#DC2626; }
+  .op-adr .barra { height:6px; margin:8px 0 0; }
+  .op-azioni { display:flex; gap:14px; justify-content:flex-end; font-size:16px; color:var(--grigio); }
+  .op-azioni .elimina { margin-left:0; }
+
+  /* ===== ATTIVAZIONE (mobile) ===== */
+  .schermata-app { background:var(--perla); min-height:640px; display:flex; flex-direction:column; }
+  .app-topbar { background:var(--notte); color:#fff; padding:14px 16px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:700; }
+  .app-topbar .indietro { color:#94A3B8; font-size:18px; }
+  .app-corpo { flex:1; padding:20px 16px 28px; overflow-y:auto; }
+  .attiva-titolo { font-size:22px; font-weight:800; color:var(--notte); margin-bottom:4px; }
+  .attiva-sotto { font-size:13px; color:var(--grigio); margin-bottom:20px; }
+  .attiva-scelta { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+  .attiva-scelta .btn-attiva { height:64px; font-size:15px; }
+  .attiva-msg { background:#fff; border-radius:12px; padding:14px; font-size:13px; color:var(--antracite); box-shadow:0 1px 3px rgba(0,0,0,0.1); border:1px solid var(--bordo); margin-bottom:20px; }
+  .attiva-msg .et { font-size:11px; font-weight:700; text-transform:uppercase; color:var(--grigio); margin-bottom:6px; }
+  .attiva-invia { width:100%; height:52px; background:#DC2626; color:#fff; border-radius:10px; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 15px -3px rgba(220,38,38,0.4); margin-bottom:8px; }
+  .attiva-nota { text-align:center; font-size:12px; color:var(--grigio); margin-bottom:24px; }
+  .risposte { background:#fff; border-radius:12px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+  .risposte h4 { font-size:14px; font-weight:700; color:var(--notte); margin-bottom:12px; }
+  .r-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--bordo); font-size:14px; }
+  .r-row:last-child { border-bottom:none; }
+  .r-row .ora { font-size:12px; color:var(--grigio); }
+  .app-nav { background:#fff; border-top:1px solid var(--bordo); display:flex; }
+  .app-nav .nav { flex:1; padding:10px 0 14px; text-align:center; font-size:10px; color:var(--grigio); }
+  .app-nav .nav .ic { font-size:20px; display:block; margin-bottom:2px; }
+  .app-nav .nav.attiva { color:var(--royal); font-weight:700; }
+  footer { text-align:center; color:var(--grigio); font-size:12px; padding:28px 16px 40px; }
+</style>
+</head>
+<body>
+
+<h1>Nucleo USAR Veneto — Anteprima schermate</h1>
+<p class="intro">Simulazione visiva con dati finti. Le schermate definitive potranno differire nei dettagli.<br>Qui sotto: LOGIN (mobile), DASHBOARD (desktop), ELENCO OPERATORI (desktop), ATTIVAZIONE (mobile).</p>
+
+<!-- ============ 1. LOGIN ============ -->
+<div class="wrap-etichetta"><span class="etichetta">1 · Login — da smartphone</span></div>
+<div class="schermo-wrap">
+  <div class="telefono">
+    <div class="login">
+      <div class="login-card">
+        <svg class="scudo" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z" fill="#2563EB" stroke="#1E293B" stroke-width="1"/>
+          <path d="M8.5 12l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h2>Nucleo USAR Veneto</h2>
+        <p class="sub">Gestione squadre e attivazioni emergenze</p>
+        <div class="campo">nome@esempio.it</div>
+        <div class="campo">•••••••• <span class="occhio">👁</span></div>
+        <div class="btn-accedi">ACCEDI</div>
+        <p class="link">Password dimenticata?</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 2. DASHBOARD ============ -->
+<div class="wrap-etichetta"><span class="etichetta">2 · Dashboard amministratore — da PC</span></div>
+<div class="schermo-wrap">
+  <div class="desktop" style="display:flex;">
+    <div class="sidebar">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3z" fill="#2563EB"/><path d="M8.5 12l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        USAR Veneto
+      </div>
+      <div class="menu">
+        <div class="voce attiva">🏠 Dashboard</div>
+        <div class="voce">👥 Operatori</div>
+        <div class="voce">⚔️ Squadre</div>
+        <div class="voce">📅 Calendario</div>
+        <div class="voce allerta">🚨 Attivazione</div>
+        <div class="voce">🎓 Addestramento</div>
+        <div class="voce">📊 Report</div>
+        <div class="separatore"></div>
+        <div class="voce">👤 Profilo</div>
+      </div>
+    </div>
+    <div class="contenuto">
+      <div class="avatar-test"><span class="nome">Mario Rossi</span><span class="avatar">MR</span></div>
+      <div class="h-titolo">Dashboard</div>
+      <div class="h-sotto">Panoramica operativa — 15 Gennaio 2025</div>
+
+      <div class="riga-card">
+        <div class="card-squadra alpha">
+          <div class="cs-top"><span class="cs-nome">🔷 ALPHA</span><span class="pill verde">✅ PRONTA</span></div>
+          <div class="cs-num">15<small>/20</small></div>
+          <div class="cs-sotto">operatori disponibili</div>
+          <div class="barra"><div></div></div>
+          <span class="cs-btn">Componi squadra →</span>
+        </div>
+        <div class="card-squadra bravo">
+          <div class="cs-top"><span class="cs-nome">🔶 BRAVO</span><span class="pill giallo">⚠️ PARZIALE</span></div>
+          <div class="cs-num">12<small>/20</small></div>
+          <div class="cs-sotto">operatori disponibili</div>
+          <div class="barra"><div></div></div>
+          <span class="cs-btn">Componi squadra →</span>
+        </div>
+      </div>
+
+      <div class="sez-attiva">
+        <h3>⚡ Attivazione emergenza</h3>
+        <div class="btn-attiva-row">
+          <div class="btn-attiva alpha">🚨 ATTIVA ALPHA</div>
+          <div class="btn-attiva bravo">🚨 ATTIVA BRAVO</div>
+        </div>
+      </div>
+
+      <div class="riga-stat">
+        <div class="stat"><div class="v">8</div><div class="t">interventi questo mese</div></div>
+        <div class="stat"><div class="v">340<small>/400</small></div><div class="barra"><div style="width:85%;"></div></div><div class="t">ore di addestramento totali</div></div>
+        <div class="stat"><div class="v">87<small>/100</small></div><div class="t">👥 operatori attivi</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 3. ELENCO OPERATORI ============ -->
+<div class="wrap-etichetta"><span class="etichetta">3 · Elenco operatori — da PC</span></div>
+<div class="schermo-wrap">
+  <div class="desktop">
+    <div class="contenuto">
+      <div class="h-pagina">
+        <div>
+          <h2>👥 Gestione Operatori</h2>
+          <div class="sotto">100 operatori registrati</div>
+        </div>
+        <div class="btn-nuovo">➕ Nuovo Operatore</div>
+      </div>
+      <div style="height:20px;"></div>
+      <div class="toolbar">
+        <div class="ricerca">🔍 Cerca per nome, specializzazione…</div>
+        <div class="filtro">Tutte le squadre ▾</div>
+        <div class="filtro">Tutti gli stati ▾</div>
+      </div>
+
+      <div class="grid-op">
+        <div class="card-op alpha">
+          <div class="op-top">
+            <div class="op-avatar alpha">MR</div>
+            <span class="pill verde">🟢 Disponibile</span>
+          </div>
+          <div class="op-nome">Mario Rossi</div>
+          <div class="op-ruolo">Strutturista · NBCR</div>
+          <div class="op-icone">🏗️ ☣️ 🚛 🐕</div>
+          <div class="op-adr">
+            <div class="t">Addestramento 2025</div>
+            <div class="v ok">45/50 ore</div>
+            <div class="barra"><div style="width:90%; background:#10B981;"></div></div>
+          </div>
+          <div class="op-azioni"><span>👁️</span><span>✏️</span><span class="elimina">🗑️</span></div>
+        </div>
+
+        <div class="card-op bravo">
+          <div class="op-top">
+            <div class="op-avatar bravo">LB</div>
+            <span class="pill giallo">🟡 In turno</span>
+          </div>
+          <div class="op-nome">Luca Bianchi</div>
+          <div class="op-ruolo">Operatore SAF · Autista</div>
+          <div class="op-icone">🧯 🚛</div>
+          <div class="op-adr">
+            <div class="t">Addestramento 2025</div>
+            <div class="v ok">50/50 ore</div>
+            <div class="barra"><div style="width:100%; background:#10B981;"></div></div>
+          </div>
+          <div class="op-azioni"><span>👁️</span><span>✏️</span><span class="elimina">🗑️</span></div>
+        </div>
+
+        <div class="card-op">
+          <div class="op-top">
+            <div class="op-avatar neutral">GV</div>
+            <span class="pill" style="background:#FEE2E2; color:#991B1B;">🔴 In ferie</span>
+          </div>
+          <div class="op-nome">Giulia Verdi</div>
+          <div class="op-ruolo">Unità cinofila</div>
+          <div class="op-icone">🐕</div>
+          <div class="op-adr">
+            <div class="t">Addestramento 2025</div>
+            <div class="v ko">18/50 ore</div>
+            <div class="barra"><div style="width:36%; background:#DC2626;"></div></div>
+          </div>
+          <div class="op-azioni"><span>👁️</span><span>✏️</span><span class="elimina">🗑️</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 4. ATTIVAZIONE (mobile) ============ -->
+<div class="wrap-etichetta"><span class="etichetta">4 · Attivazione emergenza — da smartphone</span></div>
+<div class="schermo-wrap">
+  <div class="telefono">
+    <div class="schermata-app">
+      <div class="app-topbar"><span class="indietro">←</span> 🚨 Attivazione</div>
+      <div class="app-corpo">
+        <div class="attiva-titolo">Attivazione emergenza</div>
+        <div class="attiva-sotto">Seleziona la squadra da allertare</div>
+        <div class="attiva-scelta">
+          <div class="btn-attiva alpha">🚨 ALPHA</div>
+          <div class="btn-attiva bravo">🚨 BRAVO</div>
+        </div>
+        <div class="attiva-msg">
+          <div class="et">Messaggio di emergenza (modificabile)</div>
+          🚨 ATTIVAZIONE TEAM ALPHA — Emergenza USAR in provincia di Padova. Convegno: sede di Padova, ore 20:30. Confermare la propria disponibilità.
+        </div>
+        <div class="attiva-invia">📡 INVIA ALLERTA</div>
+        <div class="attiva-nota">Il messaggio viene inviato via Telegram + notifica push</div>
+
+        <div class="risposte">
+          <h4>Risposte in tempo reale — 7/20</h4>
+          <div class="r-row"><span><b>Mario Rossi</b> <span class="ora">risposto 20:32</span></span><span class="pill verde">✅ SÌ</span></div>
+          <div class="r-row"><span><b>Luca Bianchi</b> <span class="ora">risposto 20:33</span></span><span class="pill verde">✅ SÌ</span></div>
+          <div class="r-row"><span><b>Giulia Verdi</b> <span class="ora">risposto 20:34</span></span><span class="pill" style="background:#FEE2E2;color:#991B1B;">❌ NO</span></div>
+          <div class="r-row"><span><b>Paolo Neri</b> <span class="ora">—</span></span><span class="pill" style="background:#E2E8F0;color:#475569;">⏳ In attesa</span></div>
+        </div>
+      </div>
+      <div class="app-nav">
+        <div class="app-nav nav attiva"><span class="ic">🏠</span>Home</div>
+        <div class="nav"><span class="ic">📅</span>Calendario</div>
+        <div class="nav"><span class="ic">🚨</span>Allerta</div>
+        <div class="nav"><span class="ic">👤</span>Profilo</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>Anteprima non definitiva — dati simulati · Nucleo USAR Veneto</footer>
+</body>
+</html>
