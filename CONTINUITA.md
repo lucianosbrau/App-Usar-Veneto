@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 17 ottobre 2025 (sessione 1)
+Ultimo aggiornamento: 18 ottobre 2025
 
 ---
 
@@ -135,7 +135,20 @@ Una volta validata l'app, sarebbe opportuno che **tutti gli utenti accedano con 
 2. Impostare il progetto della web app (PWA) e lo schema del database Supabase
 3. Sviluppare per priorità: autenticazione/ruoli → operatori → disponibilità → squadre → attivazione realtime → addestramento → report/export → PDF → bot Telegram
 
-## 12. Come lavorare con l'utente
+## 12. Skill di conoscenza: `vvf-usar`
+
+Esiste una **skill persistente** (documenti di conoscenza collegati all'account utente, disponibili in ogni sessione tramite `list_skills` → `read_skill`):
+
+- **Nome**: `vvf-usar` (v4) — *Caricare sempre questa skill all'inizio di ogni sessione di lavoro sul progetto.*
+- **Contenuto**: struttura e composizione del modulo USAR Medium CNVVF (38 unità operative + 5 sanitarie), ruoli e specializzazioni obbligatorie (2 strutturisti, 2 NBCR, 4 K9, 2 capisquadra, 2 SAF 2A), squadra assessment, UCC/SCC, e il **modello del documento "COMPOSIZIONE TEAM USAR VENETO"** (sezioni 1-38, regole di impaginazione e compilazione per il PDF Manifesto)
+- Fonti: Manuale Formazione USAR Medium CNVVF 2024, SGO USAR 2021, INSARAG 2020
+
+**Conseguenze per l'app**:
+- La "copertura requisiti" dell'attivazione si basa sulle specializzazioni obbligatorie del modulo Medium
+- Il PDF Manifesto segue il modello a 38 voci progressivi per sezioni (Direz. e Comando 1-6, Valut. e Sicurezza 7-10, Ricerca 11-16, Soccorso 2 turnazioni 17-32, Logistica 33-38); nomi in MAIUSCOLO, ordine logico 33-38
+- **Da chiarire con l'utente**: come si dividono Alpha e Bravo rispetto al modulo da 38 (Alpha = assetto completo? Bravo = secondo assetto/riserva?)
+
+## 13. Come lavorare con l'utente
 
 - L'utente **non è programmatore**: gestire GitHub in autonomia (commit, merge, PR) e spiegare in linguaggio semplice cosa è stato fatto
 - L'utente deve dare **OK esplicito** prima di toccare codice o procedere con sviluppi; registrare requisiti senza implementare quando chiede solo di "registrare"
