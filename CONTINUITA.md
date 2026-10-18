@@ -41,6 +41,7 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 | Disponibilità | Operatore | Disponibilità, ferie, indisponibilità |
 | Attivazione | Admin | Lancio emergenza ALPHA/BRAVO, messaggio modificabile prima dell'invio |
 | Addestramento | Admin + Operatore (proprio) | Registro ore annue, evidenziazione sotto-soglia, storico per anno |
+| Internazionale | Admin + Operatore (proprio) | Operatori **abilitati alle missioni internazionali** e relative **vaccinazioni** (registro abilitazioni, stato vaccinazioni e scadenze) |
 | Report/Statistiche | Admin | Statistiche personali e di intervento, export Excel/CSV |
 | Resoconti | Admin | Storico attivazioni: allertati, SÌ, NO, nessuna risposta, orari |
 | Profilo | Tutti | Dati personali, specializzazioni e abilitazioni |
