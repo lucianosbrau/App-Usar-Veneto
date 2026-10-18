@@ -151,9 +151,13 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 ### Manifesto — flusso di compilazione deciso (in linea di massima, da rifinire)
 
 1. L'admin verifica il raggiungimento delle 38 unità (eventualmente spostando personale da Bravo o dalle Riserve ad Alpha, come da requisito del click sul nome)
-2. Si apre la **maschera di compilazione del manifesto**: per ognuna delle 38 funzioni, l'admin assegna una persona da un **elenco a discesa**; l'elenco **esclude automaticamente chi è già stato inserito in altre funzioni** ( fattibile senza problemi)
-3. Esportazione **PDF** secondo il modello `modello-team-alpha.md` (38 voci, sezioni, maiuscolo, ordine logico 33-38)
-4. Invio del PDF su chat Telegram: **opzionale, da verificare** (l'utente non è sicuro di volerla). Tecnica: fattibile — il bot può inviare documenti a chat/gruppi —; si deciderà se attivarla per gruppo, solo admin, o disattivata
+2. All'apertura della maschera di compilazione, l'app **chiede se effettuare compilazione automatica o manuale**
+3. Se **automatica**: l'app precompila le 38 funzioni partendo dalle risposte SÌ e dalle specializzazioni di ciascuno; l'admin corregge solo dove serve. Se **manuale**: elenco a discesa per ogni funzione
+4. **Elenchi a discesa intelligenti**: escludono automaticamente chi è già inserito in altre funzioni e mostrano **prima gli idonei** alla specifica funzione (strutturisti per "Strutturista", K9 per "Unità cinofila", ecc.). Le funzioni obbligatorie (2 strutturisti, 2 NBCR, 4 K9, 2 capisquadra, 2 SAF 2A) sono evidenziate: il manifesto non è completo finché non sono coperte
+5. **Validazione in tempo reale**: indicatore tipo "34/38 — mancano: 1 NBCR, 2 soccorritori, 1 logista"; esportazione incompleta possibile solo con conferma esplicita
+6. **No drag & drop** nella maschera manifesto (scartato dall'utente — su mobile i menu a discesa sono più affidabili)
+7. Esportazione **PDF** secondo il modello `modello-team-alpha.md` (38 voci, sezioni, maiuscolo, ordine logico 33-38)
+8. Invio del PDF su chat Telegram: **opzionale, da verificare** (l'utente non è sicuro di volerla). Tecnica: fattibile — il bot può inviare documenti a chat/gruppi —; si deciderà se attivarla per gruppo, solo admin, o disattivata
 
 ## 13. Come lavorare con l'utente
 
