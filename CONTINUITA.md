@@ -155,9 +155,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 3. Se **automatica**: l'app precompila le 38 funzioni partendo dalle risposte SÌ e dalle specializzazioni di ciascuno; l'admin corregge solo dove serve. Se **manuale**: elenco a discesa per ogni funzione
 4. **Elenchi a discesa intelligenti**: escludono automaticamente chi è già inserito in altre funzioni e mostrano **prima gli idonei** alla specifica funzione (strutturisti per "Strutturista", K9 per "Unità cinofila", ecc.). Le funzioni obbligatorie (2 strutturisti, 2 NBCR, 4 K9, 2 capisquadra, 2 SAF 2A) sono evidenziate: il manifesto non è completo finché non sono coperte
 5. **Validazione in tempo reale**: indicatore tipo "34/38 — mancano: 1 NBCR, 2 soccorritori, 1 logista"; esportazione incompleta possibile solo con conferma esplicita
-6. **No drag & drop** nella maschera manifesto (scartato dall'utente — su mobile i menu a discesa sono più affidabili)
-7. Esportazione **PDF** secondo il modello `modello-team-alpha.md` (38 voci, sezioni, maiuscolo, ordine logico 33-38)
-8. Invio del PDF su chat Telegram: **opzionale, da verificare** (l'utente non è sicuro di volerla). Tecnica: fattibile — il bot può inviare documenti a chat/gruppi —; si deciderà se attivarla per gruppo, solo admin, o disattivata
+6. **Modifica post-compilazione automatica** (requisito importante, registrato dall'utente): dopo una compilazione automatica, per correggere un singolo posto **non si deve prima liberare il nominativo** che serve (es. non si deve prima toglierlo dal posto dove l'auto-compilatore lo ha messo per trovarlo nell'elenco di un altro posto). Gli elenchi a discesa devono mostrare **tutti i nomi ancora disponibili** (non ancora assegnati ad alcun posto). Ogni posto ha accanto un **pulsante "clear"** che toglie il nominativo da quel posto e lo rimette tra i disponibili. In sintesi: auto-compilazione → correzioni facili: clear sul posto sbagliato + scelta del nome giusto nell'elenco a discesa (che mostra tutti i liberi)
+7. **No drag & drop** nella maschera manifesto (scartato dall'utente — su mobile i menu a discesa sono più affidabili)
+8. Esportazione **PDF** secondo il modello `modello-team-alpha.md` (38 voci, sezioni, maiuscolo, ordine logico 33-38)
+9. Invio del PDF su chat Telegram: **opzionale, da verificare** (l'utente non è sicuro di volerla). Tecnica: fattibile — il bot può inviare documenti a chat/gruppi —; si deciderà se attivarla per gruppo, solo admin, o disattivata
 
 ## 13. Come lavorare con l'utente
 
