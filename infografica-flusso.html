@@ -46,6 +46,9 @@
     font-size: 24px; font-weight: 800;
   }
   .freccia-giu { color: #B22222; font-size: 26px; line-height: 1.4; font-weight: 700; }
+  .dispositivo { margin-top: 6px; display: flex; gap: 4px; justify-content: center; }
+  .dispositivo span { font-size: 17px; line-height: 1; }
+  .dispositivo .etich-disp { display: block; font-size: 9px; color: #94A3B8; margin-top: 3px; text-align: center; letter-spacing: 0.3px; width: 56px; }
   .box {
     background: #ffffff;
     border: 1px solid #CBD5E1;
@@ -89,7 +92,7 @@
     <h1>APP USAR VENETO</h1>
     <p>FLUSSO OPERATIVO — DALL'ALLERTA AL MANIFESTO</p>
   </div>
-  <div class="loghi"><img src="assets/logo-vvf.jpg" alt="Corpo Nazionale Vigili del Fuoco"></div>
+  <div class="loghi"><img src="assets/logo-vvf.png" alt="Corpo Nazionale Vigili del Fuoco"></div>
 </div>
 <div class="tricolore"><div class="verde"></div><div class="bianco"></div><div class="rosso"></div></div>
 
@@ -98,7 +101,8 @@
   <div class="sezione-titolo"><span>FASE 1 — ATTIVAZIONE</span></div>
 
   <div class="fase">
-    <div class="numero-cella"><div class="numero">1</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="numero-cella"><div class="numero">1</div>
+<div class="dispositivo"><span>🖥️</span><span>📱</span><span class="etich-disp">PC · mobile</span></div><div class="freccia-giu">&#8595;</div></div>
     <div class="box">
       <h2>Lancio dell'attivazione</h2>
       <p>L'admin seleziona <b>ATTIVA ALPHA</b> o <b>ATTIVA BRAVO</b>, modifica il messaggio di emergenza se necessario e invia l'allerta.</p>
@@ -106,7 +110,8 @@
   </div>
 
   <div class="fase">
-    <div class="numero-cella"><div class="numero">2</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="numero-cella"><div class="numero">2</div>
+<div class="dispositivo"><span>📱</span><span>☁️</span><span class="etich-disp">mobile · server esterno</span></div><div class="freccia-giu">&#8595;</div></div>
     <div class="box">
       <h2>Doppio canale di allertamento</h2>
       <p>Ogni operatore riceve l'allerta simultaneamente via <b>Bot Telegram</b> (gruppo + Mini App) e <b>notifica push</b> della PWA.</p>
@@ -114,7 +119,8 @@
   </div>
 
   <div class="fase">
-    <div class="numero-cella"><div class="numero">3</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="numero-cella"><div class="numero">3</div>
+<div class="dispositivo"><span>📱</span><span class="etich-disp">mobile</span></div><div class="freccia-giu">&#8595;</div></div>
     <div class="box">
       <h2>Risposta dell'operatore</h2>
       <p>Ogni operatore risponde <b>&#10004; SÌ</b> o <b>&#10006; NO</b> da Telegram o dall'app. Il sistema registra la risposta e l'orario.</p>
@@ -124,7 +130,8 @@
   <div class="sezione-titolo"><span>FASE 2 — COMPOSIZIONE</span></div>
 
   <div class="fase">
-    <div class="numero-cella"><div class="numero">4</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="numero-cella"><div class="numero">4</div>
+<div class="dispositivo"><span>🖥️</span><span class="etich-disp">PC desktop</span></div><div class="freccia-giu">&#8595;</div></div>
     <div class="box">
       <h2>Monitoraggio in tempo reale</h2>
       <p>La dashboard mostra risposte e copertura dei requisiti del modulo aggiornate istante per istante: nome, orario, SÌ/NO, icone delle specializzazioni.</p>
@@ -133,7 +140,8 @@
   </div>
 
   <div class="fase">
-    <div class="numero-cella"><div class="numero">5</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="numero-cella"><div class="numero">5</div>
+<div class="dispositivo"><span>🖥️</span><span>📱</span><span class="etich-disp">PC · mobile</span></div><div class="freccia-giu">&#8595;</div></div>
     <div class="box">
       <h2>Raggiungimento delle 38 unità</h2>
       <p>Se mancano qualifiche, l'admin clicca sul nome di un operatore di <b>squadra Bravo</b> o delle <b>Riserve</b> e lo sposta in Alpha. La copertura si aggiorna in tempo reale.</p>
@@ -143,7 +151,8 @@
   <div class="sezione-titolo"><span>FASE 3 — MANIFESTO</span></div>
 
   <div class="fase">
-    <div class="numero-cella"><div class="numero">6</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="numero-cella"><div class="numero">6</div>
+<div class="dispositivo"><span>📱</span><span>🖥️</span><span class="etich-disp">mobile · PC</span></div><div class="freccia-giu">&#8595;</div></div>
     <div class="box">
       <h2>Compilazione del Manifesto</h2>
       <p>L'app chiede <b>compilazione automatica</b> (precompila le 38 funzioni in base alle specializzazioni) o <b>manuale</b> (elenchi a discesa che escludono i già assegnati e propongono prima gli idonei).</p>
@@ -152,7 +161,8 @@
   </div>
 
   <div class="fase">
-    <div class="numero-cella"><div class="numero">7</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="numero-cella"><div class="numero">7</div>
+<div class="dispositivo"><span>📱</span><span>☁️</span><span class="etich-disp">mobile · server esterno</span></div><div class="freccia-giu">&#8595;</div></div>
     <div class="box">
       <h2>Esportazione PDF</h2>
       <p>Il <b>Manifesto del personale</b> viene generato in PDF secondo il modello ufficiale: 38 voci, sezioni, nomi in maiuscolo, loghi in testata. Invio su Telegram opzionale.</p>
@@ -162,7 +172,8 @@
   <div class="sezione-titolo"><span>FASE 4 — POST INTERVENTO</span></div>
 
   <div class="fase">
-    <div class="numero-cella"><div class="numero">8</div></div>
+    <div class="numero-cella"><div class="numero">8</div>
+<div class="dispositivo"><span>🖥️</span><span class="etich-disp">PC desktop</span></div></div>
     <div class="box">
       <h2>Resoconti e statistiche</h2>
       <p>Storico dell'attivazione: allertati, SÌ, NO, nessuna risposta, orari. Statistiche del personale ed export <b>Excel/CSV</b>.</p>
