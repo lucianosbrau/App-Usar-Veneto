@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 19 ottobre 2025
+Ultimo aggiornamento: 19 ottobre 2026
 
 ---
 
@@ -181,7 +181,7 @@ Il piano Free sospende il progetto dopo **7 giorni di inattività** (nessuna ric
 
 ## 11. Stato della sessione e prossimi passi
 
-**Situazione a fine sessione del 19 ottobre 2025**: tutte le decisioni fino a qui sono registrate; l'utente sta creando il **progetto Supabase** (URL + chiave anonima). Il codice vera inizia al suo arrivo.
+**Situazione a fine sessione del 19 ottobre 2026**: tutte le decisioni fino a qui sono registrate; l'utente sta creando il **progetto Supabase** (URL + chiave anonima). Il codice vera inizia al suo arrivo.
 
 **Decisioni prese in questa sessione** (già riflesse sopra e nei file):
 - ~250 operatori (aggiornato ovunque); nessun problema tecnico: Supabase Free ampiamente sufficiente
