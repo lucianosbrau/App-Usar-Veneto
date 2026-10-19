@@ -146,7 +146,7 @@ Il blu è stato eliminato ovunque. Guardando gli screenshot VVF confermati dall'
 
 ## 9. Stato del repository
 
-**Infografica del flusso operativo**: richiesta dall'utente un'infografica simile a "BUSSOLA ONLINE" (Drive, cartella BUSSOLA DISTRIBUITA) che descriva il workflow dell'app — ma con **meno elementi** (l'originale è troppo confusionaria) e **stile essenziale** con i loghi e i colori del progetto (rosso #B22222, tricolore, bianco; loghi in `assets/logo-usar.jpg` e `assets/logo-vvf.jpg`). File: `infografica-flusso.html`.
+**Infografica del flusso operativo**: richiesta dall'utente un'infografica simile a "BUSSOLA ONLINE" (Drive, cartella BUSSOLA DISTRIBUITA) che descriva il workflow dell'app — ma con **meno elementi** (l'originale è troppo confusionaria) e **stile essenziale** con i colori del progetto (rosso #B22222, tricolore, bianco; solo logo USAR in `assets/logo-usar.jpg` — **logo VVF rimosso su richiesta dell'utente: meglio senza**). File: `infografica-flusso.html`.
 
 - File: `README.md`, `presentazione.html` (panoramica progetto), `anteprima-schermate.html` (mockup 4 schermate con dati finti), `CONTINUITA.md` (questo documento)
 - GitHub Pages attivo su `main`: ogni file HTML committato è visibile a https://lucianosbrau.github.io/App-Usar-Veneto/<file>
