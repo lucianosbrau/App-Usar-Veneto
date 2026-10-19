@@ -35,7 +35,6 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 | Pagina | Chi la vede | Cosa fa |
 |---|---|---|
 | Dashboard | Tutti | Panoramica generale, attivazione rapida (admin) |
-| Operatori | Admin | Gestione completa: ricerca, filtri, dettaglio, modifica, inserimento |
 | Squadre | Admin | Composizione Alpha/Bravo: proposta automatica + drag & drop (dnd-kit) |
 | Calendario | Tutti | Turni mensili, pubblicazione e invio via Telegram |
 | Disponibilità | Operatore | Disponibilità, ferie, indisponibilità |
@@ -45,6 +44,10 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 | Report/Statistiche | Admin | Statistiche personali e di intervento, export Excel/CSV |
 | Resoconti | Admin | Storico attivazioni: allertati, SÌ, NO, nessuna risposta, orari |
 | Profilo | Tutti | Dati personali, specializzazioni e abilitazioni |
+
+**Dashboard — grafici a torta (deciso dall'utente)**: nella pagina principale, prima dell'attivazione, due torte:
+- **Personale per Comando** (numero, diviso per provincia)
+- **Personale per turno** (A, B, C, D — a prescindere dal Comando)
 
 ## 4. Ruoli
 
@@ -82,6 +85,8 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 
 **RIDEFINITO DALL'UTENTE — ora si chiama "MANTENIMENTI"** (non più "addestramenti"):
 
+**Soglia decisa dall'utente: 36 ore annue** per ciascun operatore (evidenziazione sotto-soglia rosso/giallo rispetto alle 36 ore).
+
 - Ogni operatore inserisce da solo i propri mantenimenti (autocertificazione, nessuna approvazione admin)
 - Nella sezione Mantenimenti dell'operatore: funzione **"Aggiungi ore mantenimento"** con campi:
   - **Cognome, Nome** — in automatico dal login utente (non editabili)
@@ -90,7 +95,7 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
   - **Argomento/Attività svolta**
   - **Ore prestate**
 - **Validazione obbligatoria**: se manca un dato, l'inserimento dà **errore** e **evidenzia i campi mancanti**
-- Resta da definire: ore minime annue (soglia per evidenziazione rossa/gialla) e chi la configura
+- Chi configura la soglia: da definire (fisso a 36 per ora)
 
 ### Registrazione dell'operatore al bot Telegram (decisa, illustrata in `presentazione.html`)
 
@@ -108,6 +113,15 @@ La sezione conterrà gli **operatori abilitati alle missioni internazionali** e 
 ### Autenticazione — indicazione dell'utente (per la messa in produzione)
 
 Una volta validata l'app, sarebbe opportuno che **tutti gli utenti accedano con credenziali già in possesso: nome utente e password degli applicativi del Corpo Nazionale** (SSO / integrazione con il sistema di autenticazione istituzionale del corpo). Da verificare in fase di validazione: che sistema di identità usa il corpo (LDAP/Active Directory, SSO, altro) e se/come Supabase Auth possa integrarcisi. Nella fase di sviluppo iniziale si procederà comunque con l'autenticazione nativa di Supabase (email + password), progettata per essere sostituibile.
+
+### Dati anagrafici nel database (deciso dall'utente)
+
+Oltre a cognome e nome, il database conterrà:
+- **Codice fiscale**
+- **Comando di appartenenza** (diviso per provincia)
+- **Sede di servizio**
+- **Turno** (A, B, C, D)
+- **Salto turno** (ogni lettera del turno affiancata da un numero da 1 a 8, es. A2, A5, C3)
 
 ## 7. Report e resoconti
 
@@ -131,6 +145,8 @@ Il blu è stato eliminato ovunque. Guardando gli screenshot VVF confermati dall'
 - Simulazioni complete in `anteprima-schermate.html`; panoramica in `presentazione.html`
 
 ## 9. Stato del repository
+
+**Infografica del flusso operativo**: richiesta dall'utente un'infografica simile a "BUSSOLA ONLINE" (Drive, cartella BUSSOLA DISTRIBUITA) che descriva il workflow dell'app — ma con **meno elementi** (l'originale è troppo confusionaria) e **stile essenziale** con i loghi e i colori del progetto (rosso #B22222, tricolore, bianco; loghi in `assets/logo-usar.jpg` e `assets/logo-vvf.jpg`). File: `infografica-flusso.html`.
 
 - File: `README.md`, `presentazione.html` (panoramica progetto), `anteprima-schermate.html` (mockup 4 schermate con dati finti), `CONTINUITA.md` (questo documento)
 - GitHub Pages attivo su `main`: ogni file HTML committato è visibile a https://lucianosbrau.github.io/App-Usar-Veneto/<file>

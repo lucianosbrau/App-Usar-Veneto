@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App USAR Veneto — Flusso operativo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Roboto', Arial, sans-serif;
+    background: #ffffff;
+    color: #1E293B;
+    padding: 0 0 60px 0;
+  }
+  .header {
+    background: #B22222;
+    padding: 28px 40px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .header .loghi { display: flex; align-items: center; gap: 20px; }
+  .header img { height: 72px; width: auto; }
+  .header .titolo { text-align: center; flex: 1; }
+  .header h1 { color: #ffffff; font-size: 30px; letter-spacing: 2px; font-weight: 800; }
+  .header p { color: #FFE9E9; font-size: 14px; margin-top: 4px; letter-spacing: 1px; }
+  .tricolore { display: flex; height: 6px; }
+  .tricolore div { flex: 1; }
+  .tricolore .verde { background: #008C45; }
+  .tricolore .bianco { background: #ffffff; }
+  .tricolore .rosso { background: #CD212A; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 24px 0; }
+  .sottotitolo {
+    text-align: center; color: #64748B; font-size: 15px; margin-bottom: 36px;
+  }
+  .fase {
+    display: flex; align-items: flex-start; gap: 20px;
+    margin-bottom: 8px;
+  }
+  .numero-cella { flex: 0 0 56px; display: flex; flex-direction: column; align-items: center; }
+  .numero {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #B22222; color: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 800;
+  }
+  .freccia-giu { color: #B22222; font-size: 26px; line-height: 1.4; font-weight: 700; }
+  .box {
+    background: #ffffff;
+    border: 1px solid #CBD5E1;
+    border-left: 5px solid #B22222;
+    border-radius: 12px;
+    padding: 18px 22px;
+    flex: 1;
+    box-shadow: 0 2px 6px rgba(30,41,59,0.06);
+  }
+  .box h2 { font-size: 18px; color: #B22222; margin-bottom: 6px; font-weight: 700; }
+  .box p { font-size: 14px; color: #334155; line-height: 1.55; }
+  .box .tag {
+    display: inline-block; margin-top: 8px; margin-right: 6px;
+    background: #F8FAFC; border: 1px solid #CBD5E1; color: #475569;
+    border-radius: 999px; font-size: 12px; padding: 3px 12px;
+  }
+  .sezione-titolo {
+    margin: 36px 0 18px;
+    text-align: center;
+  }
+  .sezione-titolo span {
+    background: #B22222; color: #ffffff;
+    padding: 8px 28px; border-radius: 999px;
+    font-size: 15px; font-weight: 700; letter-spacing: 1px;
+  }
+  .footer {
+    margin-top: 48px; text-align: center; color: #94A3B8; font-size: 12px;
+  }
+  @media (max-width: 640px) {
+    .header { flex-direction: column; }
+    .header img { height: 56px; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="loghi"><img src="assets/logo-usar.jpg" alt="Logo USAR"></div>
+  <div class="titolo">
+    <h1>APP USAR VENETO</h1>
+    <p>FLUSSO OPERATIVO — DALL'ALLERTA AL MANIFESTO</p>
+  </div>
+  <div class="loghi"><img src="assets/logo-vvf.jpg" alt="Corpo Nazionale Vigili del Fuoco"></div>
+</div>
+<div class="tricolore"><div class="verde"></div><div class="bianco"></div><div class="rosso"></div></div>
+
+<div class="wrap">
+
+  <div class="sezione-titolo"><span>FASE 1 — ATTIVAZIONE</span></div>
+
+  <div class="fase">
+    <div class="numero-cella"><div class="numero">1</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="box">
+      <h2>Lancio dell'attivazione</h2>
+      <p>L'admin seleziona <b>ATTIVA ALPHA</b> o <b>ATTIVA BRAVO</b>, modifica il messaggio di emergenza se necessario e invia l'allerta.</p>
+    </div>
+  </div>
+
+  <div class="fase">
+    <div class="numero-cella"><div class="numero">2</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="box">
+      <h2>Doppio canale di allertamento</h2>
+      <p>Ogni operatore riceve l'allerta simultaneamente via <b>Bot Telegram</b> (gruppo + Mini App) e <b>notifica push</b> della PWA.</p>
+    </div>
+  </div>
+
+  <div class="fase">
+    <div class="numero-cella"><div class="numero">3</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="box">
+      <h2>Risposta dell'operatore</h2>
+      <p>Ogni operatore risponde <b>&#10004; SÌ</b> o <b>&#10006; NO</b> da Telegram o dall'app. Il sistema registra la risposta e l'orario.</p>
+    </div>
+  </div>
+
+  <div class="sezione-titolo"><span>FASE 2 — COMPOSIZIONE</span></div>
+
+  <div class="fase">
+    <div class="numero-cella"><div class="numero">4</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="box">
+      <h2>Monitoraggio in tempo reale</h2>
+      <p>La dashboard mostra risposte e copertura dei requisiti del modulo aggiornate istante per istante: nome, orario, SÌ/NO, icone delle specializzazioni.</p>
+      <span class="tag">Supabase Realtime</span><span class="tag">Copertura requisiti</span>
+    </div>
+  </div>
+
+  <div class="fase">
+    <div class="numero-cella"><div class="numero">5</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="box">
+      <h2>Raggiungimento delle 38 unità</h2>
+      <p>Se mancano qualifiche, l'admin clicca sul nome di un operatore di <b>squadra Bravo</b> o delle <b>Riserve</b> e lo sposta in Alpha. La copertura si aggiorna in tempo reale.</p>
+    </div>
+  </div>
+
+  <div class="sezione-titolo"><span>FASE 3 — MANIFESTO</span></div>
+
+  <div class="fase">
+    <div class="numero-cella"><div class="numero">6</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="box">
+      <h2>Compilazione del Manifesto</h2>
+      <p>L'app chiede <b>compilazione automatica</b> (precompila le 38 funzioni in base alle specializzazioni) o <b>manuale</b> (elenchi a discesa che escludono i già assegnati e propongono prima gli idonei).</p>
+      <span class="tag">Validazione "34/38 — mancano: 1 NBCR…"</span>
+    </div>
+  </div>
+
+  <div class="fase">
+    <div class="numero-cella"><div class="numero">7</div><div class="freccia-giu">&#8595;</div></div>
+    <div class="box">
+      <h2>Esportazione PDF</h2>
+      <p>Il <b>Manifesto del personale</b> viene generato in PDF secondo il modello ufficiale: 38 voci, sezioni, nomi in maiuscolo, loghi in testata. Invio su Telegram opzionale.</p>
+    </div>
+  </div>
+
+  <div class="sezione-titolo"><span>FASE 4 — POST INTERVENTO</span></div>
+
+  <div class="fase">
+    <div class="numero-cella"><div class="numero">8</div></div>
+    <div class="box">
+      <h2>Resoconti e statistiche</h2>
+      <p>Storico dell'attivazione: allertati, SÌ, NO, nessuna risposta, orari. Statistiche del personale ed export <b>Excel/CSV</b>.</p>
+    </div>
+  </div>
+
+  <div class="footer">Nucleo USAR Veneto — App di gestione squadre, mantenimenti e attivazioni</div>
+</div>
+
+</body>
+</html>
