@@ -186,6 +186,12 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 5. **Validazione in tempo reale**: indicatore tipo "34/38 — mancano: 1 NBCR, 2 soccorritori, 1 logista"; esportazione incompleta possibile solo con conferma esplicita
 6. **Modifica post-compilazione automatica** (requisito importante, registrato dall'utente): dopo una compilazione automatica, per correggere un singolo posto **non si deve prima liberare il nominativo** che serve (es. non si deve prima toglierlo dal posto dove l'auto-compilatore lo ha messo per trovarlo nell'elenco di un altro posto). Gli elenchi a discesa devono mostrare **tutti i nomi ancora disponibili** (non ancora assegnati ad alcun posto). Ogni posto ha accanto un **pulsante "clear"** che toglie il nominativo da quel posto e lo rimette tra i disponibili. **Chiarito dall'utente**: se si seleziona direttamente dall'elenco a discesa un nominativo già assegnato ad altro posto (senza prima fare clear), l'app lo **sposta automaticamente**: il nuovo posto riceve il nominativo e il posto precedente si svuota da solo. In sintesi: auto-compilazione → correzioni facili: clear sul posto sbagliato + scelta del nome giusto nell'elenco a discesa (che mostra tutti i liberi)
 7. **No drag & drop** nella maschera manifesto (scartato dall'utente — su mobile i menu a discesa sono più affidabili)
+
+**Colori delle schede sezione del manifesto (decisi dall'utente)**:
+- **Direzione e Comando**: blu (#2563EB)
+- **Valutazione e Sicurezza**: senape (#C99700)
+- **Operazioni (Ricerca e Soccorso)**: rosso (#B22222)
+- **Logistica**: giallo limone (#EDE614, testo scuro)
 8. Esportazione **PDF** secondo il modello `modello-team-alpha.md` (38 voci, sezioni, maiuscolo, ordine logico 33-38)
 9. Invio del PDF su chat Telegram: **opzionale, da verificare** (l'utente non è sicuro di volerla). Tecnica: fattibile — il bot può inviare documenti a chat/gruppi —; si deciderà se attivarla per gruppo, solo admin, o disattivata
 

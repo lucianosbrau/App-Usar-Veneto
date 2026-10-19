@@ -186,11 +186,12 @@
   .mani-scelta { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
   .mani-scelta .opt { background:#fff; border:2px solid var(--bordo); border-radius:12px; padding:14px; text-align:center; font-size:14px; font-weight:700; color:var(--antracite); }
   .mani-scelta .opt.selected { border-color:var(--royal); background:#EFF6FF; color:var(--royal-dark); }
-  .mani-sez { background:#fff; border-radius:14px; padding:18px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-bottom:20px; border:1px solid var(--bordo); border-top:5px solid var(--royal); }
-  .mani-sez h5 { font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#fff; margin:-18px -16px 14px; padding:10px 16px; background:var(--royal); border-radius:14px 14px 0 0; text-align:center; }
-  .mani-sez.aranc h5 { background:var(--arancio); } .mani-sez.aranc { border-top-color:var(--arancio); }
-  .mani-sez.verde2 h5 { background:#059669; } .mani-sez.verde2 { border-top-color:#059669; }
-  .mani-sez.viola2 h5 { background:#7C3AED; } .mani-sez.viola2 { border-top-color:#7C3AED; }
+  .mani-sez { background:#fff; border-radius:14px; padding:18px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-bottom:20px; border:1px solid var(--bordo); border-top:5px solid #2563EB; }
+  .mani-sez h5 { font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#fff; margin:-18px -16px 14px; padding:10px 16px; background:#2563EB; border-radius:14px 14px 0 0; text-align:center; }
+  .mani-sez.aranc h5 { background:#B22222; } .mani-sez.aranc { border-top-color:#B22222; }
+  .mani-sez.verde2 h5 { background:#C99700; } .mani-sez.verde2 { border-top-color:#C99700; }
+  .mani-sez.viola2 h5 { background:#B22222; } .mani-sez.viola2 { border-top-color:#B22222; }
+  .mani-sez.limone h5 { background:#EDE614; color:#1E293B; } .mani-sez.limone { border-top-color:#EDE614; }
   .mani-row { display:grid; grid-template-columns:36px 1fr auto 30px; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--perla); }
   .mani-row:last-child { border-bottom:none; }
   .mani-num { width:30px; height:30px; border-radius:50%; background:var(--notte); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
@@ -647,7 +648,7 @@
           <div class="mani-row"><span class="mani-num">25-32</span><span class="mani-ruolo">Turnazione 2</span><span class="mani-dd">7 assegnati su 8 <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
         </div>
 
-        <div class="mani-sez aranc">
+        <div class="mani-sez limone">
           <h5>Logistica (33-38)</h5>
           <div class="mani-row"><span class="mani-num">33</span><span class="mani-ruolo">Capo Logistica</span><span class="mani-dd">BILLIO D. <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
           <div class="mani-row"><span class="mani-num">34-37</span><span class="mani-ruolo">Vice e addetti logistica</span><span class="mani-dd">RUBIN · LORENZET · FRISO · CREMA <span class="fre">▾</span></span><button class="mani-clear" title="Svuota posto">✕</button></div>
