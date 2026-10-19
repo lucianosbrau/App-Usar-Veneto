@@ -158,6 +158,10 @@ Il blu è stato eliminato ovunque. Guardando gli screenshot VVF confermati dall'
 - Dati personali e potenzialmente delicati (vaccinazioni, abilitazioni): prima della messa in produzione serve verifica specifica **GDPR** (ruoli di accesso, conservazione, backup). Server UE aiuta ma **non è conformità automatica**
 - Da verificare: database attualmente utilizzato dall'utente (Google Sheets / Excel / SQL / AppSheet) per riutilizzare i dati esistenti senza reinserirli
 
+### Pausa inattività Supabase — soluzione decisa (keep-alive)
+
+Il piano Free sospende il progetto dopo **7 giorni di inattività** (nessuna richiesta/login/API). In emergenza la riattivazione richiede pochi minuti — inaccettabile. Soluzione: **keep-alive con GitHub Actions cron** nel repo dell'app — un workflow gira ogni 5-6 giorni e fa una lettura semplice al database (es. `SELECT count(*)`), impedendo la pausa. Gratuito, zero manutenzione, disattivabile se si passa al Pro. Alternativa da valutare: il bot Telegram in polling tocca il DB a ogni giro. Da implementare quando si crea il progetto Supabase.
+
 ## 11. Prossimi passi (in ordine)
 
 1. Ottenere dall'utente: logo ufficiale, modello grafico del Manifesto PDF, database esistente, risposte alle 3 domande dell'addestramento (sez. 6), elenco definitivo requisiti Alpha/Bravo
