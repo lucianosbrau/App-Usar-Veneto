@@ -40,7 +40,7 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 | Calendario | Tutti | Turni mensili, pubblicazione e invio via Telegram |
 | Disponibilità | Operatore | Disponibilità, ferie, indisponibilità |
 | Attivazione | Admin | Lancio emergenza ALPHA/BRAVO, messaggio modificabile prima dell'invio |
-| Addestramento | Admin + Operatore (proprio) | Registro ore annue, evidenziazione sotto-soglia, storico per anno |
+| Mantenimenti | Operatore (propri, autocertificati) | Inserimento ore con tipo (Mantenimento, Manovra, Intervento, Lavorazione, Tutor Mantenimento, Tutor Corso, Altra formazione), evidenziazione sotto-soglia, storico per anno |
 | Internazionale | Admin + Operatore (proprio) | Operatori **abilitati alle missioni internazionali** e relative **vaccinazioni** (registro abilitazioni, stato vaccinazioni e scadenze) |
 | Report/Statistiche | Admin | Statistiche personali e di intervento, export Excel/CSV |
 | Resoconti | Admin | Storico attivazioni: allertati, SÌ, NO, nessuna risposta, orari |
@@ -80,10 +80,17 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 - Storico confrontabile anno per anno
 - Export Excel/CSV
 
-**Domande aperte**:
-1. Quante ore minime all'anno per operatore?
-2. Gli addestramenti li inserisce l'admin o li autocertifica l'operatore (con approvazione admin)?
-3. Esistono tipi di addestramento diversi (NBCR, SAF, cinofilo, guida...) con requisiti diversi?
+**RIDEFINITO DALL'UTENTE — ora si chiama "MANTENIMENTI"** (non più "addestramenti"):
+
+- Ogni operatore inserisce da solo i propri mantenimenti (autocertificazione, nessuna approvazione admin)
+- Nella sezione Mantenimenti dell'operatore: funzione **"Aggiungi ore mantenimento"** con campi:
+  - **Cognome, Nome** — in automatico dal login utente (non editabili)
+  - **Data mantenimento**
+  - **Tipo mantenimento** — elenco a discesa con causali fisse: **Mantenimento, Manovra, Intervento, Lavorazione, Tutor Mantenimento, Tutor Corso, Altra formazione**
+  - **Argomento/Attività svolta**
+  - **Ore prestate**
+- **Validazione obbligatoria**: se manca un dato, l'inserimento dà **errore** e **evidenzia i campi mancanti**
+- Resta da definire: ore minime annue (soglia per evidenziazione rossa/gialla) e chi la configura
 
 ### Registrazione dell'operatore al bot Telegram (decisa, illustrata in `presentazione.html`)
 

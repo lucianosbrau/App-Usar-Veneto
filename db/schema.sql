@@ -58,12 +58,14 @@ create table risposte_attivazione (
   unique (attivazione_id, operatore_id)
 );
 
-create table addestramenti (
+create table mantenimenti (
   id serial primary key,
   operatore_id uuid not null references profili(id) on delete cascade,
   data date not null,
-  tipo text not null,
-  ore numeric(4,1) not null check (ore > 0)
+  tipo text not null check (tipo in ('Mantenimento', 'Manovra', 'Intervento', 'Lavorazione', 'Tutor Mantenimento', 'Tutor Corso', 'Altra formazione')),
+  argomento text not null,
+  ore numeric(4,1) not null check (ore > 0),
+  inserito_il timestamptz not null default now()
 );
 
 create table manifesti (
@@ -81,7 +83,7 @@ alter table operatori_specializzazioni enable row level security;
 alter table disponibilita enable row level security;
 alter table attivazioni enable row level security;
 alter table risposte_attivazione enable row level security;
-alter table addestramenti enable row level security;
+alter table mantenimenti enable row level security;
 alter table manifesti enable row level security;
 
 create policy "lettura profili" on profili for select using (true);
@@ -98,4 +100,8 @@ create policy "lettura risposte" on risposte_attivazione for select using (true)
 create policy "propria risposta" on risposte_attivazione for insert
   with check (operatore_id = auth.uid());
 
-create policy "lettura addestramenti" on addestramenti for select using (true);
+create policy "lettura mantenimenti" on mantenimenti for select using (true);
+create policy "operatore inserisce propri" on mantenimenti for insert
+  with check (operatore_id = auth.uid());
+create policy "operatore modifica propri" on mantenimenti for update
+  using (operatore_id = auth.uid());
