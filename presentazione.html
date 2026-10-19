@@ -46,7 +46,7 @@
   .g4 { grid-template-columns: repeat(4, 1fr); }
   @media (max-width: 860px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } }
 
-  .card { background: var(--card-bg); border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); }
+  .card { background: #DCDCDC; border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); border: 1px solid #C8C8C8; }
   .card h3 { font-size: 17px; font-weight: 700; color: var(--notte); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
   .card p, .card li { font-size: 14px; color: var(--grigio); }
   .card ul { list-style: none; }
@@ -60,9 +60,9 @@
   .bordo-viola { border-left: 6px solid #7C3AED; }
 
   /* TABELLE */
-  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 14px; }
-  th { background: var(--notte); color: #F8FAFC; text-align: left; padding: 14px 18px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-  td { padding: 13px 18px; border-bottom: 1px solid var(--bordo); color: var(--antracite); vertical-align: top; }
+  table { width: 100%; border-collapse: collapse; background: #DCDCDC; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 14px; border: 1px solid #C8C8C8; }
+  th { background: #A00D25; color: #FFFFFF; text-align: left; padding: 14px 18px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 13px 18px; border-bottom: 1px solid #C8C8C8; background: #DCDCDC; color: var(--antracite); vertical-align: top; }
   tr:last-child td { border-bottom: none; }
   .tbl-wrap { overflow-x: auto; border-radius: 16px; }
 
@@ -84,7 +84,7 @@
 
   /* FLUSSO ATTIVAZIONE */
   .flusso { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
-  .step { flex: 1; min-width: 200px; background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; }
+  .step { flex: 1; min-width: 200px; background: #DCDCDC; border-radius: 14px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; border: 1px solid #C8C8C8; }
   .step .num { width: 32px; height: 32px; border-radius: 50%; background: var(--royal); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-bottom: 12px; }
   .step.arancio .num { background: var(--arancio); }
   .step h4 { font-size: 15px; margin-bottom: 6px; color: var(--notte); }
