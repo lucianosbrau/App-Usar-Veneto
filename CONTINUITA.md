@@ -244,3 +244,18 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - L'utente deve dare **OK esplicito** prima di toccare codice o procedere con sviluppi; registrare requisiti senza implementare quando chiede solo di "registrare"
 - Comunicazione in italiano
 - Ogni nuova decisione importante va riportata in questo documento
+
+---
+
+## 14. Sessione del 19 ottobre 2026 (seconda sessione)
+
+**Decisioni/verifiche di questa sessione**:
+- Verificato stato del repository: nessun problema tecnico; crash delle conversazioni = sessioni AI che terminano, mitigati da questo documento
+- **Regola di lavoro ribadita dall'utente**: ogni nuova decisione va scritta in questo documento immediatamente, proprio per poter riprendere dopo un crash della sessione
+- Corretta la data dell'ultimo aggiornamento (19 ottobre 2026, non 2025) — commit `9968ad2`
+- Confermata la comprensione del flusso di rifiuto mantenimenti: admin rifiuta con **note facoltative** (`note_rifiuto` visibili all'operatore)
+
+**Da fare (invariato)**:
+- Utente deve creare il progetto Supabase (regione Frankfurt) e fornire URL + chiave anonima per il file `.env`
+- Poi: eseguire `db/schema.sql`, creare i primi admin, sviluppare le pagine reali (ordine: Operatori, Mantenimenti, Dashboard, Attivazione...)
+- Possibile sviluppo in modalità dimostrativa (dati finti) in attesa delle credenziali, se l'utente dà OK
