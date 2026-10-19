@@ -47,8 +47,9 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 | Profilo | Tutti | Dati personali, specializzazioni e abilitazioni |
 
 **Dashboard — grafici a torta (deciso dall'utente)**: nella pagina principale, prima dell'attivazione, due torte:
-- **Personale per Comando** (numero, diviso per provincia)
+- **Personale per Comando** (numero, diviso per provincia — i Comandi sono le province del Veneto: Venezia, Verona, Padova, Vicenza, Treviso, Belluno, Rovigo)
 - **Personale per turno** (A, B, C, D — a prescindere dal Comando)
+- Palette **varia** (non solo rossa): rosso #B22222, blu #2563EB, verde #059669, ambra #F59E0B, viola #7C3AED, teal #0D9488, grigio #94A3B8 — già applicata nel mockup dashboard di `anteprima-schermate.html`
 
 ## 4. Ruoli
 
@@ -162,6 +163,8 @@ Il blu è stato eliminato come colore principale. Header rosso, riga tricolore, 
 
 **Infografica del flusso operativo**: richiesta dall'utente un'infografica simile a "BUSSOLA ONLINE" (Drive, cartella BUSSOLA DISTRIBUITA) che descriva il workflow dell'app — ma con **meno elementi** (l'originale è troppo confusionaria) e **stile essenziale** con i colori del progetto (rosso #B22222, tricolore, bianco; solo logo USAR in `assets/logo-usar.jpg` — **logo VVF rimosso su richiesta dell'utente: meglio senza**). File: `infografica-flusso.html`.
 
+**Realizzata e validata dall'utente**. Struttura: 8 fasi numerate in 4 sezioni (Attivazione 1-3, Composizione 4-5, Manifesto 6-7, Post intervento 8); ogni scheda ha un **badge dispositivo** (📱 mobile, 🖥️ PC, ☁️ server esterno); in fondo la tabella **"Dove risiede cosa"** (codice→GitHub, interfaccia→GitHub Pages, DB/auth/realtime→Supabase, bot→Telegram, PDF ed export→nel browser, loghi→GitHub/Drive, documentazione→GitHub+skill). Header simmetrico a griglia con solo logo USAR.
+
 - File: `README.md`, `presentazione.html` (panoramica progetto), `anteprima-schermate.html` (mockup 5 schermate con dati finti), `CONTINUITA.md` (questo documento)
 - GitHub Pages attivo su `main`: ogni file HTML committato è visibile a https://lucianosbrau.github.io/App-Usar-Veneto/<file>
 - Ramo predefinito: `main` (già verificato corretto)
@@ -176,11 +179,33 @@ Il blu è stato eliminato come colore principale. Header rosso, riga tricolore, 
 
 Il piano Free sospende il progetto dopo **7 giorni di inattività** (nessuna richiesta/login/API). In emergenza la riattivazione richiede pochi minuti — inaccettabile. Soluzione: **keep-alive con GitHub Actions cron** nel repo dell'app — un workflow gira ogni 5-6 giorni e fa una lettura semplice al database (es. `SELECT count(*)`), impedendo la pausa. Gratuito, zero manutenzione, disattivabile se si passa al Pro. Alternativa da valutare: il bot Telegram in polling tocca il DB a ogni giro. Da implementare quando si crea il progetto Supabase.
 
-## 11. Prossimi passi (in ordine)
+## 11. Stato della sessione e prossimi passi
+
+**Situazione a fine sessione del 19 ottobre 2025**: tutte le decisioni fino a qui sono registrate; l'utente sta creando il **progetto Supabase** (URL + chiave anonima). Il codice vera inizia al suo arrivo.
+
+**Decisioni prese in questa sessione** (già riflesse sopra e nei file):
+- ~250 operatori (aggiornato ovunque); nessun problema tecnico: Supabase Free ampiamente sufficiente
+- Grafici a torta in dashboard con palette varia
+- Campi anagrafici DB: codice fiscale, comando (provincia), sede, turno A-D, salto turno (lettera+numero 1-8)
+- Soglia mantenimenti 36 ore/anno, definita dall'admin, configurabile da futura sezione **Impostazioni**
+- Mantenimenti con **flusso di validazione**: in_validazione → approvato/rifiutato dall'admin; note di rifiuto facoltative; operatore cancella solo i propri in validazione
+- **4-5 admin** su ~250; un admin può promuovere/revocare altri admin dall'app
+- Colori schede manifesto: blu/senape/rosso/giallo limone
+- Logo VVF rimosso da tutti i documenti (richiesta utente)
+- Guida migrazione predisposta: `MIGRAZIONE-SERVER-CORPO.md`; con migrazione fatta, il keep-alive non serve più
+- Icona disposititvo per fase nell'infografica; header allineato
+
+**Ordine di sviluppo concordato**: autenticazione/ruoli → operatori → disponibilità → squadre → attivazione realtime → mantenimenti (con validazione) → report/export → PDF manifesto → bot Telegram → Impostazioni admin.
+
+**Da chiedere all'utente quando si presenta l'occasione**:
+- Icona definitiva per mantenimenti approvati (pollice in sù vs faccina)
+- Se l'admin può anche revocare un mantenimento già approvato
+- Schema sezione Internazionale (vaccinazioni)
+- Database esistente da importare
 
 1. Ottenere dall'utente: **progetto Supabase (URL + chiave anonima)** — l'utente lo sta creando; poi: database esistente da importare, elenco definitivo requisiti Alpha/Bravo, schema sezione Internazionale (vaccinazioni)
 2. Impostare il progetto della web app (PWA) e lo schema del database Supabase
-3. Sviluppare per priorità: autenticazione/ruoli → operatori → disponibilità → squadre → attivazione realtime → mantenimenti → report/export → PDF manifesto → bot Telegram
+3. Sviluppare per priorità (dettagliato sopra in "Ordine di sviluppo concordato")
 
 ## 12. Skill di conoscenza: `vvf-usar`
 
