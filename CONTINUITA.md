@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 18 ottobre 2025
+Ultimo aggiornamento: 19 ottobre 2025
 
 ---
 
@@ -15,7 +15,7 @@ Ultimo aggiornamento: 18 ottobre 2025
 
 Composizione basata su disponibilità, specializzazioni, abilitazioni, patenti e altri requisiti.
 
-Il progetto include gestione addestramenti, attivazioni di emergenza con risposta SÌ/NO, resoconti, statistiche e generazione PDF del Manifesto del personale.
+Il progetto include gestione mantenimenti, attivazioni di emergenza con risposta SÌ/NO, resoconti, statistiche e generazione PDF del Manifesto del personale.
 
 ## 2. Architettura decisa
 
@@ -25,16 +25,17 @@ Il progetto include gestione addestramenti, attivazioni di emergenza con rispost
 | Backend/DB | **Supabase** — regione Frankfurt (UE) | PostgreSQL + auth + Realtime + API auto. Piano Free da inizio; **non è gratis per sempre** (Pro ~25$/mese). Architettura anti lock-in |
 | Comunicazioni | **Bot Telegram + Mini App** | Attivazioni con risposta ✅ SÌ / ❌ NO, calendario, doppio canale di notifica (push PWA + Telegram) |
 | PDF | Manifesto del personale | Generato quando l'attivazione è confermata e coerente con la composizione prevista, sul modello grafico che l'utente fornirà |
-| Report | Export **Excel e CSV** | Statistiche personali, resoconti attivazioni, addestramenti |
+| Report | Export **Excel e CSV** | Statistiche personali, resoconti attivazioni, mantenimenti |
 | Hosting | GitHub Pages (già attivo) | https://lucianosbrau.github.io/App-Usar-Veneto/ |
 
 Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 
-## 3. Pagine dell'app (10)
+## 3. Pagine dell'app (11)
 
 | Pagina | Chi la vede | Cosa fa |
 |---|---|---|
 | Dashboard | Tutti | Panoramica generale, attivazione rapida (admin) |
+| Operatori | Admin | Gestione completa: ricerca, filtri, dettaglio, modifica, inserimento |
 | Squadre | Admin | Composizione Alpha/Bravo: proposta automatica + drag & drop (dnd-kit) |
 | Calendario | Tutti | Turni mensili, pubblicazione e invio via Telegram |
 | Disponibilità | Operatore | Disponibilità, ferie, indisponibilità |
@@ -51,9 +52,9 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 
 ## 4. Ruoli
 
-**Operatore**: modifica dati propri consentiti; modifica specializzazioni e abilitazioni; inserisce disponibilità e ferie; consulta il proprio calendario; riceve comunicazioni Telegram; risponde alle attivazioni; consulta il proprio registro addestramento.
+**Operatore**: modifica dati propri consentiti; modifica specializzazioni e abilitazioni; inserisce disponibilità e ferie; consulta il proprio calendario; riceve comunicazioni Telegram; risponde alle attivazioni; inserisce i propri mantenimenti (autocertificati).
 
-**Amministratore**: gestisce operatori; definisce requisiti Alpha/Bravo; usa proposta automatica di composizione + modifica manuale; crea e invia calendario mensile via Telegram; attiva ALPHA o BRAVO; consulta report e resoconti; registra addestramenti; genera il Manifesto PDF.
+**Amministratore**: gestisce operatori; definisce requisiti Alpha/Bravo; usa proposta automatica di composizione + modifica manuale; crea e invia calendario mensile via Telegram; attiva ALPHA o BRAVO; consulta report e resoconti; genera il Manifesto PDF.
 
 ## 5. Attivazione di emergenza (specifica dettagliata)
 
@@ -74,18 +75,18 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 
 > Nella web app e app mobile, durante un'attivazione l'admin potrà **cliccare sul nome** di un operatore di **Squadra Bravo** o **Riserve** e **attivarlo per spostarlo in squadra Alpha** in caso di necessità (carenze di qualifica). Il conteggio di copertura si aggiorna in tempo reale.
 
-## 6. Addestramento
+## 6. Mantenimenti (ex "addestramenti")
+
+**Ridefinito dall'utente**: la funzione un tempo chiamata "addestramenti" ora si chiama **MANTENIMENTI**.
 
 - Registro ore per operatore, totale annuale
-- Requisito minimo ore/anno (es. 40-50 ore) — **numero definitivo da definire**
+- **Soglia minima: 36 ore annue** per operatore (decisa dall'utente)
 - Evidenziazione automatica rosso/giallo di chi è sotto soglia
-- Dettaglio: data, tipo, ore, partecipante
+- Dettaglio: data, tipo, ore
 - Storico confrontabile anno per anno
 - Export Excel/CSV
 
-**RIDEFINITO DALL'UTENTE — ora si chiama "MANTENIMENTI"** (non più "addestramenti"):
-
-**Soglia decisa dall'utente: 36 ore annue** per ciascun operatore (evidenziazione sotto-soglia rosso/giallo rispetto alle 36 ore).
+### Inserimento dei mantenimenti (deciso dall'utente):
 
 - Ogni operatore inserisce da solo i propri mantenimenti (autocertificazione, nessuna approvazione admin)
 - Nella sezione Mantenimenti dell'operatore: funzione **"Aggiungi ore mantenimento"** con campi:
@@ -135,11 +136,12 @@ Oltre a cognome e nome, il database conterrà:
 - **Rosso principale: #B22222** (chiaro #CD3A3A, scuro #8B1A1A) — deciso dall'utente
 - **Banda tricolore italiana** (verde #008C45, bianco, rosso #CD212A) sotto l'intestazione
 - **Sfondo tutto bianco**
-Il blu è stato eliminato ovunque. Guardando gli screenshot VVF confermati dall'utente: header rosso, riga tricolore, sfondo bianco.
+Il blu è stato eliminato come colore principale. Header rosso, riga tricolore, sfondo bianco.
 
-- Palette: blu notte `#0F172A`, blu royal `#2563EB`, arancione `#EA580C`, ambra `#F59E0B`, sfondi `#F1F5F9`/`#F8FAFC`, antracite `#1E293B`, grigi `#64748B`/`#CBD5E1`
+**Palette secondaria** (per icone stato, grafici a torta variati, dettagli — decisa dall'utente per i grafici):
+- Rosso principale `#B22222` (chiaro #CD3A3A, scuro #8B1A1A); per i grafici a torta: palette varia (blu `#2563EB`, verde `#059669`, ambra `#F59E0B`, viola `#7C3AED`, teal `#0D9488`, arancione `#EA580C`, grigio `#94A3B8`)
 - Stato: verde `#D1FAE5`/`#065F46`, giallo `#FEF3C7`/`#92400E`, rosso `#FEE2E2`/`#991B1B`
-- Login: gradiente blu notte→royal, card bianca 420px, angoli 20px, campi 52px arrotondati 10px
+- Login: sfondo rosso (gradiente #B22222→#CD3A3A), card bianca 420px, angoli 20px, campi 52px arrotondati 10px
 - Dashboard: sidebar 260px scura, card squadre con bordo sinistro colorato e badge PRONTA/PARZIALE, pulsanti grandi ATTIVA
 - Font: Inter/Roboto, ombre morbide, angoli arrotondati 10-16px
 - Simulazioni complete in `anteprima-schermate.html`; panoramica in `presentazione.html`
@@ -148,10 +150,10 @@ Il blu è stato eliminato ovunque. Guardando gli screenshot VVF confermati dall'
 
 **Infografica del flusso operativo**: richiesta dall'utente un'infografica simile a "BUSSOLA ONLINE" (Drive, cartella BUSSOLA DISTRIBUITA) che descriva il workflow dell'app — ma con **meno elementi** (l'originale è troppo confusionaria) e **stile essenziale** con i colori del progetto (rosso #B22222, tricolore, bianco; solo logo USAR in `assets/logo-usar.jpg` — **logo VVF rimosso su richiesta dell'utente: meglio senza**). File: `infografica-flusso.html`.
 
-- File: `README.md`, `presentazione.html` (panoramica progetto), `anteprima-schermate.html` (mockup 4 schermate con dati finti), `CONTINUITA.md` (questo documento)
+- File: `README.md`, `presentazione.html` (panoramica progetto), `anteprima-schermate.html` (mockup 5 schermate con dati finti), `CONTINUITA.md` (questo documento)
 - GitHub Pages attivo su `main`: ogni file HTML committato è visibile a https://lucianosbrau.github.io/App-Usar-Veneto/<file>
-- Ramo predefinito: `main` (verificare che non sia ancora `vibe/presentazione-progetto-b67a8e`; se sì, cambiarlo da Settings → General → Default branch, poi eliminare il ramo vecchio)
-- Non esiste ancora codice applicativo: solo documentazione e mockup
+- Ramo predefinito: `main` (già verificato corretto)
+- Esiste una **base applicativa iniziale** (`app/main.js` login e dashboard base, `app/supabase.js` strato dati, `db/schema.sql` tabelle con RLS, PWA con service worker) — da completare con le funzioni delle pagine. Documentazione e mockup: `presentazione.html`, `anteprima-schermate.html`, `infografica-flusso.html`, `MIGRAZIONE-SERVER-CORPO.md` (guida futura migrazione sui server del Corpo)
 
 ## 10. Note legali / privacy
 
@@ -164,9 +166,9 @@ Il piano Free sospende il progetto dopo **7 giorni di inattività** (nessuna ric
 
 ## 11. Prossimi passi (in ordine)
 
-1. Ottenere dall'utente: logo ufficiale, modello grafico del Manifesto PDF, database esistente, risposte alle 3 domande dell'addestramento (sez. 6), elenco definitivo requisiti Alpha/Bravo
+1. Ottenere dall'utente: **progetto Supabase (URL + chiave anonima)** — l'utente lo sta creando; poi: database esistente da importare, elenco definitivo requisiti Alpha/Bravo, schema sezione Internazionale (vaccinazioni)
 2. Impostare il progetto della web app (PWA) e lo schema del database Supabase
-3. Sviluppare per priorità: autenticazione/ruoli → operatori → disponibilità → squadre → attivazione realtime → addestramento → report/export → PDF → bot Telegram
+3. Sviluppare per priorità: autenticazione/ruoli → operatori → disponibilità → squadre → attivazione realtime → mantenimenti → report/export → PDF manifesto → bot Telegram
 
 ## 12. Skill di conoscenza: `vvf-usar`
 
