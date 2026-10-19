@@ -111,7 +111,7 @@ Una volta validata l'app, sarebbe opportuno che **tutti gli utenti accedano con 
 ## 8. Stile visivo (mockup già validati)
 
 **AGGIORNAMENTO FINALE (dettato dall'utente, sui due screenshot nel Drive cartella USAR VENETO)**: la palette dei veri applicativi VVF è:
-- **Intestazione rossa VVF** (#C8102E primario, #E5231D accento, #A00D25 scuro) — niente blu
+- **Rosso principale: #B22222** (chiaro #CD3A3A, scuro #8B1A1A) — deciso dall'utente
 - **Banda tricolore italiana** (verde #008C45, bianco, rosso #CD212A) sotto l'intestazione
 - **Sfondo tutto bianco**
 Il blu è stato eliminato ovunque. Guardando gli screenshot VVF confermati dall'utente: header rosso, riga tricolore, sfondo bianco.
