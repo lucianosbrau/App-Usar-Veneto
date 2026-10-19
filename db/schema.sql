@@ -68,6 +68,7 @@ create table mantenimenti (
   stato text not null default 'in_validazione' check (stato in ('in_validazione', 'approvato', 'rifiutato')),
   validato_da uuid references profili(id),
   validato_il timestamptz,
+  note_rifiuto text,
   inserito_il timestamptz not null default now()
 );
 
@@ -104,6 +105,8 @@ create policy "admin modifica impostazioni" on impostazioni for update
 
 create policy "lettura profili" on profili for select using (true);
 create policy "proprio profilo" on profili for update using (auth.uid() = id);
+create policy "admin gestisce profili" on profili for update
+  using (exists (select 1 from profili p where p.id = auth.uid() and p.ruolo = 'admin'));
 
 create policy "lettura dati operativi" on specializzazioni for select using (true);
 create policy "lettura os" on operatori_specializzazioni for select using (true);

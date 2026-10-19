@@ -94,6 +94,7 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
   - Nell'area Mantenimenti dell'operatore: elenco dei **solo approvati** (con conteggio ore valide) e dei **propri in validazione**
   - **L'operatore può cancellare un suo mantenimento solo se è ancora in validazione** (gli approvati non sono eliminabili da lui)
   - L'admin vedrà la coda dei mantenimenti da validare e potrà approvare o respingere
+  - **Rifiuto con note facoltative**: quando l'admin rifiuta, può scrivere un motivo (campo `note_rifiuto`) che l'operatore vedrà
 - Nella sezione Mantenimenti dell'operatore: funzione **"Aggiungi ore mantenimento"** con campi:
   - **Cognome, Nome** — in automatico dal login utente (non editabili)
   - **Data mantenimento**
@@ -102,6 +103,12 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
   - **Ore prestate**
 - **Validazione obbligatoria**: se manca un dato, l'inserimento dà **errore** e **evidenzia i campi mancanti**
 - **La soglia la definisce l'Admin**. In un secondo momento sarà strutturata la sezione **"Impostazioni"** (riservata all'Admin) dove cambiare le ore soglia senza modificare il codice (valore iniziale: 36)
+
+### Admin multipli (deciso dall'utente)
+
+- Gli admin saranno **4-5** su ~250 utenti, ognuno con le proprie credenziali e nome
+- **Un admin può promuovere altri utenti ad admin** (e, di conseguenza, revocare) dalla pagina di gestione operatori o da Impostazioni — nessuna modifica al codice o al database per creare un admin
+- Nel database: il campo `ruolo` del profilo ('operatore' | 'admin') aggiornabile da un admin tramite apposita policy di sicurezza
 
 ### Registrazione dell'operatore al bot Telegram (decisa, illustrata in `presentazione.html`)
 
