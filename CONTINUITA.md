@@ -8,7 +8,7 @@ Ultimo aggiornamento: 18 ottobre 2025
 
 ## 1. Cos'è il progetto
 
-**Nucleo USAR Veneto** — sistema per gestire ~100 operatori organizzati mensilmente in due squadre operative:
+**Nucleo USAR Veneto** — sistema per gestire ~250 operatori organizzati mensilmente in due squadre operative:
 
 - **Team Alpha**
 - **Team Bravo**

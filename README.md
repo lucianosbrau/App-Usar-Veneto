@@ -1,6 +1,6 @@
 # App-Usar-Veneto
 
-Gestione squadre, addestramenti e attivazioni di emergenza per il Nucleo USAR Veneto (~100 operatori).
+Gestione squadre, addestramenti e attivazioni di emergenza per il Nucleo USAR Veneto (~250 operatori).
 
 ## Documentazione
 - `presentazione.html` — documento di presentazione del progetto (visibile nella Pull Request aperta)
