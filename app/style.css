@@ -1,13 +1,13 @@
 :root {
-  --notte: #0B2E59; --notte2: #123A6B; --royal: #155A8A; --royal-dark: #0F4470;
-  --arancio: #C8102E; --ambra: #E5231D; --perla: #F1F5F9; --bg-input: #F8FAFC;
+  --notte: #C8102E; --notte2: #A00D25; --royal: #C8102E; --royal-dark: #A00D25;
+  --arancio: #C8102E; --ambra: #E5231D; --perla: #FFFFFF; --bg-input: #F8FAFC;
   --antracite: #1E293B; --grigio: #64748B; --grigio-ch: #CBD5E1; --bordo: #E2E8F0;
   --verde-bg: #D1FAE5; --verde-tx: #065F46; --verde: #059669;
   --giallo-bg: #FEF3C7; --giallo-tx: #92400E;
   --rosso-bg: #FEE2E2; --rosso-tx: #991B1B; --rosso: #DC2626;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', 'Roboto', -apple-system, 'Segoe UI', sans-serif; background: var(--perla); color: var(--antracite); line-height: 1.6; }
+body { font-family: 'Inter', 'Roboto', -apple-system, 'Segoe UI', sans-serif; background: #FFFFFF; color: var(--antracite); line-height: 1.6; }
 button { font-family: inherit; cursor: pointer; }
 input, select { font-family: inherit; }
 
@@ -66,3 +66,10 @@ input, select { font-family: inherit; }
 .avatar { border-radius: 50%; background: var(--royal); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
 .barra { height: 8px; background: var(--bordo); border-radius: 99px; overflow: hidden; }
 .barra > div { height: 100%; border-radius: 99px; background: var(--verde); }
+
+/* Banda tricolore italiana (come applicativi VVF) */
+.tricolore { display: flex; height: 4px; }
+.tricolore div { flex: 1; }
+.tricolore .verde { background: #008C45; }
+.tricolore .bianco { background: #FFFFFF; }
+.tricolore .rosso { background: #CD212A; }

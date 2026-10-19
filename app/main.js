@@ -112,6 +112,7 @@ function render() {
     <div class="layout">
       <div class="sidebar">
         <div class="brand"><img src="assets/logo-usar.jpg" alt="USAR"> USAR Veneto</div>
+        <div class="tricolore"><div class="verde"></div><div class="bianco"></div><div class="rosso"></div></div>
         <div class="menu">
           ${voci.map(v => `<button class="voce ${v.id === pagina ? 'attiva' : ''}" data-p="${v.id}">${v.ic} ${v.t}</button>`).join('')}
           <div class="separatore"></div>

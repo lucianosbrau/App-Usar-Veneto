@@ -6,8 +6,8 @@
 <title>USAR Veneto — Anteprima schermate</title>
 <style>
   :root {
-    --notte: #0B2E59; --notte2: #123A6B; --royal: #155A8A; --royal-dark: #0F4470;
-    --arancio: #C8102E; --ambra: #E5231D; --perla: #F1F5F9; --antracite: #1E293B;
+    --notte: #C8102E; --notte2: #A00D25; --royal: #C8102E; --royal-dark: #A00D25;
+    --arancio: #C8102E; --ambra: #E5231D; --perla: #FFFFFF; --antracite: #1E293B;
     --grigio: #64748B; --grigio-ch: #CBD5E1; --bordo: #E2E8F0; --bg-input: #F8FAFC;
     --verde-bg: #D1FAE5; --verde-tx: #065F46; --giallo-bg: #FEF3C7; --giallo-tx: #92400E;
     --rosso-bg: #FEE2E2; --rosso-tx: #991B1B;
@@ -24,7 +24,7 @@
   @media (max-width:520px){ .telefono{ border-width:6px; border-radius:22px; } }
 
   /* ===== LOGIN ===== */
-  .login { background:linear-gradient(180deg,#0B2E59 0%,#155A8A 100%); min-height:640px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; position:relative; }
+  .login { background:linear-gradient(180deg,#C8102E 0%,#E5231D 100%); min-height:640px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; position:relative; }
   .login::before { content:''; position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,0.10) 1px, transparent 1px); background-size:22px 22px; }
   .login > * { position:relative; }
   .login-card { background:#fff; border-radius:20px; width:100%; max-width:420px; padding:40px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); }
@@ -39,6 +39,11 @@
   /* ===== DASHBOARD (desktop) ===== */
   .sidebar { width:260px; min-width:260px; background:var(--notte); color:#F8FAFC; display:flex; flex-direction:column; }
   .sidebar .logo { padding:24px; font-weight:800; font-size:18px; display:flex; gap:10px; align-items:center; }
+  .tricolore { display:flex; height:4px; }
+  .tricolore div { flex:1; }
+  .tricolore .verde { background:#008C45; }
+  .tricolore .bianco { background:#FFFFFF; }
+  .tricolore .rosso { background:#CD212A; }
   .sidebar .logo svg { width:28px; height:28px; }
   .menu { flex:1; }
   .menu .voce { height:48px; display:flex; align-items:center; gap:12px; padding:0 20px; color:#CBD5E1; font-size:14px; font-weight:500; }
@@ -231,6 +236,7 @@
         <img src="assets/logo-usar.jpg" alt="USAR" style="width:28px;height:28px;border-radius:50%;">
         USAR Veneto
       </div>
+      <div class="tricolore"><div class="verde"></div><div class="bianco"></div><div class="rosso"></div></div>
       <div class="menu">
         <div class="voce attiva">🏠 Dashboard</div>
         <div class="voce">👥 Operatori</div>
