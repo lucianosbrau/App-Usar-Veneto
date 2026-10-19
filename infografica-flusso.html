@@ -74,6 +74,18 @@
     padding: 8px 28px; border-radius: 999px;
     font-size: 15px; font-weight: 700; letter-spacing: 1px;
   }
+  .tabella-dove { background: #fff; border: 1px solid #CBD5E1; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 6px rgba(30,41,59,0.06); margin-top: 48px; }
+  .tabella-dove h3 { background: #B22222; color: #ffffff; font-size: 15px; font-weight: 700; letter-spacing: 1px; padding: 12px 18px; margin: 0; text-align: center; text-transform: uppercase; }
+  .tabella-dove table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .tabella-dove th { text-align: left; padding: 10px 16px; background: #F8FAFC; color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #CBD5E1; }
+  .tabella-dove td { padding: 10px 16px; border-bottom: 1px solid #F1F5F9; color: #334155; }
+  .tabella-dove tr:last-child td { border-bottom: none; }
+  .tabella-dove td:first-child { font-weight: 700; color: #1E293B; white-space: nowrap; }
+  .tabella-dove td .dove { display: inline-block; background: #FEE2E2; color: #991B1B; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
+  @media (max-width: 640px) {
+    .tabella-dove td, .tabella-dove th { padding: 8px 10px; font-size: 12px; }
+    .tabella-dove td:first-child { white-space: normal; }
+  }
   .footer {
     margin-top: 48px; text-align: center; color: #94A3B8; font-size: 12px;
   }
@@ -178,6 +190,23 @@
       <h2>Resoconti e statistiche</h2>
       <p>Storico dell'attivazione: allertati, SÌ, NO, nessuna risposta, orari. Statistiche del personale ed export <b>Excel/CSV</b>.</p>
     </div>
+  </div>
+
+  <div class="tabella-dove">
+    <h3>🖥️ Dove risiede cosa</h3>
+    <table>
+      <tr><th>Componente</th><th>Contenuto</th><th>Dove risiede</th></tr>
+      <tr><td>📁 Codice dell'app</td><td>Interfaccia PWA (HTML, CSS, JavaScript), mockup, documentazione</td><td><span class="dove">GitHub</span> — repository App-Usar-Veneto</td></tr>
+      <tr><td>🌍 Interfaccia pubblicata</td><td>L'app raggiungibile dagli operatori via browser</td><td><span class="dove">GitHub Pages</span> — lucianosbrau.github.io</td></tr>
+      <tr><td>🗄️ Database</td><td>Operatori, squadre, disponibilità, attivazioni, mantenimenti, vaccinazioni</td><td><span class="dove">Supabase</span> — PostgreSQL, regione Frankfurt (UE)</td></tr>
+      <tr><td>🔐 Autenticazione</td><td>Login, ruoli (operatore/admin), sessioni</td><td><span class="dove">Supabase Auth</span></td></tr>
+      <tr><td>⚡ Aggiornamenti in tempo reale</td><td>Risposte SÌ/NO e copertura requisiti durante le attivazioni</td><td><span class="dove">Supabase Realtime</span></td></tr>
+      <tr><td>🤖 Bot Telegram + Mini App</td><td>Allertamento, risposta SÌ/NO, calendario, comunicazioni</td><td><span class="dove">Telegram</span> — servizio esterno (server bot: da definire)</td></tr>
+      <tr><td>📄 PDF del Manifesto</td><td>Generazione al termine della compilazione</td><td><span class="dove">Nel browser</span> — generato sul dispositivo al momento dell'export</td></tr>
+      <tr><td>📊 Export Excel/CSV</td><td>Statistiche e resoconti scaricabili</td><td><span class="dove">Nel browser</span> — generato sul dispositivo al momento dell'export</td></tr>
+      <tr><td>🎨 Loghi e grafica</td><td>Logo USAR, icona VVF, palette e mockup</td><td><span class="dove">GitHub</span> — cartella assets + Google Drive (originali)</td></tr>
+      <tr><td>📚 Documentazione e conoscenze</td><td>CONTINUITA.md, guida migrazione, modello manifesto, skill vvf-usar</td><td><span class="dove">GitHub + account Mistral</span> (skill persistente)</td></tr>
+    </table>
   </div>
 
   <div class="footer">Nucleo USAR Veneto — App di gestione squadre, mantenimenti e attivazioni</div>
