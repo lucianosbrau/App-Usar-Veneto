@@ -65,8 +65,19 @@ create table mantenimenti (
   tipo text not null check (tipo in ('Mantenimento', 'Manovra', 'Intervento', 'Lavorazione', 'Tutor Mantenimento', 'Tutor Corso', 'Altra formazione')),
   argomento text not null,
   ore numeric(4,1) not null check (ore > 0),
+  stato text not null default 'in_validazione' check (stato in ('in_validazione', 'approvato', 'rifiutato')),
+  validato_da uuid references profili(id),
+  validato_il timestamptz,
   inserito_il timestamptz not null default now()
 );
+
+create table impostazioni (
+  chiave text primary key,
+  valore text not null,
+  aggiornato_il timestamptz not null default now()
+);
+
+insert into impostazioni (chiave, valore) values ('soglia_ore_mantenimenti', '36');
 
 create table manifesti (
   id serial primary key,
@@ -85,6 +96,11 @@ alter table attivazioni enable row level security;
 alter table risposte_attivazione enable row level security;
 alter table mantenimenti enable row level security;
 alter table manifesti enable row level security;
+alter table impostazioni enable row level security;
+
+create policy "lettura impostazioni" on impostazioni for select using (true);
+create policy "admin modifica impostazioni" on impostazioni for update
+  using (exists (select 1 from profili p where p.id = auth.uid() and p.ruolo = 'admin'));
 
 create policy "lettura profili" on profili for select using (true);
 create policy "proprio profilo" on profili for update using (auth.uid() = id);
@@ -101,7 +117,11 @@ create policy "propria risposta" on risposte_attivazione for insert
   with check (operatore_id = auth.uid());
 
 create policy "lettura mantenimenti" on mantenimenti for select using (true);
+create policy "operatore cancella propri in validazione" on mantenimenti for delete
+  using (operatore_id = auth.uid() and stato = 'in_validazione');
 create policy "operatore inserisce propri" on mantenimenti for insert
   with check (operatore_id = auth.uid());
 create policy "operatore modifica propri" on mantenimenti for update
   using (operatore_id = auth.uid());
+create policy "admin valida mantenimenti" on mantenimenti for update
+  using (exists (select 1 from profili p where p.id = auth.uid() and p.ruolo = 'admin'));

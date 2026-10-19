@@ -40,7 +40,7 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 | Calendario | Tutti | Turni mensili, pubblicazione e invio via Telegram |
 | Disponibilità | Operatore | Disponibilità, ferie, indisponibilità |
 | Attivazione | Admin | Lancio emergenza ALPHA/BRAVO, messaggio modificabile prima dell'invio |
-| Mantenimenti | Operatore (propri, autocertificati) | Inserimento ore con tipo (Mantenimento, Manovra, Intervento, Lavorazione, Tutor Mantenimento, Tutor Corso, Altra formazione), evidenziazione sotto-soglia, storico per anno |
+| Mantenimenti | Operatore (propri) + Admin (validazione) | Inserimento ore con tipo (Mantenimento, Manovra, Intervento, Lavorazione, Tutor Mantenimento, Tutor Corso, Altra formazione); stato In validazione/Approvato; operatore cancella solo i propri in validazione; evidenziazione sotto-soglia, storico per anno |
 | Internazionale | Admin + Operatore (proprio) | Operatori **abilitati alle missioni internazionali** e relative **vaccinazioni** (registro abilitazioni, stato vaccinazioni e scadenze) |
 | Report/Statistiche | Admin | Statistiche personali e di intervento, export Excel/CSV |
 | Resoconti | Admin | Storico attivazioni: allertati, SÌ, NO, nessuna risposta, orari |
@@ -54,7 +54,7 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 
 **Operatore**: modifica dati propri consentiti; modifica specializzazioni e abilitazioni; inserisce disponibilità e ferie; consulta il proprio calendario; riceve comunicazioni Telegram; risponde alle attivazioni; inserisce i propri mantenimenti (autocertificati).
 
-**Amministratore**: gestisce operatori; definisce requisiti Alpha/Bravo; usa proposta automatica di composizione + modifica manuale; crea e invia calendario mensile via Telegram; attiva ALPHA o BRAVO; consulta report e resoconti; genera il Manifesto PDF.
+**Amministratore**: gestisce operatori; definisce requisiti Alpha/Bravo; usa proposta automatica di composizione + modifica manuale; crea e invia calendario mensile via Telegram; attiva ALPHA o BRAVO; consulta report e resoconti; **approva/rifiuta i mantenimenti** degli operatori; genera il Manifesto PDF; configura le impostazioni (soglia ore).
 
 ## 5. Attivazione di emergenza (specifica dettagliata)
 
@@ -86,9 +86,14 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 - Storico confrontabile anno per anno
 - Export Excel/CSV
 
-### Inserimento dei mantenimenti (deciso dall'utente):
+### Inserimento e validazione dei mantenimenti (deciso dall'utente, aggiornato)
 
-- Ogni operatore inserisce da solo i propri mantenimenti (autocertificazione, nessuna approvazione admin)
+- Ogni operatore inserisce da solo i propri mantenimenti, ma **ogni inserimento richiede l'approvazione dell'admin** (niente più autocertificazione automatica):
+  - **Stato "In validazione"**: appena inserito dall'operatore, in attesa dell'admin
+  - **Stato "Approvato"**: confermato dall'admin (icona verde, pollice in su / faccina che ride — icona definitiva da scegliere)
+  - Nell'area Mantenimenti dell'operatore: elenco dei **solo approvati** (con conteggio ore valide) e dei **propri in validazione**
+  - **L'operatore può cancellare un suo mantenimento solo se è ancora in validazione** (gli approvati non sono eliminabili da lui)
+  - L'admin vedrà la coda dei mantenimenti da validare e potrà approvare o respingere
 - Nella sezione Mantenimenti dell'operatore: funzione **"Aggiungi ore mantenimento"** con campi:
   - **Cognome, Nome** — in automatico dal login utente (non editabili)
   - **Data mantenimento**
@@ -96,7 +101,7 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
   - **Argomento/Attività svolta**
   - **Ore prestate**
 - **Validazione obbligatoria**: se manca un dato, l'inserimento dà **errore** e **evidenzia i campi mancanti**
-- Chi configura la soglia: da definire (fisso a 36 per ora)
+- **La soglia la definisce l'Admin**. In un secondo momento sarà strutturata la sezione **"Impostazioni"** (riservata all'Admin) dove cambiare le ore soglia senza modificare il codice (valore iniziale: 36)
 
 ### Registrazione dell'operatore al bot Telegram (decisa, illustrata in `presentazione.html`)
 
