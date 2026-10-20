@@ -301,10 +301,10 @@ async function pagOperatori(el) {
 const MESI = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
 const RUOLI_MODULO = [
   { id: 'strutturista', t: 'Strutturista', ic: '🏗️', imp: 'modulo_strutturisti' },
+  { id: 'nbcr', t: 'NBCR 3° livello', ic: '☣️', imp: 'modulo_nbcr' },
   { id: 'k9', t: 'Unità cinofila K9', ic: '🐕', imp: 'modulo_k9' },
-  { id: 'caposquadra', t: 'Caposquadra', ic: '⛑️' },
-  { id: 'nbcr', t: 'NBCR', ic: '☣️' },
-  { id: 'saf', t: 'SAF 2A', ic: '🧗' },
+  { id: 'caposquadra', t: 'Caposquadra', ic: '⛑️', imp: 'modulo_capisquadra' },
+  { id: 'saf', t: 'SAF 2A', ic: '🧗', imp: 'modulo_saf' },
   { id: 'generico', t: 'Personale generico', ic: '👤' }
 ];
 
@@ -507,9 +507,10 @@ function opzioniPer(ruolo, tutti, lista, costr) {
   const giaDentro = new Set(lista.map(m => m.operatore_id));
   const specMap = { strutturista: 'Strutturista', nbcr: 'NBCR 3° livello', k9: 'Unità cinofila K9', caposquadra: 'Caposquadra/Capireparto', saf: 'SAF 2A (corda)' };
   const idSpecializzati = SPEC_IDS[specMap[ruolo.id]] || [];
-  const conSpecializzazione = new Set(Object.values(SPEC_IDS).flat());
+  const SPEC_MODULO = ['Strutturista', 'Unità cinofila K9', 'NBCR 3° livello', 'SAF 2A (corda)'];
+  const conSpecModulo = new Set(SPEC_MODULO.flatMap(n => SPEC_IDS[n] || []));
   const idonei = tutti.filter(o =>
-    ruolo.id === 'generico' ? !conSpecializzazione.has(o.id) : idSpecializzati.includes(o.id)
+    ruolo.id === 'generico' ? !conSpecModulo.has(o.id) : idSpecializzati.includes(o.id)
   );
   const ordinati = idonei
     .map(costr)

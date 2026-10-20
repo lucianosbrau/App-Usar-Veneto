@@ -279,7 +279,8 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Utente registrato e promosso admin** ✅: Luciano Di Lorenzo (lucianosbrau@gmail.com) nel db con ruolo `admin`
 - **Pagina "Programmazione mensile" (nuova, richiesta e chiarita dall'utente — ADMIN)**:
   - Flusso: mese → squadra (Alpha/Bravo) → compilazione **manuale** del manifesto programmato (ciò che verrà attivato in emergenza)
-  - Tabelle nuove in `db/migrazione-programmazione.sql` (**da eseguire in SQL Editor**): `programmi_mensili` (mese+team, flag pubblicato), `programmi_membri` (operatore, ruolo), colonna `patente` su profili; requisiti in `impostazioni`: modulo_totale=38, modulo_strutturisti=2, modulo_k9=4
+  - **REQUISITI MODULO USAR MEDIUM (già decisi in precedenza, valori definitivi — NON esempi)**: 38 unità operative + 5 sanitarie; specializzazioni obbligatorie: **2 strutturisti, 2 NBCR 3° livello, 4 K9, 2 capisquadra, 2 SAF 2A**; in `impostazioni`: modulo_totale=38, modulo_strutturisti=2, modulo_nbcr=2, modulo_k9=4, modulo_capisquadra=2, modulo_saf=2 (modificabili dall'admin)
+  - **GENERICO (definizione definitiva chiarita dall'utente)**: chi **NON è Strutturista, K9, NBCR 3° livello, SAF 2A**. Il generico può essere inserito **solo negli spazi senza requisito obbligatorio** (il caposquadra NON è generico: è ruolo obbligatorio a parte). Un autista può essere generico o SAF: la patente serve solo per il conteggio autisti, non è un ruolo
   - Tendine per ruolo (Strutturista, K9, Caposquadra, NBCR, SAF, generico): propongono **prima i meno recenti**, raggruppati con intestazioni «N MESI FA» / «IL MESE SCORSO» / «MAI INSERITI», finestra storico **6 mesi**; generico = chi non ha specializzazioni del modulo
   - **Autisti**: conteggio con grado patente (da campo `patente` del profilo), non è un ruolo a sé
   - Duplicati in due squadre: **permessi con avviso** (per ora solo alert; il vincolo DB è per programma singolo)

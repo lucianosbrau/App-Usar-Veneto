@@ -29,7 +29,10 @@ create table if not exists programmi_membri (
 insert into impostazioni (chiave, valore) values
   ('modulo_totale', '38'),
   ('modulo_strutturisti', '2'),
-  ('modulo_k9', '4')
+  ('modulo_nbcr', '2'),
+  ('modulo_k9', '4'),
+  ('modulo_capisquadra', '2'),
+  ('modulo_saf', '2')
 on conflict (chiave) do nothing;
 
 alter table programmi_mensili enable row level security;
