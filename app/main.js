@@ -473,7 +473,7 @@ async function apriProgramma(cont, impostazioni, programmi) {
         </div>
         <div style="display:flex; gap:10px; margin-bottom:10px;">
           <select id="sel-${r.id}" style="flex:1; height:46px; border:1px solid var(--bordo); border-radius:10px; padding:0 12px; background:#fff;">
-            ${opzioniPer(r, tutti, lista, costruttore)}
+            ${opzioniPer(r, tutti, lista, costruttore, impostazioni)}
           </select>
           <button class="btn-primary" data-add="${r.id}" style="width:120px; height:46px;">➕ AGGIUNGI</button>
         </div>
@@ -503,15 +503,25 @@ async function apriProgramma(cont, impostazioni, programmi) {
   };
 }
 
-function opzioniPer(ruolo, tutti, lista, costr) {
+function opzioniPer(ruolo, tutti, lista, costr, impostazioni) {
   const giaDentro = new Set(lista.map(m => m.operatore_id));
   const specMap = { strutturista: 'Strutturista', nbcr: 'NBCR 3° livello', k9: 'Unità cinofila K9', caposquadra: 'Caposquadra/Capireparto', saf: 'SAF 2A (corda)' };
   const idSpecializzati = SPEC_IDS[specMap[ruolo.id]] || [];
   const SPEC_MODULO = ['Strutturista', 'Unità cinofila K9', 'NBCR 3° livello', 'SAF 2A (corda)'];
   const conSpecModulo = new Set(SPEC_MODULO.flatMap(n => SPEC_IDS[n] || []));
-  const idonei = tutti.filter(o =>
-    ruolo.id === 'generico' ? !conSpecModulo.has(o.id) : idSpecializzati.includes(o.id)
-  );
+  const nCapiInSquadra = lista.filter(m => m.ruolo === 'caposquadra').length;
+  const minCapi = Number(impostazioni.modulo_capisquadra) || 2;
+  const capiEccedenti = nCapiInSquadra >= minCapi
+    ? (SPEC_IDS['Caposquadra/Capireparto'] || []).filter(id =>
+        lista.some(m => m.operatore_id === id && m.ruolo === 'caposquadra') &&
+        !lista.some(m => m.operatore_id === id && m.ruolo === 'generico'))
+    : [];
+  const idonei = tutti.filter(o => {
+    if (ruolo.id === 'generico') {
+      return !conSpecModulo.has(o.id) || capiEccedenti.includes(o.id);
+    }
+    return idSpecializzati.includes(o.id);
+  });
   const ordinati = idonei
     .map(costr)
     .filter(o => !giaDentro.has(o.id))
