@@ -105,6 +105,8 @@ create policy "admin modifica impostazioni" on impostazioni for update
 
 create policy "lettura profili" on profili for select using (true);
 create policy "proprio profilo" on profili for update using (auth.uid() = id);
+create policy "nuovo utente crea proprio profilo" on profili for insert
+  with check (auth.uid() = id);
 create policy "admin gestisce profili" on profili for update
   using (exists (select 1 from profili p where p.id = auth.uid() and p.ruolo = 'admin'));
 

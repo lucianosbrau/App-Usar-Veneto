@@ -263,3 +263,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Utente deve creare il progetto Supabase (regione Frankfurt) e fornire URL + chiave anonima per il file `.env`
 - Poi: eseguire `db/schema.sql`, creare i primi admin, sviluppare le pagine reali (ordine: Operatori, Mantenimenti, Dashboard, Attivazione...)
 - Possibile sviluppo in modalità dimostrativa (dati finti) in attesa delle credenziali, se l'utente dà OK
+- **OK utente ricevuto**: sviluppate login+registrazione e pagina Mantenimenti completa (app/main.js): registrazione con nome/cognome/email/password, creazione automatica riga profilo, Mantenimenti con inserimento (campi obbligatori evidenziati in rosso, cognome/nome automatici non editabili), coda validazione admin (approva/rifiuta con note facoltative), eliminazione solo propri in validazione, rifiutati con nota admin visibile, storico approvati, conteggio ore anno vs soglia con barra colore. Build verificata OK
+- **Policy aggiunta** in `db/schema.sql` + script `db/migrazione-policy-profili.sql` da eseguire in SQL Editor: `insert` profili per il proprio utente (necessaria alla registrazione). Da far eseguire all'utente
+- **Primo admin**: l'utente si registra dall'app, poi in Supabase → Table Editor → `profili` cambia `ruolo` in `admin` a mano
+- Le altre pagine (dashboard completa, squadre, calendario, attivazione reale, internazionale, report, resoconti) restano da sviluppare, per gradi con OK dell'utente
