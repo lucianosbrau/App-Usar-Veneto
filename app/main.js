@@ -65,7 +65,7 @@ function renderLogin() {
         <h1>Nucleo USAR Veneto</h1>
         <p class="sub">Gestione squadre e attivazioni emergenze</p>
         <div class="errore" id="err"></div>
-        <div class="campo"><input id="email" type="email" placeholder="nome@esempio.it" autocomplete="username"></div>
+        <div class="campo"><input id="email" type="email" placeholder="nome.cognome@vigilfuoco.it" autocomplete="username"></div>
         <div class="campo">
           <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
           <button class="toggle-pw" id="toggle">👁</button>
@@ -98,9 +98,10 @@ function renderRegistrazione() {
         <h1>Registrazione</h1>
         <p class="sub">Crea il tuo account operatore</p>
         <div class="errore" id="err"></div>
+        <div class="successo" id="ok"></div>
         <div class="campo"><input id="nome" type="text" placeholder="Nome" autocomplete="given-name"></div>
         <div class="campo"><input id="cognome" type="text" placeholder="Cognome" autocomplete="family-name"></div>
-        <div class="campo"><input id="email" type="email" placeholder="nome@esempio.it" autocomplete="email"></div>
+        <div class="campo"><input id="email" type="email" placeholder="nome.cognome@vigilfuoco.it" autocomplete="email"></div>
         <div class="campo">
           <input id="pw" type="password" placeholder="Password (minimo 6 caratteri)" autocomplete="new-password">
           <button class="toggle-pw" id="toggle">👁</button>
@@ -146,7 +147,7 @@ async function registrati() {
   });
   if (error) return mostraErrore(error.message);
   if (!data.session) {
-    mostraErrore('Registrazione riuscita: conferma l\'email ricevuta, poi torna qui ad accedere.');
+    mostraSuccesso('Registrazione riuscita: conferma l\'email ricevuta, poi torna qui ad accedere.');
   } else {
     await caricaUtente(data.user);
     render();
@@ -157,6 +158,12 @@ function mostraErrore(msg) {
   const err = document.getElementById('err');
   err.style.display = 'block';
   err.textContent = msg;
+}
+
+function mostraSuccesso(msg) {
+  const ok = document.getElementById('ok');
+  ok.style.display = 'block';
+  ok.textContent = msg;
 }
 
 async function accedi() {
