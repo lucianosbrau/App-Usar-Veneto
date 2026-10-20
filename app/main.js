@@ -208,7 +208,8 @@ function render() {
           <button class="voce" id="logout">🚪 Esci</button>
         </div>
         <div style="padding:16px 20px; font-size:12px; color:#94A3B8;">
-          ${nomeCompleto}<br>${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'}
+          ${nomeCompleto}<br>${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'}<br>
+          <span style="font-size:10px; opacity:0.7;">v. 20/10/2026</span>
         </div>
       </div>
       <div class="contenuto" id="contenuto"></div>
@@ -227,7 +228,7 @@ function render() {
         <button id="chiudi-menu" style="background:none;border:none;font-size:22px;cursor:pointer;">✕</button>
       </div>
       <div style="padding:0 16px; font-size:12px; color:#64748B; margin-bottom:8px;">
-        ${nomeCompleto} — ${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'}
+        ${nomeCompleto} — ${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'} — v. 20/10/2026
       </div>
       <div class="menu-mobile-lista">
         <button class="menu-mobile-voce" data-p="dashboard"><span>🏠</span> Dashboard</button>
