@@ -292,6 +292,13 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **DB NON definitivo**: in attesa dell'export dati da AppSheet; lo schema potrà adattarsi
 - Rimossi i file di prova `v2.html` e `reset.html` (serviti per il debug cache, non più necessari col service worker nuovo)
 
+### Database di prova (20/10/2026)
+- Creati `db/migrazione-anagrafica.sql` (campi: grado, comando, sede, turno, salto_turno, nbcr, saf, tpss, tas su `profili`) e `db/seed-prova.sql` (50 operatori fittizi, email `prova.*@usarveneto.test`, distribuzione: 8 ROS da grado CRE/CR/CSE/CS, 6 strutturisti, 5 NBCR 3°, 5 SAF 1A, 6 K9, 10 autisti, 10 generici; tutti i comandi del Veneto)
+- **L'utente deve eseguire in SQL Editor**: migrazione-anagrafica.sql poi seed-prova.sql (o l'equivalente unico file)
+- Quando arrivano i dati reali dal Google Sheet: `delete from profili where email like 'prova.%';` — il seed non tocca dati veri
+- Gradi: D, VD, IA, CRE, CR, CSE, CS, VC, VE, VF — **CRE/CR/CSE/CS = ROS** (caposquadra/caporeparto); l'app identifica i ROS dal campo `grado`
+- Patenti per ora: B, C, C+E, D (i "gradi patente" 1-4 dell'utente corrispondono; da mappare quando arrivano i dati reali)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine
 2. Pagina Operatori completa: dettaglio, modifica, **promozione/revoca admin da app**, reimposta password, campo patente

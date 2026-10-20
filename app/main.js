@@ -420,8 +420,8 @@ async function apriProgramma(cont, programmi) {
   progId = prog.id;
 
   const [pers, membri, storico] = await Promise.all([
-    supabase.from('profili').select('id, nome, cognome, patente').order('cognome'),
-    supabase.from('programmi_membri').select('*, profili(nome, cognome, patente)').eq('programma_id', prog.id),
+    supabase.from('profili').select('id, nome, cognome, patente, grado, comando').order('cognome'),
+    supabase.from('programmi_membri').select('*, profili(nome, cognome, patente, grado)').eq('programma_id', prog.id),
     supabase.from('programmi_membri').select('operatore_id, programmi_mensili!inner(mese)')
       .lt('programmi_mensili.mese', progMese).order('programmi_mensili.mese', { ascending: true })
   ]);
@@ -450,7 +450,7 @@ async function apriProgramma(cont, programmi) {
 
   const candidato = (o) => ({
     ...o,
-    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.patente ? ` (${o.patente})` : ''),
+    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.patente ? ` 🚚${o.patente}` : '') + (o.grado ? ` [${o.grado}]` : ''),
     gruppo: gruppoDi(o.id)
   });
 
