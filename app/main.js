@@ -214,10 +214,36 @@ function render() {
       <div class="contenuto" id="contenuto"></div>
     </div>
     <div class="mobile-nav">
-      ${voci.slice(0, 5).map(v => `<button data-p="${v.id}" class="${pagina === v.id ? 'attiva' : ''}"><span class="ic">${v.ic}</span>${v.t}</button>`).join('')}
+      ${voci.slice(0, 4).map(v => `<button data-p="${v.id}" class="${pagina === v.id ? 'attiva' : ''}"><span class="ic">${v.ic}</span>${v.t}</button>`).join('')}
+      <button id="menu-btn"><span class="ic">☰</span>Menù</button>
+    </div>
+    <div class="menu-overlay" id="overlay"></div>
+    <div class="menu-mobile" id="menu-mobile">
+      <div class="menu-mobile-testata">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img src="assets/logo-usar.jpg" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+          <div style="font-weight:800;">USAR Veneto</div>
+        </div>
+        <button id="chiudi-menu" style="background:none;border:none;font-size:22px;cursor:pointer;">✕</button>
+      </div>
+      <div style="padding:0 16px; font-size:12px; color:#64748B; margin-bottom:8px;">
+        ${nomeCompleto} — ${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'}
+      </div>
+      <div class="menu-mobile-lista">
+        <button class="menu-mobile-voce" data-p="dashboard"><span>🏠</span> Dashboard</button>
+        <button class="menu-mobile-voce" data-esci><span>🚪</span> Esci</button>
+      </div>
     </div>`;
   app.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { pagina = b.dataset.p; render(); });
   document.getElementById('logout').onclick = esci;
+  const overlay = document.getElementById('overlay');
+  const menuMobile = document.getElementById('menu-mobile');
+  const apriMenu = () => { overlay.classList.add('aperto'); menuMobile.classList.add('aperto'); };
+  const chiudiMenu = () => { overlay.classList.remove('aperto'); menuMobile.classList.remove('aperto'); };
+  document.getElementById('menu-btn').onclick = apriMenu;
+  document.getElementById('chiudi-menu').onclick = chiudiMenu;
+  overlay.onclick = chiudiMenu;
+  menuMobile.querySelectorAll('[data-esci]').forEach(b => b.onclick = async () => { chiudiMenu(); await esci(); });
   renderPagina();
 }
 
