@@ -346,7 +346,7 @@ function meseIt(d) {
 
 async function pagProgrammazione(el) {
   el.innerHTML = `
-    <div class="pagina-titolo">🗓️ Programmazione mensile</div>
+    <div class="pagina-titolo">🗓️ Programmazione Mensile</div>
     <div class="pagina-sotto">Manifesto programmato Alpha e Bravo — 38 posti</div>
     <div id="prog-cont">Caricamento…</div>`;
   const cont = document.getElementById('prog-cont');
@@ -522,7 +522,7 @@ async function apriProgramma(cont, programmi) {
 
 function pagAttivazione(el) {
   el.innerHTML = `
-    <div class="pagina-titolo">🚨 Attivazione emergenza</div>
+    <div class="pagina-titolo">🚨 Attivazione Emergenza</div>
     <div class="pagina-sotto">Seleziona il team da allertare</div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:600px;">
       <button class="btn-primary" style="height:80px; font-size:18px; font-weight:800;">🚨 ATTIVA ALPHA</button>
