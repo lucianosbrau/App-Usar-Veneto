@@ -537,6 +537,15 @@ function pagProfilo(el) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/App-Usar-Veneto/sw.js').catch(() => {});
+  navigator.serviceWorker.register('/App-Usar-Veneto/sw.js').then(reg => {
+    setInterval(() => reg.update().catch(() => {}), 60 * 60 * 1000);
+    reg.addEventListener('updatefound', () => {
+      const nw = reg.installing;
+      if (!nw) return;
+      nw.addEventListener('statechange', () => {
+        if (nw.state === 'installed' && navigator.serviceWorker.controller) location.reload();
+      });
+    });
+  }).catch(() => {});
 }
 init();
