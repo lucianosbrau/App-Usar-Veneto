@@ -244,6 +244,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - L'utente deve dare **OK esplicito** prima di toccare codice o procedere con sviluppi; registrare requisiti senza implementare quando chiede solo di "registrare"
 - Comunicazione in italiano
 - Ogni nuova decisione importante va riportata in questo documento
+- **Ogni azione svolta** (sviluppi, commit, modifiche a schema o config, verifiche) va registrata in questo documento con commit di riferimento, così un crash della sessione non perde nulla
 
 ---
 
