@@ -299,14 +299,38 @@ async function pagOperatori(el) {
 /* ============ PROGRAMMAZIONE MENSILE ============ */
 
 const MESI = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
-const RUOLI_MODULO = [
-  { id: 'strutturista', t: 'Strutturista', ic: '🏗️', imp: 'modulo_strutturisti' },
-  { id: 'nbcr', t: 'NBCR 3° livello', ic: '☣️', imp: 'modulo_nbcr' },
-  { id: 'k9', t: 'Unità cinofila K9', ic: '🐕', imp: 'modulo_k9' },
-  { id: 'caposquadra', t: 'Caposquadra', ic: '⛑️', imp: 'modulo_capisquadra' },
-  { id: 'saf', t: 'SAF 2A', ic: '🧗', imp: 'modulo_saf' },
-  { id: 'generico', t: 'Personale generico', ic: '👤' }
+
+const SEZIONI_MODULO = [
+  { t: 'DIREZIONE E COMANDO', posti: [
+    { n: 1, t: 'Team Leader' }, { n: 2, t: 'Vice Team Leader' }, { n: 3, t: 'Ufficiale di Collegamento' },
+    { n: 4, t: 'Staff Comando' }, { n: 5, t: 'Staff' }, { n: 6, t: 'Staff' }
+  ]},
+  { t: 'VALUTAZIONE E SICUREZZA', posti: [
+    { n: 7, t: 'Strutturista', spec: 'strutturista' }, { n: 8, t: 'NBCR', spec: 'nbcr' },
+    { n: 9, t: 'Strutturista', spec: 'strutturista' }, { n: 10, t: 'NBCR', spec: 'nbcr' }
+  ]},
+  { t: 'SOCCORSO — TURNAZIONE 1', posti: [
+    { n: 11, t: "Unità cinofila", spec: 'k9' }, { n: 12, t: "Unità cinofila", spec: 'k9' },
+    { n: 13, t: 'Tecnico strumentista' }, { n: 14, t: "Unità cinofila", spec: 'k9' },
+    { n: 15, t: "Unità cinofila", spec: 'k9' }, { n: 16, t: 'Tecnico strumentista' },
+    { n: 17, t: 'ROS (Caposquadra/Caporeparto)', ros: true },
+    { n: 18, t: 'Soccorritore tecnico' }, { n: 19, t: 'Soccorritore tecnico' },
+    { n: 20, t: 'Soccorritore tecnico' }, { n: 21, t: 'Soccorritore tecnico' },
+    { n: 22, t: 'SAF', spec: 'saf' }, { n: 23, t: 'Addetto sicurezza' }, { n: 24, t: 'Sentinella' }
+  ]},
+  { t: 'SOCCORSO — TURNAZIONE 2', posti: [
+    { n: 25, t: 'ROS (Caposquadra/Caporeparto)', ros: true },
+    { n: 26, t: 'Soccorritore tecnico' }, { n: 27, t: 'Soccorritore tecnico' },
+    { n: 28, t: 'Soccorritore tecnico' }, { n: 29, t: 'Soccorritore tecnico' },
+    { n: 30, t: 'SAF', spec: 'saf' }, { n: 31, t: 'Addetto sicurezza' }, { n: 32, t: 'Sentinella' }
+  ]},
+  { t: 'LOGISTICA', posti: [
+    { n: 33, t: 'Responsabile logistica' }, { n: 34, t: 'Vice resp. logistica' },
+    { n: 35, t: 'Logista' }, { n: 36, t: 'Logista' }, { n: 37, t: 'Logista' }, { n: 38, t: 'Logista' }
+  ]}
 ];
+const TUTTI_POSTI = SEZIONI_MODULO.flatMap(s => s.posti);
+const SPEC_DB = { strutturista: 'Strutturista', nbcr: 'NBCR 3° livello', k9: 'Unità cinofila K9', saf: 'SAF 2A (corda)' };
 
 function meseIt(d) {
   const dt = new Date(d + 'T00:00:00');
@@ -316,82 +340,63 @@ function meseIt(d) {
 async function pagProgrammazione(el) {
   el.innerHTML = `
     <div class="pagina-titolo">🗓️ Programmazione mensile</div>
-    <div class="pagina-sotto">Composizione dei manifesti Alpha e Bravo del mese successivo</div>
+    <div class="pagina-sotto">Manifesto programmato Alpha e Bravo — 38 posti</div>
     <div id="prog-cont">Caricamento…</div>`;
   const cont = document.getElementById('prog-cont');
+  const prog = await supabase.from('programmi_mensili').select('*, programmi_membri(*)').order('mese', { ascending: false });
 
-  const [imp, prog] = await Promise.all([
-    supabase.from('impostazioni').select('chiave, valore'),
-    supabase.from('programmi_mensili').select('*, programmi_membri(*)').order('mese', { ascending: false })
-  ]);
-  const impostazioni = Object.fromEntries((imp.data || []).map(r => [r.chiave, r.valore]));
-
-  if (!progMese && !progTeam) {
+  if (!progMese) {
     const now = new Date();
-    const prossimo = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-    const valoreMese = `${prossimo.getFullYear()}-${String(prossimo.getMonth() + 1).padStart(2, '0')}-01`;
     cont.innerHTML = `
       <div class="card" style="max-width:520px;">
-        <div style="font-weight:700; margin-bottom:14px;">1️⃣ Quale mese vuoi programmare?</div>
+        <div style="font-weight:700; margin-bottom:14px;">1️⃣ Quale mese?</div>
         <div style="display:flex; gap:12px;">
           <select id="prog-mese" style="flex:1; height:48px; border:1px solid var(--bordo); border-radius:10px; padding:0 12px; background:#fff;">
             ${Array.from({length: 12}, (_, i) => {
-              const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+              const d = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
               const v = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
-              return `<option value="${v}" ${i === 1 ? 'selected' : ''}>${MESI[d.getMonth()]} ${d.getFullYear()}</option>`;
+              return `<option value="${v}">${MESI[d.getMonth()]} ${d.getFullYear()}</option>`;
             }).join('')}
           </select>
           <button class="btn-primary" id="prog-vai" style="width:130px; height:48px;">VAI</button>
         </div>
-        ${statoMese(valoreMese, prog.data || [])}
       </div>
       ${(prog.data || []).length ? `
       <div class="card" style="margin-top:20px;">
         <div style="font-weight:700; margin-bottom:10px;">📅 Programmi esistenti</div>
         ${(prog.data || []).map(p => `
           <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--bordo);">
-            <div>${meseIt(p.mese)} — <b>${p.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</b> (${p.programmi_membri.length} nom.)</div>
+            <div>${meseIt(p.mese)} — <b>${p.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</b> (${p.programmi_membri.length}/38)</div>
             <button class="pill ${p.pubblicato ? 'verde' : 'giallo'}" data-apri="${p.mese}|${p.team}" style="border:none; cursor:pointer;">${p.pubblicato ? '✅ Pubblicato' : '✏️ Bozza'} — Apri</button>
           </div>`).join('')}
       </div>` : ''}`;
-    const selMese = document.getElementById('prog-mese');
-    cont.querySelector('[data-stato-mese]').outerHTML = '';
-    document.getElementById('prog-vai').onclick = () => { progMese = selMese.value; renderPagina(); };
+    document.getElementById('prog-vai').onclick = () => { progMese = document.getElementById('prog-mese').value; renderPagina(); };
     cont.querySelectorAll('[data-apri]').forEach(b => b.onclick = () => {
       const [m, t] = b.dataset.apri.split('|');
-      progMese = m; progTeam = t;
-      renderPagina();
+      progMese = m; progTeam = t; renderPagina();
     });
     return;
   }
 
-  if (progMese && !progTeam) {
+  if (!progTeam) {
     cont.innerHTML = `
       <div class="card" style="max-width:520px;">
         <button class="link" id="prog-indietro" style="padding:0; margin:0 0 14px;">← Cambia mese</button>
-        <div style="font-weight:700; margin-bottom:14px;">2️⃣ Quale squadra vuoi programmare per ${meseIt(progMese)}?</div>
+        <div style="font-weight:700; margin-bottom:14px;">2️⃣ Squadra per ${meseIt(progMese)}?</div>
         <div style="display:grid; gap:12px;">
-          <button class="btn-primary" data-team="alpha" style="height:64px; font-size:16px; font-weight:800;">🚨 SQUADRA ALPHA</button>
-          <button class="btn-primary" data-team="bravo" style="height:64px; font-size:16px; font-weight:800;">🚨 SQUADRA BRAVO</button>
+          <button class="btn-primary" data-team="alpha" style="height:64px; font-weight:800;">🚨 SQUADRA ALPHA</button>
+          <button class="btn-primary" data-team="bravo" style="height:64px; font-weight:800;">🚨 SQUADRA BRAVO</button>
         </div>
-        ${statoMese(progMese, prog.data || [])}
       </div>`;
     document.getElementById('prog-indietro').onclick = () => { progMese = null; renderPagina(); };
     cont.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { progTeam = b.dataset.team; renderPagina(); });
     return;
   }
 
-  await apriProgramma(cont, impostazioni, prog.data || []);
+  await apriProgramma(cont, prog.data || []);
 }
 
-function statoMese(mese, programmi) {
-  const existing = programmi.filter(p => p.mese === mese);
-  return `<div data-stato-mese style="margin-top:14px; font-size:13px; color:var(--grigio);">
-    ${existing.length ? existing.map(p => `${p.team === 'alpha' ? 'ALPHA' : 'BRAVO'}: ${p.pubblicato ? 'pubblicato' : 'bozza'} (${p.programmi_membri.length})`).join(' · ') : 'Nessun programma per questo mese.'}
-  </div>`;
-}
-
-async function apriProgramma(cont, impostazioni, programmi) {
+async function apriProgramma(cont, programmi) {
   cont.innerHTML = 'Caricamento…';
   let prog = programmi.find(p => p.mese === progMese && p.team === progTeam);
   if (!prog) {
@@ -402,53 +407,43 @@ async function apriProgramma(cont, impostazioni, programmi) {
   }
   progId = prog.id;
 
-  const [pers, membri] = await Promise.all([
-    supabase.from('profili').select('id, nome, cognome, patente'),
-    supabase.from('programmi_membri').select('*, profili(nome, cognome, patente)').eq('programma_id', prog.id)
+  const [pers, membri, storico] = await Promise.all([
+    supabase.from('profili').select('id, nome, cognome, patente').order('cognome'),
+    supabase.from('programmi_membri').select('*, profili(nome, cognome, patente)').eq('programma_id', prog.id),
+    supabase.from('programmi_membri').select('operatore_id, programmi_mensili!inner(mese)')
+      .lt('programmi_mensili.mese', progMese).order('programmi_mensili.mese', { ascending: true })
   ]);
   const tutti = pers.data || [];
-  const lista = membri.data || [];
-
-  const storico = await supabase.from('programmi_membri')
-    .select('operatore_id, programmi_mensili!inner(mese)')
-    .lt('programmi_mensili.mese', progMese)
-    .order('programmi_mensili.mese', { ascending: true });
+  const occupati = new Set((membri.data || []).map(m => m.operatore_id));
+  const perPosto = {};
+  (membri.data || []).forEach(m => { perPosto[m.posto] = m; });
 
   const ultimoUso = {};
-  (storico.data || []).forEach(r => {
-    if (!ultimoUso[r.operatore_id]) ultimoUso[r.operatore_id] = r.programmi_mensili.mese;
-  });
-
+  (storico.data || []).forEach(r => { if (!ultimoUso[r.operatore_id]) ultimoUso[r.operatore_id] = r.programmi_mensili.mese; });
+  const [y1, m1] = progMese.split('-').map(Number);
   const diffMesi = (m) => {
-    const [y1, m1] = progMese.split('-').map(Number);
     const [y2, m2] = m.split('-').map(Number);
     return (y1 - y2) * 12 + (m1 - m2);
   };
-
   const gruppoDi = (opId) => {
     const u = ultimoUso[opId];
     if (!u) return { n: 99, t: 'MAI INSERITI' };
     const d = diffMesi(u);
-    if (d >= 6) return { n: d, t: `${d} MESI FA` };
     if (d === 1) return { n: 1, t: 'IL MESE SCORSO' };
     return { n: d, t: `${d} MESI FA` };
   };
 
-  const costruttore = (op) => ({
-    ...op,
-    etichetta: `${op.cognome} ${op.nome}`.trim(),
-    gruppo: gruppoDi(op.id)
+  const idCapi = new Set(SPEC_IDS['Caposquadra/Capireparto'] || []);
+  const idSpec = (s) => new Set(SPEC_IDS[SPEC_DB[s]] || []);
+
+  const candidato = (o) => ({
+    ...o,
+    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.patente ? ` (${o.patente})` : ''),
+    gruppo: gruppoDi(o.id)
   });
 
-  const totReq = Number(impostazioni.modulo_totale) || 38;
-  const conteggi = RUOLI_MODULO.map(r => ({
-    ...r,
-    n: lista.filter(m => m.ruolo === r.id).length,
-    req: r.imp ? (Number(impostazioni[r.imp]) || 0) : null
-  }));
-  const nGenerici = lista.filter(m => m.ruolo === 'generico').length;
-  const autisti = lista.filter(m => m.profili?.patente);
-  const totale = lista.length;
+  const compilati = (membri.data || []).length;
+  const autisti = (membri.data || []).filter(m => m.profili?.patente);
 
   cont.innerHTML = `
     <button class="link" id="prog-indietro" style="padding:0; margin-bottom:10px;">← Cambia squadra</button>
@@ -456,99 +451,66 @@ async function apriProgramma(cont, impostazioni, programmi) {
       <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
         <div>
           <div style="font-size:22px; font-weight:800;">${meseIt(progMese)} — SQUADRA ${progTeam === 'alpha' ? 'ALPHA' : 'BRAVO'}</div>
-          <div style="font-size:13px; color:var(--grigio);">${prog.pubblicato ? '✅ Pubblicato su Telegram' : '✏️ Bozza — l\'admin può sempre modificare'} · ${totale}/${totReq} unità</div>
+          <div style="font-size:13px; color:var(--grigio);">${prog.pubblicato ? '✅ Pubblicato' : '✏️ Bozza'} · ${compilati}/38 posti · 🚚 ${autisti.length} autisti</div>
         </div>
-        <button class="btn-primary" id="prog-pubblica" style="max-width:200px; height:44px; background:${prog.pubblicato ? 'var(--verde)' : 'var(--rosso)'};">${prog.pubblicato ? 'RIPUBBLICA' : 'PUBBLICA'} SU TELEGRAM</button>
+        <button class="btn-primary" id="prog-pubblica" style="max-width:210px; height:44px; background:${prog.pubblicato ? 'var(--verde)' : 'var(--rosso)'};">${prog.pubblicato ? 'RIPUBBLICA' : 'PUBBLICA'} SU TELEGRAM</button>
       </div>
-      <div class="barra" style="margin-top:12px;"><div style="width:${Math.min(100, totale / totReq * 100)}%;"></div></div>
+      <div class="barra" style="margin-top:12px;"><div style="width:${compilati / 38 * 100}%;"></div></div>
     </div>
 
-    ${conteggi.map(r => `
+    ${SEZIONI_MODULO.map(s => `
       <div class="card" style="margin-bottom:14px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <div style="font-weight:700;">${r.ic} ${r.t}</div>
-          <div style="font-weight:800; ${r.req && r.n < r.req ? 'color:var(--rosso);' : 'color:var(--verde-tx);'}">
-            ${r.n}${r.req ? `/${r.req}` : ''}
-          </div>
-        </div>
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-          <select id="sel-${r.id}" style="flex:1; height:46px; border:1px solid var(--bordo); border-radius:10px; padding:0 12px; background:#fff;">
-            ${opzioniPer(r, tutti, lista, costruttore, impostazioni)}
-          </select>
-          <button class="btn-primary" data-add="${r.id}" style="width:120px; height:46px;">➕ AGGIUNGI</button>
-        </div>
-        ${lista.filter(m => m.ruolo === r.id).map(m => `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-top:1px solid var(--bordo);">
-            <div>• ${esc(m.profili?.cognome)} ${esc(m.profili?.nome)} ${m.profili?.patente ? `<span class="pill giallo" style="font-size:10px;">🚚 ${esc(m.profili.patente)}</span>` : ''}</div>
-            <button class="pill rosso" data-rimuovi="${m.id}" style="border:none; cursor:pointer;">✕</button>
-          </div>`).join('')}
-      </div>`).join('')}
-
-    <div class="card" style="border-left:4px solid var(--verde);">
-      <div style="font-weight:700; margin-bottom:6px;">🚚 Autisti nella squadra</div>
-      <div style="font-size:14px;">${autisti.length} — ${autisti.map(a => `${esc(a.profili?.cognome)} (${esc(a.profili?.patente)})`).join(', ') || 'Nessuno con patente indicata'}</div>
-      <div style="font-size:12px; color:var(--grigio); margin-top:6px;">La patente si imposta nel profilo dell'operatore (campo «patente», es. C, C+E, D).</div>
-    </div>`;
+        <div style="font-weight:800; font-size:13px; letter-spacing:0.5px; color:var(--grigio); margin-bottom:10px;">${s.t}</div>
+        ${s.posti.map(p => {
+          const occ = perPosto[p.n];
+          const idonei = tutti.filter(o => {
+            if (occupati.has(o.id)) return false;
+            if (p.spec) return idSpec(p.spec).has(o.id);
+            return true;
+          }).map(candidato);
+          if (p.ros) idonei.sort((a, b) => (idCapi.has(b.id) - idCapi.has(a.id)) || (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
+          else idonei.sort((a, b) => (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
+          let opzioni = `<option value="">— Scegli —</option>`;
+          let ultimoG = null;
+          idonei.forEach(o => {
+            const prefisso = p.ros ? (idCapi.has(o.id) ? '⭐ ' : '') : '';
+            if (o.gruppo.t !== ultimoG) {
+              const colore = o.gruppo.t === 'MAI INSERITI' ? '#94A3B8' : (o.gruppo.n === 1 ? '#059669' : o.gruppo.n <= 3 ? '#2563EB' : '#F59E0B');
+              opzioni += `<option disabled style="color:${colore}; font-weight:700;">── ${o.gruppo.t} ──</option>`;
+              ultimoG = o.gruppo.t;
+            }
+            opzioni += `<option value="${o.id}">${prefisso}${o.etichetta}</option>`;
+          });
+          return `
+          <div style="display:flex; gap:10px; align-items:center; padding:7px 0; border-top:1px solid var(--bordo);">
+            <span style="width:28px; font-weight:800; color:${p.spec || p.ros ? 'var(--rosso)' : 'var(--grigio)'};">${p.n}</span>
+            <span style="flex:1; font-size:14px;">${esc(p.t)}${p.spec || p.ros ? ' <span style="color:var(--rosso); font-size:11px;">● OBBL.</span>' : ''}</span>
+            ${occ
+              ? `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${occ.profili?.patente ? ` <span class="pill giallo" style="font-size:10px;">🚚 ${esc(occ.profili.patente)}</span>` : ''}</span>
+                 <button class="pill rosso" data-vuota="${occ.id}" style="border:none; cursor:pointer;">✕</button>`
+              : `<select id="posto-${p.n}" style="max-width:220px; height:40px; border:1px solid var(--bordo); border-radius:10px; padding:0 8px; background:#fff; font-size:13px;">${opzioni}</select>
+                 <button class="btn-primary" data-posto="${p.n}" style="width:90px; height:40px; font-size:13px;">➕</button>`}
+          </div>`;
+        }).join('')}
+      </div>`).join('')}`;
 
   document.getElementById('prog-indietro').onclick = () => { progTeam = null; progId = null; renderPagina(); };
-  cont.querySelectorAll('[data-add]').forEach(b => b.onclick = () => aggiungiMembro(b.dataset.add));
-  cont.querySelectorAll('[data-rimuovi]').forEach(b => b.onclick = async () => {
-    await supabase.from('programmi_membri').delete().eq('id', b.dataset.rimuovi);
+  cont.querySelectorAll('[data-posto]').forEach(b => b.onclick = async () => {
+    const sel = document.getElementById(`posto-${b.dataset.posto}`);
+    if (!sel.value) { alert('Scegli prima un operatore.'); return; }
+    const { error } = await supabase.from('programmi_membri').insert({ programma_id: progId, operatore_id: sel.value, posto: Number(b.dataset.posto) });
+    if (error) { alert('Posto già occupato.'); return; }
+    renderPagina();
+  });
+  cont.querySelectorAll('[data-vuota]').forEach(b => b.onclick = async () => {
+    await supabase.from('programmi_membri').delete().eq('id', b.dataset.vuota);
     renderPagina();
   });
   document.getElementById('prog-pubblica').onclick = async () => {
     await supabase.from('programmi_mensili').update({ pubblicato: true }).eq('id', prog.id);
-    alert('Programma pubblicato (l\'invio Telegram verrà attivato con il bot).');
+    alert('Programma pubblicato (invio Telegram con il bot).');
     renderPagina();
   };
-}
-
-function opzioniPer(ruolo, tutti, lista, costr, impostazioni) {
-  const giaDentro = new Set(lista.map(m => m.operatore_id));
-  const specMap = { strutturista: 'Strutturista', nbcr: 'NBCR 3° livello', k9: 'Unità cinofila K9', caposquadra: 'Caposquadra/Capireparto', saf: 'SAF 2A (corda)' };
-  const idSpecializzati = SPEC_IDS[specMap[ruolo.id]] || [];
-  const SPEC_MODULO = ['Strutturista', 'Unità cinofila K9', 'NBCR 3° livello', 'SAF 2A (corda)'];
-  const conSpecModulo = new Set(SPEC_MODULO.flatMap(n => SPEC_IDS[n] || []));
-  const nCapiInSquadra = lista.filter(m => m.ruolo === 'caposquadra').length;
-  const minCapi = Number(impostazioni.modulo_capisquadra) || 2;
-  const capiEccedenti = nCapiInSquadra >= minCapi
-    ? (SPEC_IDS['Caposquadra/Capireparto'] || []).filter(id =>
-        lista.some(m => m.operatore_id === id && m.ruolo === 'caposquadra') &&
-        !lista.some(m => m.operatore_id === id && m.ruolo === 'generico'))
-    : [];
-  const idonei = tutti.filter(o => {
-    if (ruolo.id === 'generico') {
-      return !conSpecModulo.has(o.id) || capiEccedenti.includes(o.id);
-    }
-    return idSpecializzati.includes(o.id);
-  });
-  const ordinati = idonei
-    .map(costr)
-    .filter(o => !giaDentro.has(o.id))
-    .sort((a, b) => b.gruppo.n - a.gruppo.n || a.etichetta.localeCompare(b.etichetta));
-  const gruppiVisibili = {};
-  ordinati.forEach(o => { gruppiVisibili[o.gruppo.t] = (gruppiVisibili[o.gruppo.t] || 0) + 1; });
-  let html = '<option value="">— Scegli operatore —</option>';
-  let ultimoGruppo = null;
-  ordinati.forEach(o => {
-    if (o.gruppo.t !== ultimoGruppo) {
-      const colore = o.gruppo.t === 'MAI INSERITI' ? '#94A3B8' : (o.gruppo.n === 1 ? '#059669' : o.gruppo.n <= 3 ? '#2563EB' : '#F59E0B');
-      html += `<option disabled style="color:${colore}; font-weight:700;">── ${o.gruppo.t} ──</option>`;
-      ultimoGruppo = o.gruppo.t;
-    }
-    html += `<option value="${o.id}">${o.etichetta}</option>`;
-  });
-  return html;
-}
-
-async function aggiungiMembro(ruolo) {
-  const sel = document.getElementById(`sel-${ruolo}`);
-  if (!sel.value) { alert('Scegli prima un operatore dalla tendina.'); return; }
-  const { error } = await supabase.from('programmi_membri').insert({
-    programma_id: progId, operatore_id: sel.value, ruolo
-  });
-  if (error) { alert(error.message.includes('duplicate') ? 'Operatore già inserito in questo programma.' : error.message); return; }
-  renderPagina();
 }
 
 function pagAttivazione(el) {

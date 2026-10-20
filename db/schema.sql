@@ -151,9 +151,9 @@ create table if not exists programmi_membri (
   id serial primary key,
   programma_id int not null references programmi_mensili(id) on delete cascade,
   operatore_id uuid not null references profili(id) on delete cascade,
-  ruolo text not null default 'generico'
-    check (ruolo in ('generico', 'strutturista', 'nbcr', 'k9', 'caposquadra', 'saf')),
+  posto int not null check (posto between 1 and 38),
   inserito_il timestamptz not null default now(),
+  unique (programma_id, posto),
   unique (programma_id, operatore_id)
 );
 
