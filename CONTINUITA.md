@@ -254,6 +254,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Regola di lavoro ribadita dall'utente**: ogni nuova decisione va scritta in questo documento immediatamente, proprio per poter riprendere dopo un crash della sessione
 - Corretta la data dell'ultimo aggiornamento (19 ottobre 2026, non 2025) — commit `9968ad2`
 - Confermata la comprensione del flusso di rifiuto mantenimenti: admin rifiuta con **note facoltative** (`note_rifiuto` visibili all'operatore)
+- **Progetto Supabase creato e collegato**: URL + chiave anonima in `.env` locale (mai committato, è in `.gitignore`)
+- **Schema eseguito con successo sulla SQL Editor**: tutte le 9 tabelle create e verificate (profili, specializzazioni, operatori_specializzazioni, disponibilita, attivazioni, risposte_attivazione, mantenimenti, impostazioni, manifesti)
+- **Il database NON è definitivo**: l'utente aspetta l'**esportazione dei dati esistenti da AppSheet** per riutilizzarli senza reinserirli; lo schema potrà essere adattato di conseguenza
+- **Sviluppo per gradi**: l'utente conferma di procedere un passo alla volta, NON tutto d'un colpo; ogni passo richiede OK esplicito prima di toccare codice
 
 **Da fare (invariato)**:
 - Utente deve creare il progetto Supabase (regione Frankfurt) e fornire URL + chiave anonima per il file `.env`
