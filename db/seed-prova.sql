@@ -37,12 +37,17 @@ from (values
   ('Stefano','Moretti','VF','Verona','Legnago','D','D5','C+E',3,'Basico',true,null),
   ('Silvia','Fontana','VC','Belluno','Feltre','C','C8','B',3,null,false,null),
   ('Giorgio','Caruso','VF','Rovigo','Adria','A','A1','D',3,'Avanzato',false,1),
-  -- SAF 2A / AVANZATI — 5
-  ('Fabio','Mancini','VF','Vicenza','Valdagno','B','B6','B',0,'1A',false,null),
-  ('Valentina','Villa','VE','Treviso','Montebelluna','A','A4','C',1,'1A',true,null),
-  ('Riccardo','Serra','VF','Padova','Camposampiero','D','D7','C+E',0,'1A',false,null),
-  ('Marta','Rinaldi','VC','Verona','San Bonifacio','C','C5','B',2,'1A',false,null),
+  -- SAF (2A / Avanzato) — 10
+  ('Fabio','Mancini','VF','Vicenza','Valdagno','B','B6','B',0,'2A',false,null),
+  ('Valentina','Villa','VE','Treviso','Montebelluna','A','A4','C',1,'2A',true,null),
+  ('Riccardo','Serra','VF','Padova','Camposampiero','D','D7','C+E',0,'2A',false,null),
+  ('Marta','Rinaldi','VC','Verona','San Bonifacio','C','C5','B',2,'2A',false,null),
   ('Luca','Pellegrini','VE','Venezia','San Donà','B','B1','D',0,'Avanzato',false,null),
+  ('Alessio','Fiore','VF','Padova','Abano','C','C1','B',0,'Avanzato',false,null),
+  ('Denise','Basso','VE','Treviso','Oderzo','A','A5','C',1,'Avanzato',false,null),
+  ('Manuel','Cavalli','VF','Verona','Legnago','D','D6','C+E',0,'2A',false,null),
+  ('Elena','Michielin','VC','Vicenza','Schio','B','B7','B',0,'Avanzato',false,null),
+  ('Andrea','Boatto','VE','Venezia','Chioggia','A','A2','D',2,'2A',false,null),
   -- UNITÀ CINOFILA K9 — 6
   ('Davide','Ferri','VF','Padova','Padova','A','A8','C',0,null,false,null),
   ('Alice','Martini','VE','Vicenza','Vicenza','B','B7','B',0,'Basico',false,null),
@@ -85,7 +90,7 @@ where p.email like 'prova.%'
     or (s.nome = 'NBCR 3° livello' and p.nbcr = 3)
     or (s.nome = 'Unità cinofila K9' and false)
     or (s.nome = 'Caposquadra/Capireparto' and p.grado in ('CRE','CR','CSE','CS'))
-    or (s.nome = 'SAF 2A (corda)' and p.saf = '1A')
+    or (s.nome = 'SAF 2A (corda)' and p.saf in ('2A','Avanzato'))
   );
 
 -- Strutturisti e K9: nomi scelti apposta (nessun campo booleano dedicato) — li lego per nome

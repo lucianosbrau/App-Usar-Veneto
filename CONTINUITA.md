@@ -298,6 +298,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Quando arrivano i dati reali dal Google Sheet: `delete from profili where email like 'prova.%';` — il seed non tocca dati veri
 - Gradi: D, VD, IA, CRE, CR, CSE, CS, VC, VE, VF — **CRE/CR/CSE/CS = ROS** (caposquadra/caporeparto); l'app identifica i ROS dal campo `grado`
 - Patenti per ora: B, C, C+E, D (i "gradi patente" 1-4 dell'utente corrispondono; da mappare quando arrivano i dati reali)
+- **SAF (chiarito dall'utente)**: valori possibili 1A, 2A, Basico, Avanzato; **per il modulo contano SOLO 2A e Avanzato** — nel seed ora ci sono 10 SAF (5×2A + 5×Avanzato); il posto 22/30 va occupato da un SAF 2A o Avanzato
 
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine
