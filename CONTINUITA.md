@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 19 ottobre 2026
+Ultimo aggiornamento: 20 ottobre 2026
 
 ---
 
@@ -36,8 +36,9 @@ Futuro opzionale: `.exe` Windows, `.apk` Android, iOS.
 |---|---|---|
 | Dashboard | Tutti | Panoramica generale, attivazione rapida (admin) |
 | Operatori | Admin | Gestione completa: ricerca, filtri, dettaglio, modifica, inserimento |
-| Squadre | Admin | Composizione Alpha/Bravo: proposta automatica + drag & drop (dnd-kit) |
+| Squadre | Tutti (consultazione) / Admin (modifica) | Composizione Alpha/Bravo del mese in corso |
 | Calendario | Tutti | Turni mensili, pubblicazione e invio via Telegram |
+| Programmazione mensile | Admin | Compilazione manuale del manifesto programmato Alpha/Bravo del mese successivo (38 posti) con rotazione del personale |
 | Disponibilità | Operatore | Disponibilità, ferie, indisponibilità |
 | Attivazione | Admin | Lancio emergenza ALPHA/BRAVO, messaggio modificabile prima dell'invio |
 | Mantenimenti | Operatore (propri) + Admin (validazione) | Inserimento ore con tipo (Mantenimento, Manovra, Intervento, Lavorazione, Tutor Mantenimento, Tutor Corso, Altra formazione); stato In validazione/Approvato; operatore cancella solo i propri in validazione; evidenziazione sotto-soglia, storico per anno |
@@ -248,53 +249,54 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 
 ---
 
-## 14. Sessione del 19 ottobre 2026 (seconda sessione)
+## 14. Stato dell'applicazione (aggiornato al 20 ottobre 2026)
 
-**Decisioni/verifiche di questa sessione**:
-- Verificato stato del repository: nessun problema tecnico; crash delle conversazioni = sessioni AI che terminano, mitigati da questo documento
-- **Regola di lavoro ribadita dall'utente**: ogni nuova decisione va scritta in questo documento immediatamente, proprio per poter riprendere dopo un crash della sessione
-- Corretta la data dell'ultimo aggiornamento (19 ottobre 2026, non 2025) — commit `9968ad2`
-- Confermata la comprensione del flusso di rifiuto mantenimenti: admin rifiuta con **note facoltative** (`note_rifiuto` visibili all'operatore)
-- **Progetto Supabase creato e collegato**: URL + chiave anonima in `.env` locale (mai committato, è in `.gitignore`)
-- **Schema eseguito con successo sulla SQL Editor**: tutte le 9 tabelle create e verificate (profili, specializzazioni, operatori_specializzazioni, disponibilita, attivazioni, risposte_attivazione, mantenimenti, impostazioni, manifesti)
-- **Il database NON è definitivo**: l'utente aspetta l'**esportazione dei dati esistenti da AppSheet** per riutilizzarli senza reinserirli; lo schema potrà essere adattato di conseguenza
-- **Sviluppo per gradi**: l'utente conferma di procedere un passo alla volta, NON tutto d'un colpo; ogni passo richiede OK esplicito prima di toccare codice
+### Sistema operativo ✅
+- **App online**: https://lucianosbrau.github.io/App-Usar-Veneto/ — deploy automatico a ogni push su `main` (GitHub Actions: build Vite con secrets `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`, pubblicazione GitHub Pages)
+- **Database Supabase collegato** (regione Frankfurt): schema completo `db/schema.sql` eseguito + migrazioni (`migrazione-policy-profili.sql`, `migrazione-programmazione.sql`) — 9 tabelle base + `programmi_mensili`/`programmi_membri` + colonna `patente`
+- **Utente admin attivo**: Luciano Di Lorenzo (lucianosbrau@gmail.com)
+- Configurazioni Supabase fatte: confirm email OFF, Site URL = GitHub Pages, redirect URLs impostati
+- Versione visibile nell'app: v. 20/10/2026 (in sidebar e menù mobile)
+- Aggiornamenti automatici: service worker riscritto (pagina sempre dal server, reload automatico su nuova versione, controllo orario)
 
-**Da fare (invariato)**:
-- Utente deve creare il progetto Supabase (regione Frankfurt) e fornire URL + chiave anonima per il file `.env`
-- Poi: eseguire `db/schema.sql`, creare i primi admin, sviluppare le pagine reali (ordine: Operatori, Mantenimenti, Dashboard, Attivazione...)
-- Possibile sviluppo in modalità dimostrativa (dati finti) in attesa delle credenziali, se l'utente dà OK
-- **OK utente ricevuto**: sviluppate login+registrazione e pagina Mantenimenti completa (app/main.js): registrazione con nome/cognome/email/password, creazione automatica riga profilo, Mantenimenti con inserimento (campi obbligatori evidenziati in rosso, cognome/nome automatici non editabili), coda validazione admin (approva/rifiuta con note facoltative), eliminazione solo propri in validazione, rifiutati con nota admin visibile, storico approvati, conteggio ore anno vs soglia con barra colore. Build verificata OK
-- **Policy aggiunta** in `db/schema.sql` + script `db/migrazione-policy-profili.sql` da eseguire in SQL Editor: `insert` profili per il proprio utente (necessaria alla registrazione). Da far eseguire all'utente
-- **Primo admin**: l'utente si registra dall'app, poi in Supabase → Table Editor → `profili` cambia `ruolo` in `admin` a mano
-- Le altre pagine (dashboard completa, squadre, calendario, attivazione reale, internazionale, report, resoconti) restano da sviluppare, per gradi con OK dell'utente
-- **Policy `insert` profili eseguita dall'utente in SQL Editor** ✅
-- **Deploy automatico GitHub Pages**: creato `.github/workflows/deploy.yml` — a ogni push su `main` build con Vite (secrets `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`) e pubblicazione via GitHub Actions. Adattati percorsi per sottocartella Pages: `manifest.webmanifest` (start_url/scope), `sw.js` (cache limitata alla sottocartella, v2), `index.html` (percorsi assoluti `/App-Usar-Veneto/...`), registrazione service worker. **L'utente deve ancora impostare i 2 secrets nel repo** (Settings → Secrets and variables → Actions) e verificare Pages settato su **Source: GitHub Actions**. App: https://lucianosbrau.github.io/App-Usar-Veneto/
-- **Deploy verificato e app online** ✅ (secrets impostati dall'utente, Pages via GitHub Actions): login+registrazione funzionanti, DB collegato
-- **Bug logo risolto**: `assets/logo-usar.jpg`, `manifest.webmanifest` e `sw.js` non venivano copiati nel build (Vite pubblica solo `public/`) — spostati/copiati in `public/` con percorsi `/App-Usar-Veneto/...`
-- **Richieste utente applicate**: placeholder email `nome.cognome@vigilfuoco.it` (login e registrazione); messaggio "Registrazione riuscita" ora su box verde chiaro (`.successo` in style.css) separato dal box rosso errore
-- **Conferma email disattivata** (decisione utente, da eseguire in Supabase → Authentication → Providers → Email → "Confirm email" OFF): registrazione senza attesa di conferma, coerente col futuro SSO VVF — l'email resterà solo dato di contatto quando si passerà alle credenziali istituzionali. Nota: la prima email di conferma non era arrivata (probabile spam/filtro o limiti servizio gratuito Supabase); tabella `profili` ancora vuota in attesa della prima registrazione riuscita
-- **Test utente con Gmail**: l'email di conferma ARRIVA (quindi il canale Supabase funziona), ma il link punta a `localhost:3000` → errore ERR_CONNECTION_REFUSED. **Fix da eseguire**: Supabase → Authentication → URL Configuration → Site URL = `https://lucianosbrau.github.io/App-Usar-Veneto/` + Redirect URLs = `https://lucianosbrau.github.io/App-Usar-Veneto/**`
-- **Fix cache service worker** (bug trovato dall'utente: pagina sempre vecchia anche cambiando browser): il vecchio sw.js serviva la pagina dalla cache senza mai controllare aggiornamenti. Riscritto (v3): la pagina HTML si scarica sempre dal server (cache solo per asset e solo offline), controllo update ogni ora e **reload automatico** quando arriva una versione nuova. L'utente ha dovuto svuotare la cache UN'ultima volta per ricevere il sw nuovo; dalle prossime release l'aggiornamento è automatico
-- **Utente registrato e promosso admin** ✅: Luciano Di Lorenzo (lucianosbrau@gmail.com) nel db con ruolo `admin`
-- **Pagina "Programmazione mensile" (nuova, richiesta e chiarita dall'utente — ADMIN) — RISCRTTA sul modello COMPOSIZIONE TEAM (Drive, PDF letto in sessione)**:
-  - Struttura modulo **38 posti numerati** letta dal PDF: 1-6 Direzione e Comando (Team Leader, Vice, Ufficiale Collegamento, Staff ×3); 7-10 Valutazione e Sicurezza (**Strutturista 7 e 9, NBCR 8 e 10**); 11-24 Soccorso turnazione 1 (Unità cinofila 11,12,14,15; Tecnico strumentista 13,16; **ROS 17**; Soccorritore tecnico 18-21; SAF 22; Addetto sicurezza 23; Sentinella 24); 25-32 turnazione 2 (**ROS 25**, soccorritori 26-29, SAF 30, addetto 31, sentinella 32); 33-38 Logistica
-  - **ROS = Caposquadra/Caporeparto, posti 17 e 25**; tendina ROS: **prima i caposquadra/caporeparto** (marcati ⭐), poi gli altri; se un capo è anche K9/NBCR3/SAF2A la **specializzazione vince** e occupa quel posto
-  - **Tutti i 38 posti si compilano a tendina** (anche 1-6 Direzione); requisiti di Direzione da definire più avanti
-  - Posti con specializzazione obbligatoria: tendina mostra SOLO gli idonei; altri posti: chiunque non già inserito
-  - Ordine tendine: prima i meno recenti («IL MESE SCORSO»/«N MESI FA»/«MAI INSERITI»), finestra 6 mesi
-  - Tabella `programmi_membri` con **campo `posto` (1-38)** unique per programma; un operatore non può occupare due posti nello stesso programma (DB); duplicati in programmi diversi permessi
-  - Vecchia versione con «ruoli/sezione caposquadra» era ERRATA: il caposquadra non è una sezione separata, è un attributo che sta nei posti ROS 17/25
+### Pagine sviluppate
+| Pagina | Stato |
+|---|---|
+| Login + Registrazione | ✅ completa (placeholder `nome.cognome@vigilfuoco.it`, box verde successo, creazione automatica profilo) |
+| Mantenimenti | ✅ completa (inserimento con validazione, coda admin approva/rifiuta con note, storico, soglia 36 h configurabile) |
+| Programmazione mensile | ✅ completa (38 posti del modulo, tendine rotazione 6 mesi, ROS 17/25 con capi prima, conteggi e autisti) |
+| Operatori | ⚙️ base (elenco; da fare: dettaglio, modifica, promozione admin, reimposta password) |
+| Dashboard | ⚙️ base (benvenuto; da fare: card team, grafici torta, attivazione rapida) |
+| Attivazione | ⚙️ mockup (da collegare al DB e al bot) |
+| Profilo | ⚙️ base (codice Telegram finto; da collegare al bot) |
+| Squadre, Calendario, Internazionale, Report, Resoconti | ❌ da sviluppare |
 
-  - Flusso: mese → squadra (Alpha/Bravo) → compilazione **manuale** del manifesto programmato (ciò che verrà attivato in emergenza)
-  - **REQUISITI MODULO USAR MEDIUM (già decisi in precedenza, valori definitivi — NON esempi)**: 38 unità operative + 5 sanitarie; specializzazioni obbligatorie: **2 strutturisti, 2 NBCR 3° livello, 4 K9, 2 capisquadra, 2 SAF 2A**; in `impostazioni`: modulo_totale=38, modulo_strutturisti=2, modulo_nbcr=2, modulo_k9=4, modulo_capisquadra=2, modulo_saf=2 (modificabili dall'admin)
-  - **GENERICO (definizione definitiva chiarita dall'utente)**: chi **NON è Strutturista, K9, NBCR 3° livello, SAF 2A**. Il generico può essere inserito **solo negli spazi senza requisito obbligatorio**. Un autista può essere generico o SAF: la patente serve solo per il conteggio autisti, non è un ruolo
-  - **CAPIQUADRA/CAPOREPARTO — regola chiarita dall'utente**: la squadra richiede **ALMENO 2** capisquadra/caporeparto (minimo, non esatto). **Se ce ne sono 3 o più**, quelli oltre il minimo **possono essere inseriti anche come soccorritori generici** (nella tendina generica compaiono i capi in squadra oltre i primi 2). Un capo usato come generico compare in entrambi gli elenchi, senza doppio conteggio unità
-  - Tendine per ruolo (Strutturista, K9, Caposquadra, NBCR, SAF, generico): propongono **prima i meno recenti**, raggruppati con intestazioni «N MESI FA» / «IL MESE SCORSO» / «MAI INSERITI», finestra storico **6 mesi**; generico = chi non ha specializzazioni del modulo
-  - **Autisti**: conteggio con grado patente (da campo `patente` del profilo), non è un ruolo a sé
-  - Duplicati in due squadre: **permessi con avviso** (per ora solo alert; il vincolo DB è per programma singolo)
-  - Admin può sempre modificare e ripubblicare; pubblicazione su **Telegram** (placeholder finché il bot non esiste)
-  - Aggiornati `presentazione.html` (tabella pagine, ora 11, + ruoli) e `anteprima-schermate.html` (nuova schermata 6) il pulsante Esci era solo nella sidebar, invisibile da telefono. Ora la barra mobile ha 4 pagine + pulsante ☰ Menù che apre un pannello laterale (overlay scuro, logo, nome utente e ruolo) con comando 🚪 Esci; struttura pronta per future voci "Dati"/"Impostazioni" da aggiungere in `.menu-mobile-lista`
-- **Barra mobile e menù ridisegnati (richiesta utente)**: barra in basso per ruolo (admin: Dashboard, Squadre, Programmazione, Attivazione; **operatore: Calendario, Squadre, Mantenimenti** — richiesta utente). Squadre ora visibile anche all'operatore (vedrà la composizione) + ☰ Menù; il menù laterale contiene **TUTTE** le voci del menu (relative al ruolo) + 🚪 Esci; click su voce naviga e chiude il menù
-- **Risolto il falso problema "versione vecchia"**: l'utente vedeva GIÀ la versione nuova (la frase di benvenuto "nei prossimi passi" è della versione attuale) — malinteso nato dalla somiglianza del testo di benvenuto. La barra mobile non compariva su alcuni dispositivi: ora il display è deciso da JavaScript (`window.innerWidth < 900`, con resize listener) e non solo CSS. La scritta v. 20/10/2026 è visibile in sidebar e menù mobile.
-- **Confermato dal test**: la posta VVF blocca le email di Supabase (mittente default filtrato); Gmail le riceve. Opzioni: A) ignorare per ora (chi ha casella VVF usa mail personale), B) Custom SMTP (Authentication → Emails → SMTP Settings, es. SMTP2GO/Brevo, prima dell'apertura al nucleo), C) si risolve da solo al passaggio SSO VVF. Recupero password: emergenza via SQL (`update auth.users set encrypted_password = crypt('Temp', gen_salt('bf')) where email='...'`), futuro sviluppo funzione admin "reimposta password" nella pagina Operatori
+### Regole di business fissate (NON reinventare)
+- **Modulo USAR Medium**: 38 unità operative (+5 sanitarie); obbligatorie 2 strutturisti (posti 7, 9), 2 NBCR (8, 10), 4 K9 (11, 12, 14, 15), 2 ROS/caposquadra (17, 25), 2 SAF (22, 30); tecnici strumentista 13, 16; soccorritori 18-21, 26-29; addetti sicurezza 23, 31; sentinelle 24, 32; logistica 33-38. Valori in tabella `impostazioni` (modulo_totale, modulo_strutturisti, modulo_nbcr, modulo_k9, modulo_capisquadra, modulo_saf)
+- **ROS = Caposquadra/Caporeparto**, attributo non sezione; nei posti 17/25 la tendina mostra **prima i capi** (⭐), poi gli altri; se un capo è anche K9/NBCR/SAF la specializzazione vince
+- **Generico** = chi NON è strutturista/K9/NBCR 3°/SAF 2A; solo in posti senza requisito obbligatorio
+- **Autista**: non è un ruolo; patente nel profilo, solo conteggio (numero e grado)
+- **Tendine**: prima i meno recenti («IL MESE SCORSO»/«N MESI FA»/«MAI INSERITI»), finestra storico 6 mesi
+- **Un operatore = un posto per programma** (DB); squadre diverse nello stesso mese: permesso
+- **Admin**: 4-5, promuovibili dall'app (da sviluppare in Operatori); può sempre modificare/ripubblicare i programmi (pubblicazione Telegram: placeholder fino al bot)
+
+### Interfaccia mobile (regole fissate)
+- Barra in basso — **admin**: Dashboard, Squadre, Programmazione, Attivazione; **operatore**: Calendario, Squadre, Mantenimenti — più ☰ Menù
+- Menù ☰: TUTTE le voci del ruolo + 🚪 Esci
+- Sidebar (PC): tutte le voci + Esci + versione in basso
+- Titoli pagina: maiuscola iniziale
+
+### Note operative
+- **Posta VVF filtra le email Supabase** (GML le riceve): per ora si registra con mail personale; Custom SMTP (es. Brevo/SMTP2GO) prima dell'apertura al nucleo; si risolve col futuro SSO VVF
+- **Recupero password** (finché non c'è SMTP): via SQL `update auth.users set encrypted_password = crypt('Temp', gen_salt('bf')) where email='...'`; poi sviluppare funzione admin in Operatori
+- **DB NON definitivo**: in attesa dell'export dati da AppSheet; lo schema potrà adattarsi
+- Rimossi i file di prova `v2.html` e `reset.html` (serviti per il debug cache, non più necessari col service worker nuovo)
+
+### Prossimi passi (in ordine proposto)
+1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine
+2. Pagina Operatori completa: dettaglio, modifica, **promozione/revoca admin da app**, reimposta password, campo patente
+3. Dashboard completa: card team, grafici torta (palette varia), attivazione rapida
+4. Calendario (turni, disponibilità, pubblicazione Telegram)
+5. Bot Telegram (allerte, risposte SÌ/NO, Mini App, collegamento account con codice)
+6. Attivazione reale (allerta da manifesto programmato, risposte in tempo reale, copertura requisiti)
+7. Report/Resoconti con export, PDF manifesto, Internazionale, Squadre
