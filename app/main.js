@@ -504,6 +504,6 @@ function pagProfilo(el) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('/App-Usar-Veneto/sw.js').catch(() => {});
 }
 init();

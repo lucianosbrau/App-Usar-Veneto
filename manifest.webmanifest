@@ -1,11 +1,12 @@
 {
   "name": "Nucleo USAR Veneto",
   "short_name": "USAR Veneto",
-  "start_url": "/",
+  "start_url": "/App-Usar-Veneto/",
+  "scope": "/App-Usar-Veneto/",
   "display": "standalone",
-  "background_color": "#0F172A",
-  "theme_color": "#0F172A",
+  "background_color": "#B22222",
+  "theme_color": "#B22222",
   "icons": [
-    { "src": "assets/logo-usar.jpg", "sizes": "357x357", "type": "image/jpeg" }
+    { "src": "assets/logo-usar.jpg", "sizes": "357x357", "type": "image/jpeg", "purpose": "any" }
   ]
 }
