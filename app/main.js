@@ -219,7 +219,7 @@ function render() {
       </div>
       <div class="contenuto" id="contenuto"></div>
     </div>
-    <div class="mobile-nav">
+    <div class="mobile-nav" id="mobile-nav">
       ${voci.slice(0, 4).map(v => `<button data-p="${v.id}" class="${pagina === v.id ? 'attiva' : ''}"><span class="ic">${v.ic}</span>${v.t}</button>`).join('')}
       <button id="menu-btn"><span class="ic">☰</span>Menù</button>
     </div>
@@ -242,6 +242,13 @@ function render() {
     </div>`;
   app.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { pagina = b.dataset.p; render(); });
   document.getElementById('logout').onclick = esci;
+  const barraMobile = document.getElementById('mobile-nav');
+  const aggiornaBarra = () => {
+    if (!barraMobile) return;
+    barraMobile.style.display = window.innerWidth < 900 ? 'flex' : 'none';
+  };
+  aggiornaBarra();
+  window.onresize = aggiornaBarra;
   const overlay = document.getElementById('overlay');
   const menuMobile = document.getElementById('menu-mobile');
   const apriMenu = () => { overlay.classList.add('aperto'); menuMobile.classList.add('aperto'); };
