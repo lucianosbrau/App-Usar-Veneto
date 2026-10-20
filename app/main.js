@@ -220,7 +220,10 @@ function render() {
       <div class="contenuto" id="contenuto"></div>
     </div>
     <div class="mobile-nav" id="mobile-nav">
-      ${voci.slice(0, 4).map(v => `<button data-p="${v.id}" class="${pagina === v.id ? 'attiva' : ''}"><span class="ic">${v.ic}</span>${v.t}</button>`).join('')}
+      ${(utente.ruolo === 'admin'
+        ? ['dashboard', 'squadre', 'programmazione', 'attivazione']
+        : ['dashboard', 'calendario', 'mantenimenti', 'internazionale']
+      ).map(id => voci.find(v => v.id === id)).filter(Boolean).map(v => `<button data-p="${v.id}" class="${pagina === v.id ? 'attiva' : ''}"><span class="ic">${v.ic}</span>${v.t}</button>`).join('')}
       <button id="menu-btn"><span class="ic">☰</span>Menù</button>
     </div>
     <div class="menu-overlay" id="overlay"></div>
@@ -236,7 +239,8 @@ function render() {
         ${nomeCompleto} — ${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'} — v. 20/10/2026
       </div>
       <div class="menu-mobile-lista">
-        <button class="menu-mobile-voce" data-p="dashboard"><span>🏠</span> Dashboard</button>
+        ${voci.map(v => `<button class="menu-mobile-voce" data-p="${v.id}" data-menu><span>${v.ic}</span> ${v.t}</button>`).join('')}
+        <div style="border-top:1px solid var(--bordo); margin:10px 0;"></div>
         <button class="menu-mobile-voce" data-esci><span>🚪</span> Esci</button>
       </div>
     </div>`;
@@ -257,6 +261,7 @@ function render() {
   document.getElementById('chiudi-menu').onclick = chiudiMenu;
   overlay.onclick = chiudiMenu;
   menuMobile.querySelectorAll('[data-esci]').forEach(b => b.onclick = async () => { chiudiMenu(); await esci(); });
+  menuMobile.querySelectorAll('[data-menu]').forEach(b => b.onclick = () => { chiudiMenu(); pagina = b.dataset.p; render(); });
   renderPagina();
 }
 
