@@ -190,7 +190,7 @@ function render() {
   const menu = [
     { id: 'dashboard', ic: '🏠', t: 'Dashboard' },
     { id: 'operatori', ic: '👥', t: 'Operatori', admin: true },
-    { id: 'squadre', ic: '⚔️', t: 'Squadre', admin: true },
+    { id: 'squadre', ic: '⚔️', t: 'Squadre' },
     { id: 'calendario', ic: '📅', t: 'Calendario' },
     { id: 'attivazione', ic: '🚨', t: 'Attivazione', admin: true },
     { id: 'programmazione', ic: '🗓️', t: 'Programmazione', admin: true },
@@ -221,9 +221,9 @@ function render() {
     </div>
     <div class="mobile-nav" id="mobile-nav">
       ${(utente.ruolo === 'admin'
-        ? ['dashboard', 'squadre', 'programmazione', 'attivazione']
-        : ['dashboard', 'calendario', 'mantenimenti', 'internazionale']
-      ).map(id => voci.find(v => v.id === id)).filter(Boolean).map(v => `<button data-p="${v.id}" class="${pagina === v.id ? 'attiva' : ''}"><span class="ic">${v.ic}</span>${v.t}</button>`).join('')}
+        ? [['dashboard','🏠','Dashboard'], ['squadre','⚔️','Squadre'], ['programmazione','🗓️','Programmazione'], ['attivazione','🚨','Attivazione']]
+        : [['calendario','📅','Calendario'], ['squadre','⚔️','Squadre'], ['mantenimenti','🎓','Mantenimenti']]
+      ).map(([id, ic, t]) => `<button data-p="${id}" class="${pagina === id ? 'attiva' : ''}"><span class="ic">${ic}</span>${t}</button>`).join('')}
       <button id="menu-btn"><span class="ic">☰</span>Menù</button>
     </div>
     <div class="menu-overlay" id="overlay"></div>
