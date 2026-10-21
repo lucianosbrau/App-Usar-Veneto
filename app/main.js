@@ -415,7 +415,7 @@ async function disegnaCalendario(el, anno, mese) {
 
   el.innerHTML = `
     <div class="pagina-titolo">📅 Calendario</div>
-    <div class="pagina-sotto">Turni e salti turno — il tuo salto è evidenziato in giallo — clicca sul turno per inserire/eliminare le tue ferie</div>
+    <div class="pagina-sotto">Turni e salti turno — il tuo salto è evidenziato in giallo — clicca sul turno per inserire/eliminare le tue ferie.</div>
     <div class="card" style="margin-bottom:18px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <button class="pill" id="cal-indietro" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">◀ Mese prima</button>
