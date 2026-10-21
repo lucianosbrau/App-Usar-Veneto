@@ -295,7 +295,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 ### Database di prova (20/10/2026)
 - Creati `db/migrazione-anagrafica.sql` (campi: grado, comando, sede, turno, salto_turno, nbcr, saf, tpss, tas su `profili`) e `db/seed-prova.sql` (50 operatori fittizi, email `prova.*@usarveneto.test`, distribuzione: 8 ROS da grado CRE/CR/CSE/CS, 6 strutturisti, 5 NBCR 3°, 5 SAF 1A, 6 K9, 10 autisti, 10 generici; tutti i comandi del Veneto)
 - **L'utente deve eseguire in SQL Editor**: migrazione-anagrafica.sql poi seed-prova.sql (o l'equivalente unico file)
-- Quando arrivano i dati reali dal Google Sheet: `delete from profili where email like 'prova.%';` — il seed non tocca dati veri
+- Quando arrivano i dati reali dal Google Sheet: `delete from profili where email like 'prova.%'; delete from auth.users where email like 'prova.%';` — il seed non tocca dati veri. NOTA: il seed crea anche gli utenti di login fittizi in `auth.users` (password `Prova2026!` per tutti) perché `profili.id` è vincolato a `auth.users` (foreign key) — la prima versione del seed falliva con errore 23503 per questo
 - Gradi: D, VD, IA, CRE, CR, CSE, CS, VC, VE, VF — **CRE/CR/CSE/CS = ROS** (caposquadra/caporeparto); l'app identifica i ROS dal campo `grado`
 - Patenti per ora: B, C, C+E, D (i "gradi patente" 1-4 dell'utente corrispondono; da mappare quando arrivano i dati reali)
 - **SAF (chiarito dall'utente)**: valori possibili 1A, 2A, Basico, Avanzato; **per il modulo contano SOLO 2A e Avanzato** — nel seed ora ci sono 10 SAF (5×2A + 5×Avanzato); il posto 22/30 va occupato da un SAF 2A o Avanzato
