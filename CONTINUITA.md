@@ -340,6 +340,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Contatori in testata programma**: 🏗️ Strutturisti, ☣️ NBCR 3°, 🐕 Unità cinofile, 🧗 SAF 2A/Avanzato, 🚚 Autisti accanto alla barra di avanzamento
 - **📄 GENERA PDF**: pulsante accanto a Pubblica su Telegram; apre una pagina con **logo USAR + «Nucleo USAR Veneto» + squadra (ALPHA/BRAVO) e mese**, banda tricolore, **tutti i 38 posti** nella struttura del modello COMPOSIZIONE TEAM (Direzione 1-6, Valutazione 7-10, Ricerca 11-16, Soccorso turnazioni 17-24/25-32, Logistica 33-38), nomi in MAIUSCOLO, e si apre la finestra di stampa → «Salva come PDF». Futuro: export diretto PDF via libreria se la stampa non basta
 
+### Riepilogo con icone (21/10/2026)
+- Nel riepilogo dei posti compilati, accanto a ogni nome ora compaiono **tutte le icone delle specializzazioni** (🏗️ ☣️ 🐕 🧗 ⭐) oltre al 🚚patente
+- L'utente indica il modello grafico definitivo del manifesto come **«COMPILAZIONE MANIFESTO ALPHA»** — da reperire su Drive (il file non risulta con quel nome; già usato: COMPOSIZIONE TEAM USAR VENETO - ALPHA (2).pdf). Da verificare con l'utente se coincidono
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
