@@ -178,3 +178,12 @@ create policy "admin scrive programmi" on programmi_mensili for all
   using (exists (select 1 from profili p where p.id = auth.uid() and p.ruolo = 'admin'));
 create policy "admin scrive membri" on programmi_membri for all
   using (exists (select 1 from profili p where p.id = auth.uid() and p.ruolo = 'admin'));
+-- Migrazione: ferie per turno (giorno/notte) inseribili dal Calendario
+-- Eseguire nella SQL Editor di Supabase.
+
+alter table disponibilita add column if not exists turno_ferie text
+  check (turno_ferie in ('giorno', 'notte'));
+
+-- L'operatore può cancellare le proprie disponibilità/ferie
+create policy "operatore cancella proprie disponibilita" on disponibilita for delete
+  using (operatore_id = auth.uid());

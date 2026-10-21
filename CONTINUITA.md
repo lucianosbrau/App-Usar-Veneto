@@ -306,6 +306,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Pagina Calendario: navigazione mesi, range **01/01/2024–31/12/2028**, gestione anni bisestili (calcolo su giorni reali UTC); **vista personalizzata**: le due caselle del proprio salto turno evidenziate in **giallo**
 - Pagina Profilo: l'operatore modifica da solo **turno, salto turno, comando, sede** (salvataggio su profili)
 - **Disponibilità/ferie**: la programmazione mensile NON ha vincoli di salto turno; l'operatore inserirà solo causale **"Ferie"** dall'app Telegram (dettagli futuri); tabella `disponibilita` pronta
+- **Ferie inseribili dal Calendario** (richiesta utente): click sulla cella ☀️ = ferie **diurna**, click su 🌙 = ferie **notturna** (nuovo campo `turno_ferie` in `disponibilita` — migrazione `db/migrazione-ferie-turno.sql` **da eseguire**: aggiunge colonna + policy delete proprie); click di nuovo = cancella. Ricap admin nel badge: nomi con ☀️/🌙 per turno. NOTA: il bot /ferie registra giorni interi (senza turno_ferie) — da uniformare se serve
 - **Ferie nel Calendario** (aggiunto dopo richiesta utente): riga del giorno con **sfondo blu chiaro** se è il TUO periodo di ferie; per l'admin **badge «🏖 N in ferie»** su ogni giorno (nomi nel tooltip al tocco). In Programmazione: «N gg ferie» nelle tendine + avviso dopo inserimento
 
 ### Ferie nella Programmazione (20/10/2026, richiesta utente)

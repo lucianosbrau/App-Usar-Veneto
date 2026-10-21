@@ -7,6 +7,7 @@ let progMese = null;
 let progTeam = null;
 let progId = null;
 let SPEC_IDS = {};
+let mieFerieGlobali = {};
 
 const TIPI_MAN = ['Mantenimento', 'Manovra', 'Intervento', 'Lavorazione', 'Tutor Mantenimento', 'Tutor Corso', 'Altra formazione'];
 
@@ -348,19 +349,27 @@ async function disegnaCalendario(el, anno, mese) {
   const inizioMese = `${anno}-${String(mese + 1).padStart(2, '0')}-01`;
   const fineMese = `${anno}-${String(mese + 1).padStart(2, '0')}-${String(new Date(anno, mese + 1, 0).getDate()).padStart(2, '0')}`;
   const [fe] = await Promise.all([
-    supabase.from('disponibilita').select('operatore_id, data, tipo, profili(nome, cognome)')
+    supabase.from('disponibilita').select('id, operatore_id, data, tipo, turno_ferie, profili(nome, cognome)')
       .eq('tipo', 'ferie').gte('data', inizioMese).lte('data', fineMese)
   ]);
   const ferieGiorno = {};
+  const mieFerieId = {};
+  mieFerieGlobali = {};
   (fe.data || []).forEach(f => {
-    (ferieGiorno[f.data] = ferieGiorno[f.data] || []).push(`${f.profili?.cognome} ${f.profili?.nome}`);
+    const nome = `${f.profili?.cognome} ${f.profili?.nome}`;
+    (ferieGiorno[f.data] = ferieGiorno[f.data] || []).push(nome + (f.turno_ferie ? ` (${f.turno_ferie === 'giorno' ? '☀️' : '🌙'})` : ''));
+    if (f.operatore_id === utente.id) {
+      const chiave = f.data + '|' + (f.turno_ferie || 'intera');
+      mieFerieId[chiave] = f.id;
+      mieFerieGlobali[chiave] = f.id;
+    }
   });
   const nomiMesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   const primaValida = Date.UTC(2024, 0, 1), ultimaValida = Date.UTC(2028, 11, 31);
 
   el.innerHTML = `
     <div class="pagina-titolo">📅 Calendario</div>
-    <div class="pagina-sotto">Turni e salti turno — il tuo salto è evidenziato in giallo</div>
+    <div class="pagina-sotto">Turni e salti turno — il tuo salto in giallo — clicca su ☀️/🌙 per mettere/togliere le tue ferie</div>
     <div class="card" style="margin-bottom:18px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <button class="pill" id="cal-indietro" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">◀ Mese prima</button>
@@ -391,16 +400,22 @@ async function disegnaCalendario(el, anno, mese) {
           const dicituraFerie = mieFerie ? '<span class="pill" style="font-size:10px; background:#DBEAFE; color:#1E40AF; margin-left:6px;">Ferie</span>' : '';
           const sfondo = mieFerie ? 'background:#DBEAFE;' : '';
           const settCompleto = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'][new Date(anno, mese, giorno).getDay()];
+          const miaG = mieFerieId[dataIso + '|giorno'] || mieFerieId[dataIso + '|intera'];
+          const miaN = mieFerieId[dataIso + '|notte'] || mieFerieId[dataIso + '|intera'];
+          const cellaG = miaG ? 'background:#DBEAFE; color:#1E40AF; font-weight:800; cursor:pointer; border-radius:6px;' : 'cursor:pointer;';
+          const cellaN = miaN ? 'background:#DBEAFE; color:#1E40AF; font-weight:800; cursor:pointer; border-radius:6px;' : 'cursor:pointer;';
           return `<tr style="border-top:1px solid var(--bordo); text-align:center; ${sfondo}">
             <td style="text-align:left; padding:8px 4px;"><b>${gg}</b> <span style="color:var(--grigio); font-size:12px;">${settCompleto}</span>${dicituraFerie} ${badge}</td>
-            <td style="padding:8px 4px; ${clsG}">${cp.giorno}</td>
-            <td style="padding:8px 4px; ${clsN}">${cp.notte}</td>
+            <td data-ferie-g="${dataIso}" style="padding:8px 4px; ${clsG} ${cellaG}" title="Ferie diurna: clicca per toglierla / metterla">${cp.giorno}</td>
+            <td data-ferie-n="${dataIso}" style="padding:8px 4px; ${clsN} ${cellaN}" title="Ferie notturna: clicca per toglierla / metterla">${cp.notte}</td>
           </tr>`;
         }).join('')}
       </table>
     </div>
     <p style="color:var(--grigio); font-size:12px; margin-top:10px;">Calendario disponibile dal 01/01/2024 al 31/12/2028. Turno di riposo = salto turno del giorno (☀️) o della notte (🌙). Ferie e permessi: gestione in arrivo con l'app Telegram.</p>`;
 
+  el.querySelectorAll('[data-ferie-g]').forEach(td => td.onclick = () => toggleFerie(td.dataset.ferieG, 'giorno', el, anno, mese));
+  el.querySelectorAll('[data-ferie-n]').forEach(td => td.onclick = () => toggleFerie(td.dataset.ferieN, 'notte', el, anno, mese));
   document.getElementById('cal-indietro').onclick = () => {
     let a = anno, m = mese - 1;
     if (m < 0) { m = 11; a--; }
@@ -411,6 +426,18 @@ async function disegnaCalendario(el, anno, mese) {
     if (m > 11) { m = 0; a++; }
     disegnaCalendario(el, a, m);
   };
+}
+
+async function toggleFerie(data, turno, el, anno, mese) {
+  const chiave = data + '|' + turno;
+  const esistenteId = mieFerieGlobali[chiave] || mieFerieGlobali[data + '|intera'];
+  if (esistenteId) {
+    await supabase.from('disponibilita').delete().eq('id', esistenteId);
+  } else {
+    const { error } = await supabase.from('disponibilita').insert({ operatore_id: utente.id, data, tipo: 'ferie', turno_ferie: turno });
+    if (error) { alert('Errore: ' + error.message); return; }
+  }
+  await disegnaCalendario(el, anno, mese);
 }
 
 /* ============ PROGRAMMAZIONE MENSILE ============ */
