@@ -388,9 +388,11 @@ async function disegnaCalendario(el, anno, mese) {
           const mieFerie = inFerie.some(n => n.startsWith(`${utente.cognome || ''} ${utente.nome || ''}`.trim()));
           const badge = utente.ruolo === 'admin' && inFerie.length
             ? `<span class="pill giallo" style="font-size:10px; cursor:help;" title="${esc(inFerie.join(', '))}">🏖 ${inFerie.length} in ferie</span>` : '';
+          const dicituraFerie = mieFerie ? '<span class="pill" style="font-size:10px; background:#DBEAFE; color:#1E40AF; margin-left:6px;">Ferie</span>' : '';
           const sfondo = mieFerie ? 'background:#DBEAFE;' : '';
+          const settCompleto = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'][new Date(anno, mese, giorno).getDay()];
           return `<tr style="border-top:1px solid var(--bordo); text-align:center; ${sfondo}">
-            <td style="text-align:left; padding:8px 4px;"><b>${gg}</b> <span style="color:var(--grigio); font-size:12px;">${sett}</span> ${badge}</td>
+            <td style="text-align:left; padding:8px 4px;"><b>${gg}</b> <span style="color:var(--grigio); font-size:12px;">${settCompleto}</span>${dicituraFerie} ${badge}</td>
             <td style="padding:8px 4px; ${clsG}">${cp.giorno}</td>
             <td style="padding:8px 4px; ${clsN}">${cp.notte}</td>
           </tr>`;
