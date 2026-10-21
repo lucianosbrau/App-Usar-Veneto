@@ -917,12 +917,14 @@ function pagProfilo(el) {
     document.getElementById('p-ok').style.display = 'block';
     setTimeout(() => document.getElementById('p-ok').style.display = 'none', 2500);
   };
-  document.getElementById('gen-codice').onclick = () => {
+  document.getElementById('gen-codice').onclick = async () => {
     const n = String(Math.floor(1000 + Math.random() * 9000));
     const codice = `${n.slice(0,2)}-${n.slice(2)}`;
+    const scade = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+    await supabase.from('codici_telegram').insert({ operatore_id: utente.id, codice, scade_il: scade });
     document.getElementById('tg-box').innerHTML = `
       <div style="font-size:40px; font-weight:800; color:var(--royal); letter-spacing:3px;">${codice}</div>
-      <p style="font-size:12px; color:var(--grigio);">Scade tra 15 minuti</p>`;
+      <p style="font-size:12px; color:var(--grigio);">Scade tra 15 minuti — invialo al bot su Telegram</p>`;
   };
 }
 

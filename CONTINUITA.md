@@ -313,11 +313,18 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Dati dalla tabella `disponibilita` (tipo='ferie', range del mese programmato); **nessun blocco**, solo informazione — decisione dell'admin
 - Aggiunta policy RLS: operatore inserisce le proprie disponibilita/ferie (in schema.sql e migrazione-anagrafica.sql — **da eseguire la riga policy se già migrato**)
 
+### Bot Telegram — avviato (21/10/2026)
+- Creato `bot/telegram-bot.mjs` (Node): comandi /start, collegamento account via **codice** (es. 48-21, 15 min, monouso), **/ferie gg/mm/aaaa - gg/mm/aaaa** (registra in `disponibilita` tipo 'ferie'); scrittura DB con chiave **service_role** (SEGRETA, solo server)
+- Creata `db/migrazione-telegram.sql`: tabella `codici_telegram` (codice, scadenza, usato) + policy RLS. **Da eseguire in SQL Editor**
+- App aggiornata: il "Collega Telegram" del Profilo ora genera un **codice vero** salvato in `codici_telegram` (prima era finto)
+- **Da fare utente**: 1) creare il bot con **@BotFather** su Telegram (/newbot) e prendere il **token**; 2) scegliere dove farlo girare sempre acceso (consiglio Railway/Render, piano gratuito); 3) fornire token + SUPABASE_SERVICE_KEY (Settings → API keys) alla piattaforma scelta
+- Keep-alive GitHub Actions (anti pausa Supabase free): ancora da creare (cron che tocca il DB ogni 5-6 giorni)
+
 ### Prossimi passi (in ordine proposto)
-1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine
-2. Pagina Operatori completa: dettaglio, modifica, **promozione/revoca admin da app**, reimposta password, campo patente
-3. Dashboard completa: card team, grafici torta (palette varia), attivazione rapida
-4. Calendario (turni, disponibilità, pubblicazione Telegram)
-5. Bot Telegram (allerte, risposte SÌ/NO, Mini App, collegamento account con codice)
-6. Attivazione reale (allerta da manifesto programmato, risposte in tempo reale, copertura requisiti)
-7. Report/Resoconti con export, PDF manifesto, Internazionale, Squadre
+1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
+2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
+3. Pagina Operatori completa: dettaglio, modifica, **promozione/revoca admin da app**, reimposta password, campo patente
+4. Dashboard completa: card team, grafici torta (palette varia), attivazione rapida
+5. Attivazione reale (allerta da manifesto programmato via bot, risposte SÌ/NO in tempo reale, copertura requisiti)
+6. Report/Resoconti con export, PDF manifesto, Internazionale, Squadre
+7. Keep-alive cron + Mini App Telegram
