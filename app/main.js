@@ -885,65 +885,132 @@ async function apriProgramma(cont, programmi) {
 
 function generaPdfManifesto(prog, membri) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-  const L = 15, R = 195;
   const perPosto = {};
   membri.forEach(m => {
-    const nome = `${(m.profili?.cognome || '').toUpperCase()} ${(m.profili?.nome || '').toUpperCase()}`.trim();
-    perPosto[m.posto] = nome;
+    perPosto[m.posto] = `${(m.profili?.cognome || '').toUpperCase()} ${(m.profili?.nome || '').toUpperCase()}`.trim();
   });
+  const team = prog.team === 'alpha' ? 'TEAM ALPHA' : 'TEAM BRAVO';
 
-  // Intestazione: logo + titolo
-  doc.addImage('/App-Usar-Veneto/assets/logo-usar.jpg', 'JPEG', L, 12, 24, 24);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(178, 34, 34);
-  doc.setFontSize(20);
-  doc.text('Nucleo USAR Veneto', L + 30, 20);
-  doc.setTextColor(30, 41, 59);
-  doc.setFontSize(14);
-  const team = prog.team === 'alpha' ? 'SQUADRA ALPHA' : 'SQUADRA BRAVO';
-  doc.text(`${team} — ${meseIt(progMese)}`, L + 30, 28);
+  const BIANCO = [255,255,255];
+  const BLU_SCURO = [30,64,120];
+  const BLU = [219,234,254];
+  const CELESTE = [240,247,255];
+  const GIALLO = [254,249,195];
+  const ROSSO = [254,226,226];
+  const GRIGIO_TX = [71,85,105];
+  const ANTRACITE = [30,41,59];
 
-  // Banda tricolore
-  doc.setFillColor(0, 140, 69); doc.rect(L, 40, 60, 2, 'F');
-  doc.setFillColor(255, 255, 255); doc.rect(L + 60, 40, 60, 2, 'F');
-  doc.setFillColor(205, 33, 42); doc.rect(L + 120, 40, 60, 2, 'F');
-  doc.setDrawColor(178, 34, 34); doc.setLineWidth(0.5); doc.line(L, 44, R, 44);
+  function box(x, y, w, h, n, ruolo, nome, sfondo, stile) {
+    doc.setFillColor(...sfondo);
+    doc.setDrawColor(148,163,184);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(x, y, w, h, 1.5, 1.5, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(178,34,34);
+    doc.text(String(n), x + 2.5, y + 4);
+    doc.setFontSize(7);
+    doc.setTextColor(...GRIGIO_TX);
+    doc.text(ruolo.toUpperCase(), x + 2.5, y + 8);
+    doc.setFontSize(9.5);
+    if (stile === 'capo') { doc.setTextColor(...BLU_SCURO); } else { doc.setTextColor(...ANTRACITE); }
+    doc.text(nome || '—', x + 2.5, y + 13.5);
+    if (!nome) { doc.setTextColor(148,163,184); }
+  }
 
-  const SEZ = [
-    ['DIREZIONE E COMANDO', [[1,'Team Leader'],[2,'Vice Team Leader'],[3,'Ufficiale di Collegamento'],[4,'Staff Comando'],[5,'Staff'],[6,'Staff']]],
-    ['VALUTAZIONE E SICUREZZA', [[7,'Strutturista'],[8,'NBCR'],[9,'Strutturista'],[10,'NBCR']]],
-    ['RICERCA', [[11,'Unita Cinofila'],[12,'Unita Cinofila'],[13,'Tecnico Strumentista'],[14,'Unita Cinofila'],[15,'Unita Cinofila'],[16,'Tecnico Strumentista']]],
-    ['SOCCORSO - TURNAZIONE 1', [[17,'ROS'],[18,'Soccorritore Tecnico'],[19,'Soccorritore Tecnico'],[20,'Soccorritore Tecnico'],[21,'Soccorritore Tecnico'],[22,'SAF'],[23,'Addetto Sicurezza'],[24,'Sentinella']]],
-    ['SOCCORSO - TURNAZIONE 2', [[25,'ROS'],[26,'Soccorritore Tecnico'],[27,'Soccorritore Tecnico'],[28,'Soccorritore Tecnico'],[29,'Soccorritore Tecnico'],[30,'SAF'],[31,'Addetto Sicurezza'],[32,'Sentinella']]],
-    ['LOGISTICA', [[33,'Responsabile Logistica'],[34,'Vice Resp. Logistica'],[35,'Logista'],[36,'Logista'],[37,'Logista'],[38,'Logista']]]
-  ];
+  function sezioneBg(y1, y2, colore) {
+    doc.setFillColor(...colore);
+    doc.rect(12, y1, 186, y2 - y1, 'F');
+  }
+  function titoloSezione(y, testo) {
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...ANTRACITE);
+    doc.text(testo, 15, y);
+  }
 
-  let y = 52;
-  SEZ.forEach(([titolo, posti]) => {
-    if (y > 262) { doc.addPage(); y = 20; }
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(100, 116, 139);
-    doc.text(titolo, L, y);
-    doc.setDrawColor(203, 213, 225); doc.line(L, y + 1.5, R, y + 1.5);
-    y += 6;
-    posti.forEach(([n, ruolo]) => {
-      if (y > 275) { doc.addPage(); y = 20; }
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(178, 34, 34);
-      doc.text(String(n), L, y);
-      doc.setFont('helvetica', 'normal'); doc.setTextColor(71, 85, 105); doc.setFontSize(9);
-      doc.text(ruolo, L + 8, y);
-      doc.setFont('helvetica', 'bold'); doc.setTextColor(30, 41, 59); doc.setFontSize(10);
-      doc.text(perPosto[n] || '—', L + 80, y);
-      doc.setDrawColor(226, 232, 240); doc.line(L, y + 1.5, R, y + 1.5);
-      y += 7;
-    });
-    y += 3;
+  // ===== INTESTAZIONE =====
+  doc.addImage('/App-Usar-Veneto/assets/logo-usar.jpg', 'JPEG', 14, 10, 16, 16);
+  doc.addImage('/App-Usar-Veneto/assets/logo-usar.jpg', 'JPEG', 180, 10, 16, 16);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(...ANTRACITE);
+  doc.text(team, 105, 17, { align: 'center' });
+  doc.setFontSize(13); doc.setTextColor(37,99,235);
+  doc.text(meseIt(progMese).toUpperCase(), 105, 24, { align: 'center' });
+  doc.setDrawColor(178,34,34); doc.setLineWidth(0.6); doc.line(12, 29, 198, 29);
+
+  let y = 34;
+
+  // ===== DIREZIONE E COMANDO (sfondo blu) =====
+  sezioneBg(y, y + 34, BLU);
+  titoloSezione(y + 5, 'DIREZIONE E COMANDO');
+  box(15, y + 8, 55, 18, 1, 'Team Leader', perPosto[1], BLU_SCURO, 'capo');
+  doc.setTextColor(255,255,255);
+  // nomi bianchi nel box capo: riscrivo
+  doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(255,255,255);
+  doc.text(perPosto[1] || '—', 17.5, y + 21.5);
+  box(74, y + 8, 40, 18, 2, 'Vice Team Leader', perPosto[2], BIANCO, 'capo');
+  box(117, y + 8, 36, 18, 3, 'Uff. di Collegamento', perPosto[3], BIANCO, 'capo');
+  box(156, y + 8, 28, 18, 4, 'Staff Comando', perPosto[4], CELESTE, null);
+  box(15, y + 8 + 20, 40, 18, 5, 'Staff', perPosto[5], CELESTE, null);
+  box(58, y + 8 + 20, 40, 18, 6, 'Staff', perPosto[6], CELESTE, null);
+  y += 38;
+
+  // ===== VALUTAZIONE E SICUREZZA (sfondo giallo) =====
+  sezioneBg(y, y + 30, GIALLO);
+  titoloSezione(y + 5, 'VALUTAZIONE E SICUREZZA');
+  const wV = 43;
+  [[7,'Strutturista'],[8,'NBCR'],[9,'Strutturista'],[10,'NBCR']].forEach(([n, r], i) => {
+    box(15 + i * (wV + 2.5), y + 8, wV, 18, n, r, perPosto[n], BIANCO, null);
   });
+  y += 34;
 
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(148, 163, 184);
-  doc.text(`Generato il ${new Date().toLocaleString('it-IT')} — Nucleo USAR Veneto`, L, 285);
+  // ===== OPERAZIONI (sfondo rosso): RICERCA + SOCCORSO =====
+  sezioneBg(y, y + 96, ROSSO);
+  titoloSezione(y + 5, 'OPERAZIONI');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...GRIGIO_TX);
+  doc.text('RICERCA', 15, y + 10);
+  // Ricerca: 2 colonne da 3
+  const colR1 = [[11,'Unit\u00e0 Cinofila'],[12,'Unit\u00e0 Cinofila'],[13,'Tecnico Strum.']];
+  const colR2 = [[14,'Unit\u00e0 Cinofila'],[15,'Unit\u00e0 Cinofila'],[16,'Tecnico Strum.']];
+  colR1.forEach(([n, r], i) => box(15, y + 12 + i * 20, 85, 18, n, r, perPosto[n], BIANCO, null));
+  colR2.forEach(([n, r], i) => box(104, y + 12 + i * 20, 85, 18, n, r, perPosto[n], BIANCO, null));
+  const colS1 = [[17,'ROS'],[18,'Socc. Tecnico'],[19,'Socc. Tecnico'],[20,'Socc. Tecnico'],[21,'Socc. Tecnico'],[22,'SAF'],[23,'Add. Sicurezza'],[24,'Sentinella']];
+  const colS2 = [[25,'ROS'],[26,'Socc. Tecnico'],[27,'Socc. Tecnico'],[28,'Socc. Tecnico'],[29,'Socc. Tecnico'],[30,'SAF'],[31,'Add. Sicurezza'],[32,'Sentinella']];
+  // due pagine: colonne lunghe -> le turnazioni in righe compatte sotto Ricerca
+  y += 96;
 
-  const nomeFile = `manifesto-${prog.team}-${progMese}.pdf`;
-  doc.save(nomeFile);
+  // SOCCORSO: righe compatte a 4 box (2 pagine se serve)
+  sezioneBg(y - 2, y + 46, ROSSO);
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...ANTRACITE);
+  doc.text('SOCCORSO — TURNAZIONE 1', 15, y + 5);
+  const wS = 43;
+  colS1.forEach(([n, r], i) => {
+    const xx = 15 + (i % 4) * (wS + 2.5);
+    const yy = y + 8 + Math.floor(i / 4) * 20;
+    box(xx, yy, wS, 18, n, r, perPosto[n], BIANCO, null);
+  });
+  y += 50;
+  sezioneBg(y - 2, y + 46, ROSSO);
+  doc.text('SOCCORSO — TURNAZIONE 2', 15, y + 5);
+  colS2.forEach(([n, r], i) => {
+    const xx = 15 + (i % 4) * (wS + 2.5);
+    const yy = y + 8 + Math.floor(i / 4) * 20;
+    box(xx, yy, wS, 18, n, r, perPosto[n], BIANCO, null);
+  });
+  y += 50;
+
+  // ===== LOGISTICA (sfondo giallo) =====
+  sezioneBg(y, y + 46, GIALLO);
+  titoloSezione(y + 5, 'LOGISTICA');
+  box(15, y + 8, 55, 18, 33, 'Resp. Logistica', perPosto[33], BIANCO, null);
+  box(73, y + 8, 55, 18, 34, 'Vice Resp. Log.', perPosto[34], BIANCO, null);
+  [35,36,37,38].forEach((n, i) => {
+    box(15 + i * 46, y + 28, 44, 15, n, 'Logista', perPosto[n], BIANCO, null);
+  });
+  y += 50;
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(148,163,184);
+  doc.text(`Generato il ${new Date().toLocaleString('it-IT')} — Nucleo USAR Veneto`, 105, y, { align: 'center' });
+
+  doc.save(`manifesto-${prog.team}-${progMese}.pdf`);
 }
 
 function pagAttivazione(el) {

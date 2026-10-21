@@ -349,6 +349,12 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Layout PDF A4: logo USAR, «Nucleo USAR Veneto» + squadra e mese, banda tricolore, 6 sezioni con i 38 posti (nomi MAIUSCOLO, righe alternate, paginazione automatica), piè data generazione
 - Dipendenza aggiunta: `jspdf` in package.json
 
+### PDF organigramma sul modello COMPOSIZIONE (21/10/2026, da screenshot utente in assets/)
+- Screenshot modello letto: **TEAM ALPHA + mese** centrati, loghi ai lati; sezioni con **sfondi colorati**: Direzione=blu (TL riquadro blu scuro, Vice/Ufficiale stile proprio, Staff celesti), Valutazione=giallo (4 box), OPERAZIONI=rosso con Ricerca (2 colonne da 3: 11-13 | 14-16) e Soccorso (turnazione 1 | turnazione 2), Logistica=giallo (33-34 + 35-38)
+- **Nessuna linea di collegamento** gerarchica; le specializzazioni obbligatorie si riconoscono solo dal ruolo scritto (conferme utente: 1 sì colori, 2 solo ruolo, 3 sì stile capo)
+- PDF jsPDF riscritto a organigramma: sezioni colorate, riquadri arrotondati con numero/ruolo/nome, Team Leader in blu scuro con nome bianco; le 2 turnazioni su righe da 4 box
+- Screenshot del modello tenuto in `assets/` come riferimento grafico (Screenshot_2026-10-21-18-42-02-87_*.jpg)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
