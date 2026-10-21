@@ -637,10 +637,19 @@ async function apriProgramma(cont, programmi) {
   const idCapi = new Set(SPEC_IDS['Caposquadra/Capireparto'] || []);
   const idSpec = (s) => new Set(SPEC_IDS[SPEC_DB[s]] || []);
 
+  const iconeSpec = (opId) => {
+    let icone = '';
+    if ((SPEC_IDS['Strutturista'] || []).includes(opId)) icone += '🏗️';
+    if ((SPEC_IDS['NBCR 3° livello'] || []).includes(opId)) icone += '☣️';
+    if ((SPEC_IDS['Unità cinofila K9'] || []).includes(opId)) icone += '🐕';
+    if ((SPEC_IDS['SAF 2A (corda)'] || []).includes(opId)) icone += '🧗';
+    if ((SPEC_IDS['Caposquadra/Capireparto'] || []).includes(opId)) icone += '⭐';
+    return icone ? ' ' + icone : '';
+  };
   const candidato = (o) => ({
     ...o,
     giorniFerie: (feriePerOp[o.id] || []).length,
-    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.patente ? ` 🚚${o.patente}` : '') + (o.grado ? ` [${o.grado}]` : '') + ((feriePerOp[o.id] || []).length ? ` 🏖 ${(feriePerOp[o.id] || []).length} gg ferie` : ''),
+    etichetta: `${o.cognome} ${o.nome}`.trim() + iconeSpec(o.id) + (o.patente ? ` 🚚${o.patente}` : '') + (o.grado ? ` [${o.grado}]` : '') + ((feriePerOp[o.id] || []).length ? ` 🏖 ${(feriePerOp[o.id] || []).length} gg ferie` : ''),
     gruppo: gruppoDi(o.id)
   });
 
@@ -670,19 +679,7 @@ async function apriProgramma(cont, programmi) {
             if (p.spec) return idSpec(p.spec).has(o.id);
             return true;
           }).map(candidato);
-          if (p.ros) idonei.sort((a, b) => (idCapi.has(b.id) - idCapi.has(a.id)) || (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
-          else idonei.sort((a, b) => (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
-          let opzioni = `<option value="">— Scegli —</option>`;
-          let ultimoG = null;
-          idonei.forEach(o => {
-            const prefisso = p.ros ? (idCapi.has(o.id) ? '⭐ ' : '') : '';
-            if (o.gruppo.t !== ultimoG) {
-              const colore = o.gruppo.t === 'MAI INSERITI' ? '#94A3B8' : (o.gruppo.n === 1 ? '#059669' : o.gruppo.n <= 3 ? '#2563EB' : '#F59E0B');
-              opzioni += `<option disabled style="color:${colore}; font-weight:700;">── ${o.gruppo.t} ──</option>`;
-              ultimoG = o.gruppo.t;
-            }
-            opzioni += `<option value="${o.id}">${prefisso}${o.etichetta}</option>`;
-          });
+          (window.__idoneiPosto = window.__idoneiPosto || {})[p.n] = idonei;
           return `
           <div style="display:flex; gap:10px; align-items:center; padding:7px 0; border-top:1px solid var(--bordo);">
             <span style="width:28px; font-weight:800; color:${p.spec || p.ros ? 'var(--rosso)' : 'var(--grigio)'};">${p.n}</span>
@@ -690,13 +687,50 @@ async function apriProgramma(cont, programmi) {
             ${occ
               ? `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${occ.profili?.patente ? ` <span class="pill giallo" style="font-size:10px;">🚚 ${esc(occ.profili.patente)}</span>` : ''}</span>
                  <button class="pill rosso" data-vuota="${occ.id}" style="border:none; cursor:pointer;">✕</button>`
-              : `<select id="posto-${p.n}" style="max-width:220px; height:40px; border:1px solid var(--bordo); border-radius:10px; padding:0 8px; background:#fff; font-size:13px;">${opzioni}</select>
+              : `<div style="position:relative; max-width:260px;">
+                   <input id="cerca-${p.n}" placeholder="Cerca nome…" autocomplete="off"
+                     style="width:100%; height:40px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; font-size:13px;">
+                   <div id="lista-${p.n}" data-lista="${p.n}" style="display:none; position:absolute; top:42px; left:0; right:0; background:#fff; border:1px solid var(--bordo); border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.15); z-index:30; max-height:260px; overflow-y:auto;"></div>
+                 </div>
+                 <input type="hidden" id="posto-${p.n}">
                  <button class="btn-primary" data-posto="${p.n}" style="width:90px; height:40px; font-size:13px;">➕</button>`}
           </div>`;
         }).join('')}
       </div>`).join('')}`;
 
   document.getElementById('prog-indietro').onclick = () => { progTeam = null; progId = null; renderPagina(); };
+  cont.querySelectorAll('input[id^="cerca-"]').forEach(inp => {
+    const n = inp.id.replace('cerca-', '');
+    const lista = document.getElementById(`lista-${n}`);
+    const ros = TUTTI_POSTI.find(pp => pp.n === Number(n))?.ros;
+    const disegnaLista = () => {
+      const q = inp.value.trim().toLowerCase();
+      const idonei = (window.__idoneiPosto[n] || []);
+      const filtrati = idonei.filter(o => !q || o.etichetta.toLowerCase().includes(q));
+      if (ros) filtrati.sort((a, b) => (idCapi.has(b.id) - idCapi.has(a.id)) || (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
+      else filtrati.sort((a, b) => (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
+      let html = '';
+      let ultimoG = null;
+      filtrati.forEach(o => {
+        if (o.gruppo.t !== ultimoG) {
+          const colore = o.gruppo.t === 'MAI INSERITI' ? '#94A3B8' : (o.gruppo.n === 1 ? '#059669' : o.gruppo.n <= 3 ? '#2563EB' : '#F59E0B');
+          html += `<div style="padding:5px 10px; font-size:11px; font-weight:700; color:${colore};">${o.gruppo.t}</div>`;
+          ultimoG = o.gruppo.t;
+        }
+        const pref = ros && idCapi.has(o.id) ? '⭐ ' : '';
+        html += `<div data-scelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9;">${pref}${esc(o.etichetta)}</div>`;
+      });
+      lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
+      lista.querySelectorAll('[data-scelta]').forEach(d => d.onclick = () => {
+        document.getElementById(`posto-${n}`).value = d.dataset.scelta;
+        inp.value = d.textContent.trim();
+        lista.style.display = 'none';
+      });
+    };
+    inp.onfocus = () => { disegnaLista(); lista.style.display = 'block'; };
+    inp.oninput = () => { disegnaLista(); lista.style.display = 'block'; };
+    inp.onblur = () => setTimeout(() => lista.style.display = 'none', 200);
+  });
   cont.querySelectorAll('[data-posto]').forEach(b => b.onclick = async () => {
     const sel = document.getElementById(`posto-${b.dataset.posto}`);
     if (!sel.value) { alert('Scegli prima un operatore.'); return; }

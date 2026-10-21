@@ -322,6 +322,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Da fare utente**: 1) creare il bot con **@BotFather** su Telegram (/newbot) e prendere il **token**; 2) scegliere dove farlo girare sempre acceso (consiglio Railway/Render, piano gratuito); 3) fornire token + SUPABASE_SERVICE_KEY (Settings → API keys) alla piattaforma scelta
 - Keep-alive GitHub Actions (anti pausa Supabase free): ancora da creare (cron che tocca il DB ogni 5-6 giorni)
 
+### Tendine Programmazione rinnovate (21/10/2026, richieste utente)
+- **Etichette con icone specializzazioni**: 🏗️ strutturista, ☣️ NBCR, 🐕 K9, 🧗 SAF, ⭐ caposquadra — oltre a 🚚patente, [grado], 🏖 ferie
+- **Ricerca nominativo**: la select nativa è sostituita da **casella di ricerca + tendina filtrabile** (si scrive, la lista si restringe in tempo reale); gruppi «N MESI FA»/«MAI INSERITI» e regole ROS (capi prima, ⭐) conservati; click sul nome seleziona e riempie la casella; ➕ conferma
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
