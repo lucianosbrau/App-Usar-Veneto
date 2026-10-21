@@ -709,10 +709,13 @@ async function apriProgramma(cont, programmi) {
             ${occ
               ? `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${occ.profili?.patente ? ` <span class="pill giallo" style="font-size:10px;">🚚 ${esc(occ.profili.patente)}</span>` : ''}</span>
                  <button class="pill rosso" data-vuota="${occ.id}" style="border:none; cursor:pointer;">✕</button>`
-              : `<div style="position:relative; max-width:260px;">
-                   <input id="cerca-${p.n}" placeholder="Cerca nome…" autocomplete="off"
-                     style="width:100%; height:40px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; font-size:13px;">
-                   <div id="lista-${p.n}" data-lista="${p.n}" style="display:none; position:absolute; top:42px; left:0; right:0; background:#fff; border:1px solid var(--bordo); border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.15); z-index:30; max-height:260px; overflow-y:auto;"></div>
+              : `<div style="display:flex; gap:6px; align-items:center; max-width:300px;">
+                   <div style="position:relative; flex:1;">
+                     <input id="cerca-${p.n}" placeholder="Cerca nome…" autocomplete="off"
+                       style="width:100%; height:40px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; font-size:13px;">
+                     <div id="lista-${p.n}" data-lista="${p.n}" style="display:none; position:absolute; top:42px; left:0; right:0; background:#fff; border:1px solid var(--bordo); border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.15); z-index:30; max-height:260px; overflow-y:auto;"></div>
+                   </div>
+                   <button data-x="${p.n}" title="Svuota" style="border:none; background:none; font-size:16px; cursor:pointer; color:var(--rosso);">✕</button>
                  </div>
                  <input type="hidden" id="posto-${p.n}">
                  <button class="btn-primary" data-posto="${p.n}" style="width:90px; height:40px; font-size:13px;">➕</button>`}
@@ -743,10 +746,13 @@ async function apriProgramma(cont, programmi) {
         html += `<div data-scelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9;">${pref}${esc(o.etichetta)}</div>`;
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
-      lista.querySelectorAll('[data-scelta]').forEach(d => d.onclick = () => {
-        document.getElementById(`posto-${n}`).value = d.dataset.scelta;
-        inp.value = d.textContent.trim();
-        lista.style.display = 'none';
+      lista.querySelectorAll('[data-scelta]').forEach(d => {
+        d.addEventListener('pointerdown', (ev) => {
+          ev.preventDefault();
+          document.getElementById(`posto-${n}`).value = d.dataset.scelta;
+          inp.value = d.textContent.trim();
+          lista.style.display = 'none';
+        });
       });
     };
     inp.onfocus = () => { disegnaLista(); lista.style.display = 'block'; };
@@ -805,6 +811,11 @@ async function apriProgramma(cont, programmi) {
     if (messaggio) alert(messaggio);
     if (fatti || errorePosti.length) renderPagina();
   };
+  cont.querySelectorAll('[data-x]').forEach(b => b.onclick = () => {
+    const n = b.dataset.x;
+    document.getElementById(`cerca-${n}`).value = '';
+    document.getElementById(`posto-${n}`).value = '';
+  });
   cont.querySelectorAll('[data-posto]').forEach(b => b.onclick = inserisciSelezionati);
   const btnTutti = document.getElementById('prog-inserisci-tutti');
   if (btnTutti) btnTutti.onclick = inserisciSelezionati;
