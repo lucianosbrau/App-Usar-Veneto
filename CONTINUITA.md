@@ -397,6 +397,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Nella pagina Attivazione, oltre ad ATTIVA ALPHA e ATTIVA BRAVO c'è **🎯 ATTIVAZIONE PERSONALIZZATA**: si invia il messaggio di allerta, poi chi fa l'attivazione compila il modulo **ruolo + nominativo a menù** con le **stesse regole della Programmazione** (nomi già inseriti nascosti, specializzazioni idonee mostrate per prime nel ruolo, capi ⭐ prima nei ROS, ✖ per liberare)
 - **Nominativi solo da chi ha risposto SÌ** all'attivazione (più chi è già inserito nel manifesto, per non nascondere le scelte fatte)
 - Per le attivazioni personalizzate **non esiste COMPILAZIONE AUTOMATICA** (nessun team di riferimento); PDF con titolo "ATTIVAZIONE PERSONALIZZATA"
+- **Riquadri vuoti nel PDF** (richiesta utente): nel manifesto di un'attivazione i posti non compilati restano **completamente vuoti** (solo numero-ruolo, niente trattino "—"), mantenendo riquadro e colore — l'impaginazione è la stessa del manifesto completo, mancano solo i nomi
 - Migrazione: `db/migrazione-attivazione-personalizzata.sql` **da eseguire in SQL Editor** (consente team='personalizzata' in attivazioni e manifesti)
 
 ### Prossimi passi (in ordine proposto)

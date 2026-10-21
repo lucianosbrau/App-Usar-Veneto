@@ -937,7 +937,7 @@ async function generaPdfManifesto(prog, membri) {
     if (scuro || lum) { doc.setTextColor(255,255,255); }
     else if (nome) { doc.setTextColor(...ANTRACITE); }
     else { doc.setTextColor(150,150,150); }
-    doc.text(nome || '—', cx, y + 9.5, { align: 'center' });
+    if (nome) doc.text(nome, cx, y + 9.5, { align: 'center' });
   }
 
   function sezioneBg(y1, y2, colore) {
