@@ -297,7 +297,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **L'utente deve eseguire in SQL Editor**: migrazione-anagrafica.sql poi seed-prova.sql (o l'equivalente unico file)
 - Quando arrivano i dati reali dal Google Sheet: `delete from profili where email like 'prova.%'; delete from auth.users where email like 'prova.%';` — il seed non tocca dati veri. NOTA: il seed crea anche gli utenti di login fittizi in `auth.users` (password `Prova2026!` per tutti) perché `profili.id` è vincolato a `auth.users` (foreign key) — la prima versione del seed falliva con errore 23503 per questo
 - Gradi: D, VD, IA, CRE, CR, CSE, CS, VC, VE, VF — **CRE/CR/CSE/CS = ROS** (caposquadra/caporeparto); l'app identifica i ROS dal campo `grado`
-- Patenti per ora: B, C, C+E, D (i "gradi patente" 1-4 dell'utente corrispondono; da mappare quando arrivano i dati reali)
+- **Patente = GRADO di patente (chiarito dall'utente)**: valori **1°, 2°, 3°, 4°** (NON le categorie europee B/C/D che erano un'ipotesi errata del seed). Il seed ora usa i gradi; per i 50 già caricati eseguire: `update profili set patente = case patente when 'B' then '1°' when 'D' then '2°' when 'C' then '3°' when 'C+E' then '4°' else patente end where email like 'prova.%';`
 - **SAF (chiarito dall'utente)**: valori possibili 1A, 2A, Basico, Avanzato; **per il modulo contano SOLO 2A e Avanzato** — nel seed ora ci sono 10 SAF (5×2A + 5×Avanzato); il posto 22/30 va occupato da un SAF 2A o Avanzato
 
 ### Calendario turni sviluppato (20/10/2026, richiesta utente)
