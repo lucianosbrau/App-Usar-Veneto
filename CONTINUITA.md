@@ -344,6 +344,11 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Nel riepilogo dei posti compilati, accanto a ogni nome ora compaiono **tutte le icone delle specializzazioni** (🏗️ ☣️ 🐕 🧗 ⭐) oltre al 🚚patente
 - **Confermato dall'utente**: il modello grafico definitivo del manifesto è il PDF «COMPOSIZIONE TEAM USAR VENETO - ALPHA (2).pdf» — l'implementazione GENERA PDF lo segue già (struttura 38 posti, intestazione logo + Nucleo USAR Veneto + squadra)
 
+### PDF nativo mobile (21/10/2026, requisito operativo dell'utente)
+- **L'utente genera il manifesto da mobile in emergenza** — la finestra di stampa non è affidabile su telefono (e su PWA iOS può essere bloccata): sostituita con **jsPDF** (libreria nel bundle, ~150KB): il pulsante GENERA PDF ora produce un **file PDF vero** (`manifesto-alpha-2026-11-01.pdf`) scaricato direttamente, identico su Android/iPhone/PC
+- Layout PDF A4: logo USAR, «Nucleo USAR Veneto» + squadra e mese, banda tricolore, 6 sezioni con i 38 posti (nomi MAIUSCOLO, righe alternate, paginazione automatica), piè data generazione
+- Dipendenza aggiunta: `jspdf` in package.json
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
