@@ -342,7 +342,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 
 ### Riepilogo con icone (21/10/2026)
 - Nel riepilogo dei posti compilati, accanto a ogni nome ora compaiono **tutte le icone delle specializzazioni** (🏗️ ☣️ 🐕 🧗 ⭐) oltre al 🚚patente
-- L'utente indica il modello grafico definitivo del manifesto come **«COMPILAZIONE MANIFESTO ALPHA»** — da reperire su Drive (il file non risulta con quel nome; già usato: COMPOSIZIONE TEAM USAR VENETO - ALPHA (2).pdf). Da verificare con l'utente se coincidono
+- **Confermato dall'utente**: il modello grafico definitivo del manifesto è il PDF «COMPOSIZIONE TEAM USAR VENETO - ALPHA (2).pdf» — l'implementazione GENERA PDF lo segue già (struttura 38 posti, intestazione logo + Nucleo USAR Veneto + squadra)
 
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
