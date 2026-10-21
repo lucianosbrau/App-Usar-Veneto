@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 20 ottobre 2026
+Ultimo aggiornamento: 21 ottobre 2026
 
 ---
 
@@ -256,7 +256,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Database Supabase collegato** (regione Frankfurt): schema completo `db/schema.sql` eseguito + migrazioni (`migrazione-policy-profili.sql`, `migrazione-programmazione.sql`) — 9 tabelle base + `programmi_mensili`/`programmi_membri` + colonna `patente`
 - **Utente admin attivo**: Luciano Di Lorenzo (lucianosbrau@gmail.com)
 - Configurazioni Supabase fatte: confirm email OFF, Site URL = GitHub Pages, redirect URLs impostati
-- Versione visibile nell'app: v. 20/10/2026 (in sidebar e menù mobile)
+- Versione visibile nell'app: v. 21/10/2026 (in sidebar e menù mobile)
 - Aggiornamenti automatici: service worker riscritto (pagina sempre dal server, reload automatico su nuova versione, controllo orario)
 
 ### Pagine sviluppate
@@ -297,7 +297,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **L'utente deve eseguire in SQL Editor**: migrazione-anagrafica.sql poi seed-prova.sql (o l'equivalente unico file)
 - Quando arrivano i dati reali dal Google Sheet: `delete from profili where email like 'prova.%'; delete from auth.users where email like 'prova.%';` — il seed non tocca dati veri. NOTA: il seed crea anche gli utenti di login fittizi in `auth.users` (password `Prova2026!` per tutti) perché `profili.id` è vincolato a `auth.users` (foreign key) — la prima versione del seed falliva con errore 23503 per questo
 - Gradi: D, VD, IA, CRE, CR, CSE, CS, VC, VE, VF — **CRE/CR/CSE/CS = ROS** (caposquadra/caporeparto); l'app identifica i ROS dal campo `grado`
-- **Patente = GRADO di patente (chiarito dall'utente)**: valori **1°, 2°, 3°, 4°** + **estensioni** (Autoscala, Autogru, Anfibio) in `estensioni_patente` (migrazione anagrafica aggiornata — **da eseguire**: `alter table profili add column if not exists estensioni_patente text[];`). Nelle tendine: 🚚4°+AS / +AG / +AN; nel riepilogo autisti grado ed estensioni per esteso (NON le categorie europee B/C/D che erano un'ipotesi errata del seed). Il seed ora usa i gradi; per i 50 già caricati eseguire: `update profili set patente = case patente when 'B' then '1°' when 'D' then '2°' when 'C' then '3°' when 'C+E' then '4°' else patente end where email like 'prova.%';`
+- **Patente = GRADO di patente (chiarito dall'utente)**: valori **1°, 2°, 3°, 4°** + **estensioni** (Autoscala, Autogru, Anfibio) in `estensioni_patente` (migrazione anagrafica, eseguita). Nelle tendine: 🚚4°+AS / +AG / +AN; nel riepilogo autisti grado ed estensioni per esteso (NON le categorie europee B/C/D che erano un'ipotesi errata del seed). Il seed ora usa i gradi; per i 50 già caricati eseguire: `update profili set patente = case patente when 'B' then '1°' when 'D' then '2°' when 'C' then '3°' when 'C+E' then '4°' else patente end where email like 'prova.%';`
 - **SAF (chiarito dall'utente)**: valori possibili 1A, 2A, Basico, Avanzato; **per il modulo contano SOLO 2A e Avanzato** — nel seed ora ci sono 10 SAF (5×2A + 5×Avanzato); il posto 22/30 va occupato da un SAF 2A o Avanzato
 
 ### Calendario turni sviluppato (20/10/2026, richiesta utente)
@@ -306,18 +306,18 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Pagina Calendario: navigazione mesi, range **01/01/2024–31/12/2028**, gestione anni bisestili (calcolo su giorni reali UTC); **vista personalizzata**: le due caselle del proprio salto turno evidenziate in **giallo**
 - Pagina Profilo: l'operatore modifica da solo **turno, salto turno, comando, sede** (salvataggio su profili)
 - **Disponibilità/ferie**: la programmazione mensile NON ha vincoli di salto turno; l'operatore inserirà solo causale **"Ferie"** dall'app Telegram (dettagli futuri); tabella `disponibilita` pronta
-- **Ferie inseribili dal Calendario** (richiesta utente): click sulla cella ☀️ = ferie **diurna**, click su 🌙 = ferie **notturna** (nuovo campo `turno_ferie` in `disponibilita` — migrazione `db/migrazione-ferie-turno.sql` **da eseguire**: aggiunge colonna + policy delete proprie); click di nuovo = cancella. Ricap admin nel badge: nomi con ☀️/🌙 per turno. Bot /ferie aggiornato: registra **giorno** di default; con la parola **"continuative"** registra giorno+notte per ogni data. Recap admin nel Calendario: sezioni **GIORNO/NOTTE** con nominativi sotto la data. Aggiunta pagina **Resoconti**: contatore ferie del mese (giorni diurni, notti, operatori coinvolti, dettaglio per persona). Titoli pagine in costruzione ora con maiuscola (Squadre, Internazionale, Report e Statistiche)
+- **Ferie inseribili dal Calendario** (richiesta utente): click sulla cella ☀️ = ferie **diurna**, click su 🌙 = ferie **notturna** (nuovo campo `turno_ferie` in `disponibilita` — migrazione `db/migrazione-ferie-turno.sql` (eseguita)); click di nuovo = cancella. Ricap admin nel badge: nomi con ☀️/🌙 per turno. Bot /ferie aggiornato: registra **giorno** di default; con la parola **"continuative"** registra giorno+notte per ogni data. Recap admin nel Calendario: sezioni **GIORNO/NOTTE** con nominativi sotto la data. Aggiunta pagina **Resoconti**: contatore ferie del mese (giorni diurni, notti, operatori coinvolti, dettaglio per persona). Titoli pagine in costruzione ora con maiuscola (Squadre, Internazionale, Report e Statistiche)
 - **Ferie nel Calendario** (aggiunto dopo richiesta utente): riga del giorno con **sfondo blu chiaro** se è il TUO periodo di ferie; per l'admin **badge «🏖 N in ferie»** su ogni giorno (nomi nel tooltip al tocco). In Programmazione: «N gg ferie» nelle tendine + avviso dopo inserimento
 
 ### Ferie nella Programmazione (20/10/2026, richiesta utente)
 - Nelle tendine della Programmazione chi ha ferie nel mese programmato mostra **«🏖 N gg ferie»** nell'etichetta
 - Dopo l'inserimento di chi è in ferie: **avviso** «Attenzione, Cognome Nome è in ferie dal gg/mm al gg/mm (N giorni)»
 - Dati dalla tabella `disponibilita` (tipo='ferie', range del mese programmato); **nessun blocco**, solo informazione — decisione dell'admin
-- Aggiunta policy RLS: operatore inserisce le proprie disponibilita/ferie (in schema.sql e migrazione-anagrafica.sql — **da eseguire la riga policy se già migrato**)
+- Aggiunta policy RLS: operatore inserisce le proprie disponibilita/ferie (in schema.sql e migrazione-anagrafica.sql (eseguita))
 
 ### Bot Telegram — avviato (21/10/2026)
 - Creato `bot/telegram-bot.mjs` (Node): comandi /start, collegamento account via **codice** (es. 48-21, 15 min, monouso), **/ferie gg/mm/aaaa - gg/mm/aaaa** (registra in `disponibilita` tipo 'ferie'); scrittura DB con chiave **service_role** (SEGRETA, solo server)
-- Creata `db/migrazione-telegram.sql`: tabella `codici_telegram` (codice, scadenza, usato) + policy RLS. **Da eseguire in SQL Editor**
+- Creata `db/migrazione-telegram.sql`: tabella `codici_telegram` (codice, scadenza, usato) + policy RLS (eseguita)
 - App aggiornata: il "Collega Telegram" del Profilo ora genera un **codice vero** salvato in `codici_telegram` (prima era finto)
 - **Da fare utente**: 1) creare il bot con **@BotFather** su Telegram (/newbot) e prendere il **token**; 2) scegliere dove farlo girare sempre acceso (consiglio Railway/Render, piano gratuito); 3) fornire token + SUPABASE_SERVICE_KEY (Settings → API keys) alla piattaforma scelta
 - Keep-alive GitHub Actions (anti pausa Supabase free): ancora da creare (cron che tocca il DB ogni 5-6 giorni)
@@ -385,7 +385,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Dicitura**: pulsante "ELIMINA PROGRAMMA" → **"ELIMINA COMPILAZIONE"** in Programmazione
 - **Pagina Attivazione completa** (sostituisce il mockup):
   - **Admin**: selezione ATTIVA ALPHA/BRAVO + messaggio modificabile + INVIA ALLERTA (crea riga in `attivazioni`; invio Telegram in attesa del bot, ma le risposte arrivano già in tempo reale). Vista attivazione aperta: contatori SÌ/NO, **copertura requisiti** (2 strutturisti, 2 NBCR, 4 K9, 2 capi, 2 SAF, 38 totale — conteggi su chi ha risposto SÌ), elenco risposte con orario e badge IN PROGRAMMA per chi è nel programma del mese, pulsante CHIUDI ATTIVAZIONE
-  - **Compilazione del manifesto dell'attivazione** (nuova tabella `manifesti_membri`, migrazione `db/migrazione-manifesti.sql` **da eseguire in SQL Editor**):
+  - **Compilazione del manifesto dell'attivazione** (nuova tabella `manifesti_membri`, migrazione `db/migrazione-manifesti.sql` (eseguita)):
     - **⚡ COMPILAZIONE AUTOMATICA** (chiarimento utente): precompila i 38 posti con i componenti della squadra attivata (Alpha o Bravo) inseriti **nel programma del mese corrente**; **ogni pressione sovrascrive/aggiorna la maschera precedente senza inviare nulla** (nuove conferme → ripremere per aggiornare)
     - **✏️ COMPILAZIONE MANUALE**: stessi criteri della Programmazione (casella ricerca + tendina filtrabile, icone specializzazioni, capi ⭐ prima nei posti ROS, ➕ per inserire, ✖ per liberare un posto)
     - **📄 GENERA PDF**: manifesto dell'attivazione con lo stesso PDF della Programmazione (loghi, sezioni colorate)
@@ -398,10 +398,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Nominativi solo da chi ha risposto SÌ** all'attivazione (più chi è già inserito nel manifesto, per non nascondere le scelte fatte)
 - Per le attivazioni personalizzate **non esiste COMPILAZIONE AUTOMATICA** (nessun team di riferimento); PDF con titolo "ATTIVAZIONE PERSONALIZZATA"
 - **Riquadri vuoti nel PDF** (richiesta utente): nel manifesto di un'attivazione i posti non compilati restano **completamente vuoti** (solo numero-ruolo, niente trattino "—"), mantenendo riquadro e colore — l'impaginazione è la stessa del manifesto completo, mancano solo i nomi
-- Migrazione: `db/migrazione-attivazione-personalizzata.sql` **da eseguire in SQL Editor** (consente team='personalizzata' in attivazioni e manifesti)
+- Migrazione: `db/migrazione-attivazione-personalizzata.sql` (eseguita; consente team='personalizzata' in attivazioni e manifesti)
 
 ### Sicurezza: fix escalation admin e privacy profili (21/10/2026, revisione rischi)
-- **Rischio risolto — escalation ad admin**: la policy "proprio profilo" (`update using auth.uid() = id`) non limitava le colonne: un operatore poteva aggiornare la PROPRIA riga con `ruolo='admin'` usando la chiave anon. Fix: **trigger `trg_proteggi_ruolo`** (migrazione `db/migrazione-sicurezza-profili.sql` **da eseguire in SQL Editor**) — la modifica di `ruolo` è bloccata a meno che a farla sia un admin esistente (o la service_role del bot). schema.sql aggiornato con la nota per i setup futuri
+- **Rischio risolto — escalation ad admin**: la policy "proprio profilo" (`update using auth.uid() = id`) non limitava le colonne: un operatore poteva aggiornare la PROPRIA riga con `ruolo='admin'` usando la chiave anon. Fix: **trigger `trg_proteggi_ruolo`** (migrazione `db/migrazione-sicurezza-profili.sql`, eseguita) — la modifica di `ruolo` è bloccata a meno che a farla sia un admin esistente (o la service_role del bot). schema.sql aggiornato con la nota per i setup futuri
 - **Privacy profili**: la policy di SELECT era `using(true)` (chiunque con la chiave anon leggeva i profili, inclusi i 50 account di prova). Ora: `using (auth.role() = 'authenticated')` — solo utenti autenticati. Stessa migrazione. I dati veri (250 operatori, CF, vaccinazioni) non saranno mai leggibili da non autenticati
 - **Bot /ferie rafforzato**: aggiunti limite **max 31 giorni per comando** (evita insert di migliaia di righe con range di anni) e **controllo anno plausibile (2020-2035)**; già presente: date legate solo al chat_id collegato, regex formato, fine≥inizio
 - **Reset password / SMTP**: già tracciato alle righe "Posta VVF" e "Recupero password" (CONTINUITA sez. Note operative): SMTP custom (Brevo/SMTP2GO) prima dell'apertura al nucleo, poi funzione admin in pagina Operatori — il SQL con password temporanea è soluzione transitoria

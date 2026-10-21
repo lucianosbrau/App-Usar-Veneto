@@ -13,7 +13,13 @@ Sistema per la gestione operativa del nucleo:
 - **Attivazioni di emergenza** con risposta SÌ/NO (doppio canale PWA + Telegram) — pagina completa: allerta ALPHA/BRAVO/**personalizzata** (modulo compila a mano tra chi risponde SÌ), risposte in tempo reale, copertura requisiti, compilazione automatica (dal programma del mese) o manuale del manifesto, PDF
 - **Report/statistiche** con export Excel/CSV e **PDF** del Manifesto
 - **Internazionale**: abilitazioni missioni e vaccinazioni — da sviluppare
-- **Bot Telegram** (`bot/telegram-bot.mjs`): collegamento account con codice, comando /ferie (giorno/notte, continuative)
+- **Bot Telegram** (`bot/telegram-bot.mjs`): collegamento account con codice, comando /ferie (giorno/notte, continuative; max 31 giorni per comando)
+
+## Sicurezza
+- **Ruolo admin protetto**: trigger DB che impedisce l'auto-promozione (solo un admin esistente può promuovere/revocare)
+- **Profili leggibili solo da utenti autenticati** (RLS)
+- Dati sensibili (service key, token bot) solo su Render/variabili d'ambiente, mai nel repo
+- Prima dei dati reali: eliminare gli account di prova (v. Convenzioni)
 
 ## Architettura
 
@@ -30,7 +36,7 @@ Sistema per la gestione operativa del nucleo:
 ```
 app/                 codice dell'app (main.js, style.css, supabase.js)
 db/schema.sql        schema completo del database (primo setup)
-db/migrazione-*.sql  migrazioni successive da eseguire in SQL Editor
+db/migrazione-*.sql  migrazioni successive (TUTTE GIÀ ESEGUITE sul progetto attuale)
 db/seed-prova.sql    50 operatori fittizi per test (email prova.*, cancellabili)
 bot/telegram-bot.mjs bot Telegram (collegamento account, /ferie)
 public/              file statici pubblicati (logo, manifest PWA, service worker)
@@ -39,6 +45,8 @@ CONTINUITA.md        documento di continuità (leggere PRIMA di riprendere il la
 ```
 
 ## Setup (nuovo ambiente)
+
+> ⚠️ L'ambiente attuale è già configurato e tutte le migrazioni sono state eseguite: queste istruzioni servono solo per ricreare il progetto da zero (es. migrazione sui server del Corpo, vedi `MIGRAZIONE-SERVER-CORPO.md`).
 
 1. Creare un progetto Supabase (regione Frankfurt)
 2. Eseguire `db/schema.sql` nella SQL Editor

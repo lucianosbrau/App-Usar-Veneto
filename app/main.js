@@ -232,7 +232,7 @@ function render() {
         </div>
         <div style="padding:16px 20px; font-size:12px; color:#94A3B8;">
           ${nomeCompleto}<br>${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'}<br>
-          <span style="font-size:10px; opacity:0.7;">v. 20/10/2026</span>
+          <span style="font-size:10px; opacity:0.7;">v. 21/10/2026</span>
         </div>
       </div>
       <div class="contenuto" id="contenuto"></div>
@@ -254,7 +254,7 @@ function render() {
         <button id="chiudi-menu" style="background:none;border:none;font-size:22px;cursor:pointer;">✕</button>
       </div>
       <div style="padding:0 16px; font-size:12px; color:#64748B; margin-bottom:8px;">
-        ${nomeCompleto} — ${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'} — v. 20/10/2026
+        ${nomeCompleto} — ${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'} — v. 21/10/2026
       </div>
       <div class="menu-mobile-lista">
         ${voci.map(v => `<button class="menu-mobile-voce" data-p="${v.id}" data-menu><span>${v.ic}</span> ${v.t}</button>`).join('')}
