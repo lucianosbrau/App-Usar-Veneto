@@ -415,7 +415,7 @@ async function disegnaCalendario(el, anno, mese) {
 
   el.innerHTML = `
     <div class="pagina-titolo">📅 Calendario</div>
-    <div class="pagina-sotto">Turni e salti turno — il tuo salto in giallo — clicca su ☀️/🌙 per mettere/togliere le tue ferie</div>
+    <div class="pagina-sotto">Turni e salti turno — il tuo salto è evidenziato in giallo — clicca sul turno per inserire/eliminare le tue ferie</div>
     <div class="card" style="margin-bottom:18px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <button class="pill" id="cal-indietro" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">◀ Mese prima</button>
@@ -532,7 +532,7 @@ function meseIt(d) {
 async function pagProgrammazione(el) {
   el.innerHTML = `
     <div class="pagina-titolo">🗓️ Programmazione Mensile</div>
-    <div class="pagina-sotto">Manifesto programmato Alpha e Bravo — 38 posti</div>
+    <div class="pagina-sotto">Manifesto programmato Alpha e Bravo — 38 unità</div>
     <div id="prog-cont">Caricamento…</div>`;
   const cont = document.getElementById('prog-cont');
   const prog = await supabase.from('programmi_mensili').select('*, programmi_membri(*)').order('mese', { ascending: false });
@@ -541,7 +541,7 @@ async function pagProgrammazione(el) {
     const now = new Date();
     cont.innerHTML = `
       <div class="card" style="max-width:520px;">
-        <div style="font-weight:700; margin-bottom:14px;">1️⃣ Quale mese?</div>
+        <div style="font-weight:700; margin-bottom:14px;">1️⃣ Quale mese vuoi inserire?</div>
         <div style="display:flex; gap:12px;">
           <select id="prog-mese" style="flex:1; height:48px; border:1px solid var(--bordo); border-radius:10px; padding:0 12px; background:#fff;">
             ${Array.from({length: 12}, (_, i) => {
@@ -653,7 +653,7 @@ async function apriProgramma(cont, programmi) {
       <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
         <div>
           <div style="font-size:22px; font-weight:800;">${meseIt(progMese)} — SQUADRA ${progTeam === 'alpha' ? 'ALPHA' : 'BRAVO'}</div>
-          <div style="font-size:13px; color:var(--grigio);">${prog.pubblicato ? '✅ Pubblicato' : '✏️ Bozza'} · ${compilati}/38 posti · 🚚 ${autisti.length} autisti</div>
+          <div style="font-size:13px; color:var(--grigio);">${prog.pubblicato ? '✅ Pubblicato' : '✏️ Bozza'} · ${compilati}/38 unità · 🚚 ${autisti.length} autisti</div>
         </div>
         <button class="btn-primary" id="prog-pubblica" style="max-width:210px; height:44px; background:${prog.pubblicato ? 'var(--verde)' : 'var(--rosso)'};">${prog.pubblicato ? 'RIPUBBLICA' : 'PUBBLICA'} SU TELEGRAM</button>
       </div>
