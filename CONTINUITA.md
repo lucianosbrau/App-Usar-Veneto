@@ -355,6 +355,12 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - PDF jsPDF riscritto a organigramma: sezioni colorate, riquadri arrotondati con numero/ruolo/nome, Team Leader in blu scuro con nome bianco; le 2 turnazioni su righe da 4 box
 - Screenshot del modello tenuto in `assets/` come riferimento grafico (Screenshot_2026-10-21-18-42-02-87_*.jpg)
 
+### PDF organigramma riscritto sul modello reale (21/10/2026, sessione ripresa)
+- **Problema risolto**: il PDF di riferimento non si poteva caricare su GitHub né in chat; letto invece **direttamente da Google Drive** (tool Drive: `read_file_content` sul file "COMPOSIZIONE TEAM USAR VENETO - ALPHA (2).pdf" — dà il testo/ordine dei ruoli) + **analisi visiva dello screenshot** in `assets/` (dà layout, colori, disposizioni)
+- **Layout fedele al modello, ora implementato**: header TEAM + mese centrati con loghi ai lati; DIREZIONE E COMANDO (sfondo blu chiaro #A7D4FF) con **Team Leader centrato da solo** (riquadro blu #0066CC, testo bianco), poi Vice + Ufficiale affiancati, poi 3 Staff in riga; VALUTAZIONE E SICUREZZA (giallo) con **4 box in una riga**; OPERAZIONI (rosso deciso #B22222) con sottotitoli RICERCA (2 colonne da 3) e SOCCORSO (2 colonne da 8 = le 2 turnazioni affiancate); LOGISTICA (giallo) con **2 righe da 3** (33-35 sopra, 36-38 sotto — ordine logico). Box bianchi con bordo nero; dentro ogni box: numero+ruolo in alto (rosso), nome sotto
+- Tutto in **una pagina A4 portrait**, verificato con rendering locale (pymupdf) + analisi immagine: nessun testo tagliato, nessuna sovrapposizione
+- Anteprima aggiornata: `public/manifesto-preview.pdf` (Team Alpha settembre con i nominativi del modello) — per la revisione dell'utente
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
