@@ -756,12 +756,20 @@ async function apriProgramma(cont, programmi) {
   const inserisciSelezionati = async () => {
     const avvisi = [];
     const errorePosti = [];
+    const doppioniScelti = [];
     let fatti = 0;
-    const celle = cont.querySelectorAll('input[id^="posto-"]');
+    const giaScelti = new Set();
+    const celle = Array.from(cont.querySelectorAll('input[id^="posto-"]'));
     for (const cella of celle) {
       const n = Number(cella.id.replace('posto-', ''));
       const opId = cella.value;
       if (!opId) continue;
+      if (giaScelti.has(opId)) {
+        const op = (pers.data || []).find(p => p.id === opId);
+        doppioniScelti.push(`${op?.cognome} ${op?.nome} (posto ${n}): già scelto nel posto ${celle.find(c => c.value === opId)?.id?.replace('posto-','')})`);
+        continue;
+      }
+      giaScelti.add(opId);
       const { error } = await supabase.from('programmi_membri')
         .insert({ programma_id: progId, operatore_id: opId, posto: n });
       if (error) { errorePosti.push(n); continue; }
@@ -791,6 +799,7 @@ async function apriProgramma(cont, programmi) {
     }
     let messaggio = '';
     if (fatti) messaggio += `✅ Inseriti ${fatti} operatori.`;
+    if (doppioniScelti.length) messaggio += `\n⚠️ Scelto due volte:\n` + doppioniScelti.join('\n');
     if (errorePosti.length) messaggio += `\n❌ Posti già occupati: ${errorePosti.join(', ')}.`;
     if (avvisi.length) messaggio += `\n` + avvisi.join('\n');
     if (messaggio) alert(messaggio);
