@@ -103,8 +103,10 @@ create policy "lettura impostazioni" on impostazioni for select using (true);
 create policy "admin modifica impostazioni" on impostazioni for update
   using (exists (select 1 from profili p where p.id = auth.uid() and p.ruolo = 'admin'));
 
-create policy "lettura profili" on profili for select using (true);
+create policy "lettura profili" on profili for select using (auth.role() = 'authenticated');
 create policy "proprio profilo" on profili for update using (auth.uid() = id);
+-- NB: la modifica del campo ruolo è protetta dal trigger trg_proteggi_ruolo
+-- (vedere migrazione-sicurezza-profili.sql): solo un admin esistente può promuovere/revocare
 create policy "nuovo utente crea proprio profilo" on profili for insert
   with check (auth.uid() = id);
 create policy "admin gestisce profili" on profili for update

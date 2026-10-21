@@ -44,6 +44,16 @@ async function inserisciFerie(chatId, testo) {
   const d1 = `${match[3]}-${match[2]}-${match[1]}`;
   const d2 = match[4] ? `${match[6]}-${match[5]}-${match[4]}` : d1;
   if (d2 < d1) return 'La seconda data è prima della prima.';
+  const anno = Number(match[3]);
+  const annoF = Number(match[6] || match[3]);
+  const annoNow = new Date().getFullYear();
+  if (anno < 2020 || anno > 2035 || annoF < 2020 || annoF > 2035) {
+    return 'Anno non plausibile: usa date tra il 2020 e il 2035.';
+  }
+  const gg = (Date.parse(d2) - Date.parse(d1)) / 86400000 + 1;
+  if (gg > 31) {
+    return 'Intervallo troppo lungo: massimo 31 giorni per comando. Per periodi più lunghi, suddividi in più comandi /ferie.';
+  }
   const continuative = /continuative/i.test(testo);
 
   const righe = [];

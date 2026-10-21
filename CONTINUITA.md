@@ -400,6 +400,14 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Riquadri vuoti nel PDF** (richiesta utente): nel manifesto di un'attivazione i posti non compilati restano **completamente vuoti** (solo numero-ruolo, niente trattino "—"), mantenendo riquadro e colore — l'impaginazione è la stessa del manifesto completo, mancano solo i nomi
 - Migrazione: `db/migrazione-attivazione-personalizzata.sql` **da eseguire in SQL Editor** (consente team='personalizzata' in attivazioni e manifesti)
 
+### Sicurezza: fix escalation admin e privacy profili (21/10/2026, revisione rischi)
+- **Rischio risolto — escalation ad admin**: la policy "proprio profilo" (`update using auth.uid() = id`) non limitava le colonne: un operatore poteva aggiornare la PROPRIA riga con `ruolo='admin'` usando la chiave anon. Fix: **trigger `trg_proteggi_ruolo`** (migrazione `db/migrazione-sicurezza-profili.sql` **da eseguire in SQL Editor**) — la modifica di `ruolo` è bloccata a meno che a farla sia un admin esistente (o la service_role del bot). schema.sql aggiornato con la nota per i setup futuri
+- **Privacy profili**: la policy di SELECT era `using(true)` (chiunque con la chiave anon leggeva i profili, inclusi i 50 account di prova). Ora: `using (auth.role() = 'authenticated')` — solo utenti autenticati. Stessa migrazione. I dati veri (250 operatori, CF, vaccinazioni) non saranno mai leggibili da non autenticati
+- **Bot /ferie rafforzato**: aggiunti limite **max 31 giorni per comando** (evita insert di migliaia di righe con range di anni) e **controllo anno plausibile (2020-2035)**; già presente: date legate solo al chat_id collegato, regex formato, fine≥inizio
+- **Reset password / SMTP**: già tracciato alle righe "Posta VVF" e "Recupero password" (CONTINUITA sez. Note operative): SMTP custom (Brevo/SMTP2GO) prima dell'apertura al nucleo, poi funzione admin in pagina Operatori — il SQL con password temporanea è soluzione transitoria
+- **Seed di prova**: da eliminare PRIMA del caricamento dati veri (già documentato in README/CONTINUITA): `delete from profili where email like 'prova.%'; delete from auth.users where email like 'prova.%';`
+- **Service worker**: verificato network-first con fallback cache — in emergenza con rete si ha sempre l'ultima versione; offline si vede l'ultima cache scaricata (comportamento voluto). Nessuna modifica
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
