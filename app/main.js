@@ -603,8 +603,8 @@ async function apriProgramma(cont, programmi) {
   const [y, mo] = progMese.split('-').map(Number);
   const meseFine = `${y}-${String(mo).padStart(2, '0')}-${String(new Date(y, mo, 0).getDate()).padStart(2, '0')}`;
   const [pers, membri, storico, ferie] = await Promise.all([
-    supabase.from('profili').select('id, nome, cognome, patente, grado, comando').order('cognome'),
-    supabase.from('programmi_membri').select('*, profili(nome, cognome, patente, grado)').eq('programma_id', prog.id),
+    supabase.from('profili').select('id, nome, cognome, patente, grado, comando, estensioni_patente').order('cognome'),
+    supabase.from('programmi_membri').select('*, profili(nome, cognome, patente, grado, estensioni_patente)').eq('programma_id', prog.id),
     supabase.from('programmi_membri').select('operatore_id, programmi_mensili!inner(mese)')
       .lt('programmi_mensili.mese', progMese).order('programmi_mensili.mese', { ascending: true }),
     supabase.from('disponibilita').select('operatore_id, data').eq('tipo', 'ferie')
@@ -637,6 +637,10 @@ async function apriProgramma(cont, programmi) {
   const idCapi = new Set(SPEC_IDS['Caposquadra/Capireparto'] || []);
   const idSpec = (s) => new Set(SPEC_IDS[SPEC_DB[s]] || []);
 
+  const patenteSigla = (o) => {
+    if (!o.patente) return '';
+    return ' 🚚' + o.patente + (o.estensioni_patente?.length ? '+' + o.estensioni_patente.map(e => e === 'Autoscala' ? 'AS' : e === 'Autogru' ? 'AG' : e === 'Anfibio' ? 'AN' : e).join('') : '');
+  };
   const iconeSpec = (opId) => {
     let icone = '';
     if ((SPEC_IDS['Strutturista'] || []).includes(opId)) icone += '🏗️';
@@ -649,7 +653,7 @@ async function apriProgramma(cont, programmi) {
   const candidato = (o) => ({
     ...o,
     giorniFerie: (feriePerOp[o.id] || []).length,
-    etichetta: `${o.cognome} ${o.nome}`.trim() + iconeSpec(o.id) + (o.patente ? ` 🚚${o.patente}` : '') + (o.grado ? ` [${o.grado}]` : '') + ((feriePerOp[o.id] || []).length ? ` 🏖 ${(feriePerOp[o.id] || []).length} gg ferie` : ''),
+    etichetta: `${o.cognome} ${o.nome}`.trim() + iconeSpec(o.id) + patenteSigla(o) + (o.grado ? ` [${o.grado}]` : '') + ((feriePerOp[o.id] || []).length ? ` 🏖 ${(feriePerOp[o.id] || []).length} gg ferie` : ''),
     gruppo: gruppoDi(o.id)
   });
 
