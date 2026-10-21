@@ -506,12 +506,21 @@ async function apriProgramma(cont, programmi) {
   }
   progId = prog.id;
 
-  const [pers, membri, storico] = await Promise.all([
+  const meseInizio = progMese;
+  const [y, mo] = progMese.split('-').map(Number);
+  const meseFine = `${y}-${String(mo).padStart(2, '0')}-${String(new Date(y, mo, 0).getDate()).padStart(2, '0')}`;
+  const [pers, membri, storico, ferie] = await Promise.all([
     supabase.from('profili').select('id, nome, cognome, patente, grado, comando').order('cognome'),
     supabase.from('programmi_membri').select('*, profili(nome, cognome, patente, grado)').eq('programma_id', prog.id),
     supabase.from('programmi_membri').select('operatore_id, programmi_mensili!inner(mese)')
-      .lt('programmi_mensili.mese', progMese).order('programmi_mensili.mese', { ascending: true })
+      .lt('programmi_mensili.mese', progMese).order('programmi_mensili.mese', { ascending: true }),
+    supabase.from('disponibilita').select('operatore_id, data').eq('tipo', 'ferie')
+      .gte('data', meseInizio).lte('data', meseFine)
   ]);
+  const feriePerOp = {};
+  (ferie.data || []).forEach(f => {
+    (feriePerOp[f.operatore_id] = feriePerOp[f.operatore_id] || []).push(f.data);
+  });
   const tutti = pers.data || [];
   const occupati = new Set((membri.data || []).map(m => m.operatore_id));
   const perPosto = {};
@@ -537,7 +546,8 @@ async function apriProgramma(cont, programmi) {
 
   const candidato = (o) => ({
     ...o,
-    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.patente ? ` 🚚${o.patente}` : '') + (o.grado ? ` [${o.grado}]` : ''),
+    giorniFerie: (feriePerOp[o.id] || []).length,
+    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.patente ? ` 🚚${o.patente}` : '') + (o.grado ? ` [${o.grado}]` : '') + ((feriePerOp[o.id] || []).length ? ` 🏖 ${(feriePerOp[o.id] || []).length} gg ferie` : ''),
     gruppo: gruppoDi(o.id)
   });
 
@@ -599,6 +609,12 @@ async function apriProgramma(cont, programmi) {
     if (!sel.value) { alert('Scegli prima un operatore.'); return; }
     const { error } = await supabase.from('programmi_membri').insert({ programma_id: progId, operatore_id: sel.value, posto: Number(b.dataset.posto) });
     if (error) { alert('Posto già occupato.'); return; }
+    const gf = (feriePerOp[sel.value] || []).sort();
+    if (gf.length) {
+      const op = (pers.data || []).find(p => p.id === sel.value);
+      const fmt = (d) => { const [y, m, g] = d.split('-'); return `${g}/${m}`; };
+      alert(`⚠️ Attenzione: ${op?.cognome} ${op?.nome} è in ferie dal ${fmt(gf[0])} al ${fmt(gf[gf.length - 1])} (${gf.length} giorni).`);
+    }
     renderPagina();
   });
   cont.querySelectorAll('[data-vuota]').forEach(b => b.onclick = async () => {

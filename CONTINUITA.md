@@ -307,6 +307,12 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Pagina Profilo: l'operatore modifica da solo **turno, salto turno, comando, sede** (salvataggio su profili)
 - **Disponibilità/ferie**: la programmazione mensile NON ha vincoli di salto turno; l'operatore inserirà solo causale **"Ferie"** dall'app Telegram (dettagli futuri); tabella `disponibilita` pronta
 
+### Ferie nella Programmazione (20/10/2026, richiesta utente)
+- Nelle tendine della Programmazione chi ha ferie nel mese programmato mostra **«🏖 N gg ferie»** nell'etichetta
+- Dopo l'inserimento di chi è in ferie: **avviso** «Attenzione, Cognome Nome è in ferie dal gg/mm al gg/mm (N giorni)»
+- Dati dalla tabella `disponibilita` (tipo='ferie', range del mese programmato); **nessun blocco**, solo informazione — decisione dell'admin
+- Aggiunta policy RLS: operatore inserisce le proprie disponibilita/ferie (in schema.sql e migrazione-anagrafica.sql — **da eseguire la riga policy se già migrato**)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine
 2. Pagina Operatori completa: dettaglio, modifica, **promozione/revoca admin da app**, reimposta password, campo patente

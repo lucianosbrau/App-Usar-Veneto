@@ -113,6 +113,8 @@ create policy "admin gestisce profili" on profili for update
 create policy "lettura dati operativi" on specializzazioni for select using (true);
 create policy "lettura os" on operatori_specializzazioni for select using (true);
 create policy "lettura disp" on disponibilita for select using (true);
+create policy "operatore inserisce proprie ferie" on disponibilita for insert
+  with check (operatore_id = auth.uid());
 
 create policy "admin crea attivazioni" on attivazioni for insert with check (
   exists (select 1 from profili p where p.id = auth.uid() and p.ruolo = 'admin'));

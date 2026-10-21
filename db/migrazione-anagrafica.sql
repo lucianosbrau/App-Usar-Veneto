@@ -15,3 +15,7 @@ comment on column profili.grado is 'D, VD, IA, CRE, CR, CSE, CS, VC, VE, VF — 
 comment on column profili.nbcr is 'Livello NBCR: 0-3 (3 = specializzazione obbligatoria del modulo)';
 comment on column profili.saf is 'SAF: 1A, 2A, Basico, Avanzato — per il modulo contano solo 2A e Avanzato';
 comment on column profili.tas is 'TAS: null, 1, 2';
+
+-- Ferie: l'operatore inserisce le proprie
+create policy "operatore inserisce proprie ferie" on disponibilita for insert
+  with check (operatore_id = auth.uid());
