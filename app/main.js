@@ -574,7 +574,10 @@ async function pagProgrammazione(el) {
         ${(prog.data || []).map(p => `
           <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--bordo);">
             <div>${meseIt(p.mese)} — <b>${p.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</b> (${p.programmi_membri.length}/38)</div>
-            <button class="pill ${p.pubblicato ? 'verde' : 'giallo'}" data-apri="${p.mese}|${p.team}" style="border:none; cursor:pointer;">${p.pubblicato ? '✅ Pubblicato' : '✏️ Bozza'} — Apri</button>
+            <span style="display:flex; gap:6px;">
+              <button class="pill ${p.pubblicato ? 'verde' : 'giallo'}" data-apri="${p.mese}|${p.team}" style="border:none; cursor:pointer;">${p.pubblicato ? '✅ Pubblicato' : '✏️ Bozza'} — Apri</button>
+              <button class="pill rosso" data-elimina-prog="${p.id}" style="border:none; cursor:pointer;">🗑</button>
+            </span>
           </div>`).join('')}
       </div>` : ''}`;
     document.getElementById('prog-vai').onclick = () => { progMese = document.getElementById('prog-mese').value; renderPagina(); };
@@ -685,6 +688,7 @@ async function apriProgramma(cont, programmi) {
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn-primary" id="prog-inserisci-tutti" style="height:44px;">➕ INSERISCI TUTTI</button>
+          <button class="btn-primary" id="prog-elimina" style="height:44px; background:var(--rosso);">🗑 ELIMINA PROGRAMMA</button>
           <button class="btn-primary" id="prog-pubblica" style="max-width:210px; height:44px; background:${prog.pubblicato ? 'var(--verde)' : 'var(--rosso)'};">${prog.pubblicato ? 'RIPUBBLICA' : 'PUBBLICA'} SU TELEGRAM</button>
         </div>
       </div>
@@ -816,6 +820,11 @@ async function apriProgramma(cont, programmi) {
     document.getElementById(`cerca-${n}`).value = '';
     document.getElementById(`posto-${n}`).value = '';
   });
+  cont.querySelectorAll('[data-x]').forEach(b => b.onclick = () => {
+    const n = b.dataset.x;
+    document.getElementById(`cerca-${n}`).value = '';
+    document.getElementById(`posto-${n}`).value = '';
+  });
   cont.querySelectorAll('[data-posto]').forEach(b => b.onclick = inserisciSelezionati);
   const btnTutti = document.getElementById('prog-inserisci-tutti');
   if (btnTutti) btnTutti.onclick = inserisciSelezionati;
@@ -823,6 +832,20 @@ async function apriProgramma(cont, programmi) {
     await supabase.from('programmi_membri').delete().eq('id', b.dataset.vuota);
     renderPagina();
   });
+  cont.querySelectorAll('[data-elimina-prog]').forEach(b => b.onclick = async () => {
+    if (!confirm('Eliminare questo programma con tutti i nominativi inseriti?')) return;
+    await supabase.from('programmi_membri').delete().eq('programma_id', b.dataset.eliminaProg);
+    await supabase.from('programmi_mensili').delete().eq('id', b.dataset.eliminaProg);
+    renderPagina();
+  });
+  const btnElimina = document.getElementById('prog-elimina');
+  if (btnElimina) btnElimina.onclick = async () => {
+    if (!confirm('Eliminare il programma ' + meseIt(progMese) + ' ' + (progTeam === 'alpha' ? 'ALPHA' : 'BRAVO') + ' con tutti i nominativi?')) return;
+    await supabase.from('programmi_membri').delete().eq('programma_id', progId);
+    await supabase.from('programmi_mensili').delete().eq('id', progId);
+    progMese = null; progTeam = null; progId = null;
+    renderPagina();
+  };
   document.getElementById('prog-pubblica').onclick = async () => {
     await supabase.from('programmi_mensili').update({ pubblicato: true }).eq('id', prog.id);
     alert('Programma pubblicato (invio Telegram con il bot).');

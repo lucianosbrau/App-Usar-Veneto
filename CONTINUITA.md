@@ -330,6 +330,11 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Pulsante **«➕ INSERISCI TUTTI»** in cima: inserisce in un colpo tutti i nomi scelti nelle caselle di ricerca; i pulsanti ➕ singoli per posto restano e fanno la stessa cosa (inserisce solo quella riga)
 - **Rapporto cumulativo unico** dopo l'inserimento: ✅ N inseriti; ❌ posti già occupati (numeri); 🏖 ferie per operatore con date e posto; ⚔️ presenti anche nell'altra squadra dello stesso mese (nome + squadra) — un solo alert, non uno per persona
 
+### Ultime migliorie Programmazione (21/10/2026)
+- **✕ accanto a ogni casella** di ricerca: svuota la casella e la selezione (necessaria per l'inserimento massivo: permettere di togliere un nome scelto senza doverlo ricliccare)
+- **Fix click/tocco sui nomi della tendina**: selezione con evento `pointerdown` (il vecchio `onclick` veniva annullato dall'onblur della casella su touchpad/tocco)
+- **🗑 Elimina programma**: pulsante rosso nella testata del programma aperto (con conferma) + cestino in ogni riga della lista "Programmi esistenti" — cancella membri e programma
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
