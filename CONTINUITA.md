@@ -300,6 +300,13 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Patenti per ora: B, C, C+E, D (i "gradi patente" 1-4 dell'utente corrispondono; da mappare quando arrivano i dati reali)
 - **SAF (chiarito dall'utente)**: valori possibili 1A, 2A, Basico, Avanzato; **per il modulo contano SOLO 2A e Avanzato** — nel seed ora ci sono 10 SAF (5×2A + 5×Avanzato); il posto 22/30 va occupato da un SAF 2A o Avanzato
 
+### Calendario turni sviluppato (20/10/2026, richiesta utente)
+- **Regola ciclica salti turno** (fissata — NON reinventare): riferimento **01/11/2026 = B2 giorno / A2 notte**; lettera avanza ogni giorno (B→C→D→A), numero sale dopo 4 giorni, **ciclo completo di 32 coppie (A1..D8)**; la notte del giorno n ha il salto del giorno n-1 (sfalsata). Chi ha il salto turno del giorno/notte è in **riposo**
+- Formula verificata: 01/11/2024 = D3/C3; 01/03/2027 = B8/A8 (l'utente deve confermarle sul calendario reale)
+- Pagina Calendario: navigazione mesi, range **01/01/2024–31/12/2028**, gestione anni bisestili (calcolo su giorni reali UTC); **vista personalizzata**: le due caselle del proprio salto turno evidenziate in **giallo**
+- Pagina Profilo: l'operatore modifica da solo **turno, salto turno, comando, sede** (salvataggio su profili)
+- **Disponibilità/ferie**: la programmazione mensile NON ha vincoli di salto turno; l'operatore inserirà solo causale **"Ferie"** dall'app Telegram (dettagli futuri); tabella `disponibilita` pronta
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine
 2. Pagina Operatori completa: dettaglio, modifica, **promozione/revoca admin da app**, reimposta password, campo patente

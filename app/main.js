@@ -58,6 +58,7 @@ async function caricaUtente(user) {
     utente.nome = nome; utente.cognome = cognome; utente.ruolo = 'operatore';
   } else {
     utente.nome = prof.nome; utente.cognome = prof.cognome; utente.ruolo = prof.ruolo || 'operatore';
+  utente.salto_turno = prof.salto_turno; utente.turno = prof.turno; utente.comando = prof.comando; utente.sede = prof.sede;
   }
 }
 
@@ -273,6 +274,7 @@ function renderPagina() {
     case 'operatori': return pagOperatori(c);
     case 'attivazione': return pagAttivazione(c);
     case 'programmazione': return pagProgrammazione(c);
+    case 'calendario': return pagCalendario(c);
     case 'profilo': return pagProfilo(c);
     default:
       c.innerHTML = `<div class="pagina-titolo">${esc(pagina)}</div><div class="pagina-sotto">Pagina in costruzione</div>
@@ -306,6 +308,91 @@ async function pagOperatori(el) {
           <div style="font-size:14px; color:var(--grigio);">${esc(o.ruolo)}</div>
         </div>`).join('')}
     </div>`;
+}
+
+
+/* ============ CALENDARIO TURNI ============ */
+/* Ciclo salti turno: parte da 01/11/2026 (B2 giorno / A2 notte).
+   Lettera avanza ogni giorno (B,C,D,A), numero sale dopo 4 giorni, ciclo 32 coppie (A1..D8).
+   La notte del giorno n ha il salto del giorno n-1. */
+
+const RIFERIMENTO = Date.UTC(2026, 10, 1); // 01/11/2026
+const GIORNO_MS = 86400000;
+const LETTERE = ['B', 'C', 'D', 'A'];
+
+function saltoGiorno(n) {
+  const idx = ((n % 4) + 4) % 4;
+  const L = 2 + Math.floor((n + 1) / 4);
+  const numero = (((L - 1) % 8) + 8) % 8 + 1;
+  return LETTERE[idx] + numero;
+}
+function nGiorno(anno, mese, giorno) {
+  return Math.round((Date.UTC(anno, mese, giorno) - RIFERIMENTO) / GIORNO_MS);
+}
+function coppiaGiorno(anno, mese, giorno) {
+  const n = nGiorno(anno, mese, giorno);
+  return { giorno: saltoGiorno(n), notte: saltoGiorno(n - 1) };
+}
+
+async function pagCalendario(el) {
+  const oggi = new Date();
+  let anno = oggi.getFullYear(), mese = oggi.getMonth();
+  const meseSalvato = localStorage.getItem('cal-mese');
+  if (meseSalvato) { anno = Number(meseSalvato.slice(0, 4)); mese = Number(meseSalvato.slice(5)) - 1; }
+  await disegnaCalendario(el, anno, mese);
+}
+
+async function disegnaCalendario(el, anno, mese) {
+  localStorage.setItem('cal-mese', `${anno}-${String(mese + 1).padStart(2, '0')}`);
+  const mioSalto = utente.salto_turno || '';
+  const nomiMesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+  const primaValida = Date.UTC(2024, 0, 1), ultimaValida = Date.UTC(2028, 11, 31);
+
+  el.innerHTML = `
+    <div class="pagina-titolo">📅 Calendario</div>
+    <div class="pagina-sotto">Turni e salti turno — il tuo salto è evidenziato in giallo</div>
+    <div class="card" style="margin-bottom:18px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button class="pill" id="cal-indietro" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">◀ Mese prima</button>
+        <div style="font-size:20px; font-weight:800;">${nomiMesi[mese]} ${anno}</div>
+        <button class="pill" id="cal-avanti" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">Mese dopo ▶</button>
+      </div>
+      ${mioSalto ? `<div style="text-align:center; margin-top:10px; font-size:13px; color:var(--grigio);">Il tuo salto turno: <b style="background:var(--giallo-bg); color:var(--giallo-tx); padding:2px 10px; border-radius:99px;">${esc(mioSalto)}</b> — riposo quando compare in giallo</div>` : '<div style="text-align:center; margin-top:10px; font-size:13px; color:var(--rosso-tx);">⚠️ Imposta il tuo salto turno nella pagina Profilo per vedere le evidenziazioni.</div>'}
+    </div>
+    <div class="card">
+      <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr style="color:var(--grigio); font-size:12px;">
+          <th style="padding:8px 4px; text-align:left;">Data</th>
+          <th style="padding:8px 4px;">☀️ Giorno</th>
+          <th style="padding:8px 4px;">🌙 Notte</th>
+        </tr>
+        ${Array.from({length: new Date(anno, mese + 1, 0).getDate()}, (_, i) => {
+          const giorno = i + 1;
+          if (Date.UTC(anno, mese, giorno) < primaValida || Date.UTC(anno, mese, giorno) > ultimaValida) return '';
+          const cp = coppiaGiorno(anno, mese, giorno);
+          const clsG = cp.giorno === mioSalto ? 'background:var(--giallo-bg); color:var(--giallo-tx); font-weight:800;' : '';
+          const clsN = cp.notte === mioSalto ? 'background:var(--giallo-bg); color:var(--giallo-tx); font-weight:800;' : '';
+          const [gg, sett] = [new Date(anno, mese, giorno).getDate(), ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'][new Date(anno, mese, giorno).getDay()]];
+          return `<tr style="border-top:1px solid var(--bordo); text-align:center;">
+            <td style="text-align:left; padding:8px 4px;"><b>${gg}</b> <span style="color:var(--grigio); font-size:12px;">${sett}</span></td>
+            <td style="padding:8px 4px; ${clsG}">${cp.giorno}</td>
+            <td style="padding:8px 4px; ${clsN}">${cp.notte}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>
+    <p style="color:var(--grigio); font-size:12px; margin-top:10px;">Calendario disponibile dal 01/01/2024 al 31/12/2028. Turno di riposo = salto turno del giorno (☀️) o della notte (🌙). Ferie e permessi: gestione in arrivo con l'app Telegram.</p>`;
+
+  document.getElementById('cal-indietro').onclick = () => {
+    let a = anno, m = mese - 1;
+    if (m < 0) { m = 11; a--; }
+    disegnaCalendario(el, a, m);
+  };
+  document.getElementById('cal-avanti').onclick = () => {
+    let a = anno, m = mese + 1;
+    if (m > 11) { m = 0; a++; }
+    disegnaCalendario(el, a, m);
+  };
 }
 
 /* ============ PROGRAMMAZIONE MENSILE ============ */
@@ -753,9 +840,44 @@ async function salvaMantenimento() {
 }
 
 function pagProfilo(el) {
+  const TURNI = ['A', 'B', 'C', 'D'];
+  const SALTI = [];
+  for (const t of TURNI) for (let n = 1; n <= 8; n++) SALTI.push(t + n);
   el.innerHTML = `
     <div class="pagina-titolo">👤 Profilo</div>
     <div class="pagina-sotto">${esc(utente.email)} — ruolo: ${esc(utente.ruolo)}</div>
+    <div class="card" style="max-width:600px; margin-bottom:20px;">
+      <div style="font-weight:700; margin-bottom:14px;">📌 Dati di servizio</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Turno</label>
+          <select id="p-turno" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="">—</option>
+            ${TURNI.map(t => `<option ${utente.turno === t ? 'selected' : ''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Salto turno</label>
+          <select id="p-salto" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="">—</option>
+            ${SALTI.map(s => `<option ${utente.salto_turno === s ? 'selected' : ''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Comando</label>
+          <select id="p-comando" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="">—</option>
+            ${['Venezia','Verona','Padova','Vicenza','Treviso','Belluno','Rovigo'].map(c => `<option ${utente.comando === c ? 'selected' : ''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Sede di servizio</label>
+          <input id="p-sede" value="${esc(utente.sede || '')}" placeholder="es. Mestre" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+      </div>
+      <div class="successo" id="p-ok" style="margin-top:14px;">Dati salvati.</div>
+      <button class="btn-primary" id="p-salva" style="max-width:200px; height:46px; margin-top:14px;">SALVA</button>
+    </div>
     <div class="card" style="max-width:600px;">
       <div style="font-weight:700; margin-bottom:10px;">🤖 Collega Telegram</div>
       <p style="font-size:14px; color:var(--grigio);">Apri il bot su Telegram, premi AVVIA e invia il codice che compare qui sotto.</p>
@@ -763,6 +885,22 @@ function pagProfilo(el) {
         <button class="btn-primary" id="gen-codice" style="max-width:280px;">Genera codice di collegamento</button>
       </div>
     </div>`;
+  document.getElementById('p-ok').style.display = 'none';
+  document.getElementById('p-salva').onclick = async () => {
+    const { error } = await supabase.from('profili').update({
+      turno: document.getElementById('p-turno').value,
+      salto_turno: document.getElementById('p-salto').value,
+      comando: document.getElementById('p-comando').value,
+      sede: document.getElementById('p-sede').value.trim()
+    }).eq('id', utente.id);
+    if (error) { alert('Errore: ' + error.message); return; }
+    utente.turno = document.getElementById('p-turno').value;
+    utente.salto_turno = document.getElementById('p-salto').value;
+    utente.comando = document.getElementById('p-comando').value;
+    utente.sede = document.getElementById('p-sede').value.trim();
+    document.getElementById('p-ok').style.display = 'block';
+    setTimeout(() => document.getElementById('p-ok').style.display = 'none', 2500);
+  };
   document.getElementById('gen-codice').onclick = () => {
     const n = String(Math.floor(1000 + Math.random() * 9000));
     const codice = `${n.slice(0,2)}-${n.slice(2)}`;
