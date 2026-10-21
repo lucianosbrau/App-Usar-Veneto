@@ -677,6 +677,11 @@ async function apriProgramma(cont, programmi) {
 
   const compilati = (membri.data || []).length;
   const autisti = (membri.data || []).filter(m => m.profili?.patente);
+  const inSquadra = (set) => (membri.data || []).filter(m => set.has(m.operatore_id)).length;
+  const nStrutt = inSquadra(new Set(SPEC_IDS['Strutturista'] || []));
+  const nNbcr = inSquadra(new Set(SPEC_IDS['NBCR 3° livello'] || []));
+  const nK9 = inSquadra(new Set(SPEC_IDS['Unità cinofila K9'] || []));
+  const nSaf = inSquadra(new Set(SPEC_IDS['SAF 2A (corda)'] || []));
 
   cont.innerHTML = `
     <button class="link" id="prog-indietro" style="padding:0; margin-bottom:10px;">← Cambia squadra</button>
@@ -689,10 +694,18 @@ async function apriProgramma(cont, programmi) {
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn-primary" id="prog-inserisci-tutti" style="height:44px;">➕ INSERISCI TUTTI</button>
           <button class="btn-primary" id="prog-elimina" style="height:44px; background:var(--rosso);">🗑 ELIMINA PROGRAMMA</button>
+          <button class="btn-primary" id="prog-genera-pdf" style="height:44px;">📄 GENERA PDF</button>
           <button class="btn-primary" id="prog-pubblica" style="max-width:210px; height:44px; background:${prog.pubblicato ? 'var(--verde)' : 'var(--rosso)'};">${prog.pubblicato ? 'RIPUBBLICA' : 'PUBBLICA'} SU TELEGRAM</button>
         </div>
       </div>
       <div class="barra" style="margin-top:12px;"><div style="width:${compilati / 38 * 100}%;"></div></div>
+      <div style="display:flex; gap:22px; margin-top:14px; flex-wrap:wrap; font-size:13px;">
+        <span>🏗️ Strutturisti: <b>${nStrutt}</b></span>
+        <span>☣️ NBCR 3°: <b>${nNbcr}</b></span>
+        <span>🐕 Unità cinofile: <b>${nK9}</b></span>
+        <span>🧗 SAF 2A/Avanzato: <b>${nSaf}</b></span>
+        <span>🚚 Autisti: <b>${autisti.length}</b></span>
+      </div>
     </div>
 
     ${SEZIONI_MODULO.map(s => `
@@ -728,13 +741,19 @@ async function apriProgramma(cont, programmi) {
       </div>`).join('')}`;
 
   document.getElementById('prog-indietro').onclick = () => { progTeam = null; progId = null; renderPagina(); };
+  const giaSceltiLive = () => {
+    const s = new Set();
+    cont.querySelectorAll('input[id^="posto-"]').forEach(c => { if (c.value) s.add(c.value); });
+    return s;
+  };
   cont.querySelectorAll('input[id^="cerca-"]').forEach(inp => {
     const n = inp.id.replace('cerca-', '');
     const lista = document.getElementById(`lista-${n}`);
     const ros = TUTTI_POSTI.find(pp => pp.n === Number(n))?.ros;
     const disegnaLista = () => {
       const q = inp.value.trim().toLowerCase();
-      const idonei = (window.__idoneiPosto[n] || []);
+      const scelti = giaSceltiLive();
+      const idonei = (window.__idoneiPosto[n] || []).filter(o => !scelti.has(o.id));
       const filtrati = idonei.filter(o => !q || o.etichetta.toLowerCase().includes(q));
       if (ros) filtrati.sort((a, b) => (idCapi.has(b.id) - idCapi.has(a.id)) || (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
       else filtrati.sort((a, b) => (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
@@ -851,6 +870,51 @@ async function apriProgramma(cont, programmi) {
     alert('Programma pubblicato (invio Telegram con il bot).');
     renderPagina();
   };
+  document.getElementById('prog-genera-pdf').onclick = () => generaPdfManifesto(prog, membri.data || []);
+}
+
+function generaPdfManifesto(prog, membri) {
+  const perPosto = {};
+  membri.forEach(m => { perPosto[m.posto] = `${(m.profili?.cognome || '').toUpperCase()} ${(m.profili?.nome || '').toUpperCase()}`.trim(); });
+  const team = prog.team === 'alpha' ? 'SQUADRA ALPHA' : 'SQUADRA BRAVO';
+
+  const SEZ = [
+    { t: 'DIREZIONE E COMANDO', coppie: [[1,'Team Leader'],[2,'Vice Team Leader'],[3,'Ufficiale di Collegamento'],[4,'Staff Comando'],[5,'Staff'],[6,'Staff']] },
+    { t: 'VALUTAZIONE E SICUREZZA', coppie: [[7,'Strutturista'],[8,'NBCR'],[9,'Strutturista'],[10,'NBCR']] },
+    { t: 'RICERCA', coppie: [[11,"Unità Cinofila"],[12,"Unità Cinofila"],[13,'Tecnico Strumentista'],[14,"Unità Cinofila"],[15,"Unità Cinofila"],[16,'Tecnico Strumentista']] },
+    { t: 'SOCCORSO — TURNAZIONE 1', coppie: [[17,'ROS'],[18,'Soccorritore Tecnico'],[19,'Soccorritore Tecnico'],[20,'Soccorritore Tecnico'],[21,'Soccorritore Tecnico'],[22,'SAF'],[23,'Addetto Sicurezza'],[24,'Sentinella']] },
+    { t: 'SOCCORSO — TURNAZIONE 2', coppie: [[25,'ROS'],[26,'Soccorritore Tecnico'],[27,'Soccorritore Tecnico'],[28,'Soccorritore Tecnico'],[29,'Soccorritore Tecnico'],[30,'SAF'],[31,'Addetto Sicurezza'],[32,'Sentinella']] },
+    { t: 'LOGISTICA', coppie: [[33,'Responsabile Logistica'],[34,'Vice Resp. Logistica'],[35,'Logista'],[36,'Logista'],[37,'Logista'],[38,'Logista']] }
+  ];
+
+  const w = window.open('', '_blank', 'width=800,height=900');
+  w.document.write(`<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Manifesto ${team}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; color: #1E293B; }
+    .testata { display:flex; align-items:center; gap:18px; border-bottom:3px solid #B22222; padding-bottom:14px; }
+    .testata img { width:72px; height:72px; border-radius:50%; }
+    .testata h1 { font-size:24px; margin:0; color:#B22222; }
+    .testata h2 { font-size:18px; margin:4px 0 0; font-weight:600; }
+    .tricolore { display:flex; height:5px; margin:8px 0 20px; }
+    .tricolore div { flex:1; }
+    h3 { font-size:13px; letter-spacing:1px; color:#64748B; margin:18px 0 6px; border-bottom:1px solid #CBD5E1; padding-bottom:3px; }
+    table { width:100%; border-collapse:collapse; }
+    td { padding:5px 8px; font-size:14px; border-bottom:1px solid #E2E8F0; }
+    td.n { width:34px; font-weight:700; color:#B22222; }
+    td.r { width:44%; color:#475569; font-size:12px; }
+    td.v { font-weight:700; }
+    @media print { body { margin: 10mm; } }
+  </style></head><body>
+  <div class="testata">
+    <img src="/App-Usar-Veneto/assets/logo-usar.jpg">
+    <div><h1>Nucleo USAR Veneto</h1><h2>${team} — ${meseIt(progMese)}</h2></div>
+  </div>
+  <div class="tricolore"><div style="background:#008C45"></div><div style="background:#fff"></div><div style="background:#CD212A"></div></div>
+  ${SEZ.map(s => `<h3>${s.t}</h3><table>${s.coppie.map(([n, r]) => `<tr><td class="n">${n}</td><td class="r">${r}</td><td class="v">${perPosto[n] || '—'}</td></tr>`).join('')}</table>`).join('')}
+  <p style="margin-top:24px; font-size:11px; color:#94A3B8;">Generato il ${new Date().toLocaleString('it-IT')} — Nucleo USAR Veneto</p>
+  <script>window.onload = () => setTimeout(() => window.print(), 400);</` + `script>
+  </body></html>`);
+  w.document.close();
 }
 
 function pagAttivazione(el) {

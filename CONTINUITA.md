@@ -335,6 +335,11 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Fix click/tocco sui nomi della tendina**: selezione con evento `pointerdown` (il vecchio `onclick` veniva annullato dall'onblur della casella su touchpad/tocco)
 - **🗑 Elimina programma**: pulsante rosso nella testata del programma aperto (con conferma) + cestino in ogni riga della lista "Programmi esistenti" — cancella membri e programma
 
+### Contatori, tendine esclusive e PDF manifesto (21/10/2026)
+- **Tendine esclusive in tempo reale**: un nominativo già scritto in una casella (prima dell'inserimento) NON compare più nelle tendine degli altri posti
+- **Contatori in testata programma**: 🏗️ Strutturisti, ☣️ NBCR 3°, 🐕 Unità cinofile, 🧗 SAF 2A/Avanzato, 🚚 Autisti accanto alla barra di avanzamento
+- **📄 GENERA PDF**: pulsante accanto a Pubblica su Telegram; apre una pagina con **logo USAR + «Nucleo USAR Veneto» + squadra (ALPHA/BRAVO) e mese**, banda tricolore, **tutti i 38 posti** nella struttura del modello COMPOSIZIONE TEAM (Direzione 1-6, Valutazione 7-10, Ricerca 11-16, Soccorso turnazioni 17-24/25-32, Logistica 33-38), nomi in MAIUSCOLO, e si apre la finestra di stampa → «Salva come PDF». Futuro: export diretto PDF via libreria se la stampa non basta
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
