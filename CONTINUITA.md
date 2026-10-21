@@ -393,6 +393,12 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
   - **Tempo reale**: canale Supabase Realtime su `attivazioni` e `risposte_attivazione` — admin e operatore vedono aggiornarsi tutto senza ricaricare; canale chiuso quando si esce dalla pagina
 - **Da fare**: collegare l'invio allerta al bot Telegram quando online (ora l'allerta si crea nel DB; il bot la leggerà e la inoltrerà)
 
+### Attivazione personalizzata (21/10/2026, richiesta utente)
+- Nella pagina Attivazione, oltre ad ATTIVA ALPHA e ATTIVA BRAVO c'è **🎯 ATTIVAZIONE PERSONALIZZATA**: si invia il messaggio di allerta, poi chi fa l'attivazione compila il modulo **ruolo + nominativo a menù** con le **stesse regole della Programmazione** (nomi già inseriti nascosti, specializzazioni idonee mostrate per prime nel ruolo, capi ⭐ prima nei ROS, ✖ per liberare)
+- **Nominativi solo da chi ha risposto SÌ** all'attivazione (più chi è già inserito nel manifesto, per non nascondere le scelte fatte)
+- Per le attivazioni personalizzate **non esiste COMPILAZIONE AUTOMATICA** (nessun team di riferimento); PDF con titolo "ATTIVAZIONE PERSONALIZZATA"
+- Migrazione: `db/migrazione-attivazione-personalizzata.sql` **da eseguire in SQL Editor** (consente team='personalizzata' in attivazioni e manifesti)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)

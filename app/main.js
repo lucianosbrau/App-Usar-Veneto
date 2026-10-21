@@ -907,7 +907,7 @@ async function generaPdfManifesto(prog, membri) {
   membri.forEach(m => {
     perPosto[m.posto] = `${(m.profili?.cognome || '').toUpperCase()} ${(m.profili?.nome || '').toUpperCase()}`.trim();
   });
-  const team = prog.team === 'alpha' ? 'TEAM ALPHA' : 'TEAM BRAVO';
+  const team = prog.team === 'alpha' ? 'TEAM ALPHA' : prog.team === 'bravo' ? 'TEAM BRAVO' : 'ATTIVAZIONE PERSONALIZZATA';
 
   const BIANCO = [255,255,255];
   const BIANCO_SEZ = [255,255,255];
@@ -1124,6 +1124,12 @@ async function pagAttivazioneAdmin(el) {
           <button class="btn-primary" data-avvia="bravo" style="height:80px; font-size:18px; font-weight:800;">🚨 ATTIVA BRAVO</button>
         </div>
         <div class="card" style="margin-top:20px; max-width:600px;">
+          <div style="text-align:center; margin-bottom:10px;">
+            <button class="btn-primary" data-avvia="personalizzata" style="height:64px; font-size:16px; font-weight:800; width:100%;">🎯 ATTIVAZIONE PERSONALIZZATA</button>
+            <div style="font-size:12px; color:var(--grigio); margin-top:6px;">Nessun team predefinito: si allerta il nucleo e il modulo si compila a mano tra chi risponde SÌ</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:20px; max-width:600px;">
           <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--grigio); margin-bottom:6px;">Messaggio di emergenza (modificabile)</div>
           <textarea id="att-msg" rows="4" style="width:100%; border:1.5px solid var(--grigio-ch); border-radius:10px; padding:12px; font-family:inherit; font-size:14px;">🚨 ATTIVAZIONE TEAM — Emergenza USAR. Ritrovo: Centrale VVF Mestre. Confermare la propria disponibilità.</textarea>
           <button class="btn-primary" id="att-invia" style="margin-top:12px;">📡 INVIA ALLERTA</button>
@@ -1135,7 +1141,7 @@ async function pagAttivazioneAdmin(el) {
         teamScelto = b.dataset.avvia;
       });
       document.getElementById('att-invia').onclick = async () => {
-        if (!teamScelto) { alert('Seleziona prima ATTIVA ALPHA o ATTIVA BRAVO.'); return; }
+        if (!teamScelto) { alert('Seleziona prima ATTIVA ALPHA, ATTIVA BRAVO o ATTIVAZIONE PERSONALIZZATA.'); return; }
         const messaggio = document.getElementById('att-msg').value.trim();
         if (!messaggio) { alert('Scrivi il messaggio di emergenza.'); return; }
         const { data: nuova, error } = await supabase.from('attivazioni')
@@ -1176,7 +1182,7 @@ async function pagAttivazioneAdmin(el) {
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
-            <div style="font-size:22px; font-weight:800;">🚨 TEAM ${aperta.team === 'alpha' ? 'ALPHA' : 'BRAVO'} ATTIVATO</div>
+            <div style="font-size:22px; font-weight:800;">🚨 TEAM ${aperta.team === 'alpha' ? 'ALPHA' : aperta.team === 'bravo' ? 'BRAVO' : 'ATTIVAZIONE PERSONALIZZATA'} ATTIVATO</div>
             <div style="font-size:13px; color:var(--grigio);">${new Date(aperta.creata_il).toLocaleString('it-IT')} · allertati: in attesa del bot Telegram</div>
           </div>
           <button class="btn-primary" id="att-chiudi" style="height:44px; background:var(--grigio-ch);">✔️ CHIUDI ATTIVAZIONE</button>
@@ -1211,10 +1217,12 @@ async function pagAttivazioneAdmin(el) {
       </div>
 
       <div class="card" style="margin-top:14px;">
-        <div style="font-weight:800;">📋 MANIFESTO DELL'ATTIVAZIONE — TEAM ${aperta.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</div>
-        <div style="color:var(--grigio); font-size:13px; margin:6px 0 12px;">Compila i 38 posti: <b>automaticamente</b> dal programma del mese (ogni pressione aggiorna la maschera, non invia nulla) o <b>manualmente</b> con gli stessi criteri della Programmazione.</div>
+        <div style="font-weight:800;">📋 MANIFESTO DELL'ATTIVAZIONE${aperta.team === 'personalizzata' ? ' — PERSONALIZZATA' : ` — TEAM ${aperta.team === 'alpha' ? 'ALPHA' : 'BRAVO'}`}</div>
+        <div style="color:var(--grigio); font-size:13px; margin:6px 0 12px;">${aperta.team === 'personalizzata'
+          ? 'Compila i 38 posti scegliendo <b>ruolo e nominativo</b> tra chi ha risposto SÌ.'
+          : 'Compila i 38 posti: <b>automaticamente</b> dal programma del mese (ogni pressione aggiorna la maschera, non invia nulla) o <b>manualmente</b> con gli stessi criteri della Programmazione.'}</div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn-primary" id="att-auto" style="height:44px;">⚡ COMPILAZIONE AUTOMATICA</button>
+          ${aperta.team !== 'personalizzata' ? `<button class="btn-primary" id="att-auto" style="height:44px;">⚡ COMPILAZIONE AUTOMATICA</button>` : ''}
           <button class="btn-primary" id="att-manuale" style="height:44px;">✏️ COMPILAZIONE MANUALE</button>
           <button class="btn-primary" id="att-pdf" style="height:44px;">📄 GENERA PDF</button>
         </div>
@@ -1232,8 +1240,9 @@ async function pagAttivazioneAdmin(el) {
       if (!membri.length) { alert('Il manifesto è vuoto: fai prima la compilazione (automatica o manuale).'); return; }
       generaPdfManifesto({ team: aperta.team }, membri).catch(err => alert('Errore PDF: ' + err.message));
     };
-    document.getElementById('att-auto').onclick = () => compilazioneAutomaticaAttivazione(aperta, disegna);
-    document.getElementById('att-manuale').onclick = () => apriCompilazioneManualeAttivazione(aperta, cont.querySelector('#att-manifesto'), disegna);
+    const btnAuto = document.getElementById('att-auto');
+    if (btnAuto) btnAuto.onclick = () => compilazioneAutomaticaAttivazione(aperta, disegna);
+    document.getElementById('att-manuale').onclick = () => apriCompilazioneManualeAttivazione(aperta, cont.querySelector('#att-manifesto'), disegna, aperta.team === 'personalizzata');
   };
 
   await disegna();
@@ -1277,15 +1286,17 @@ async function compilazioneAutomaticaAttivazione(att, dopo) {
   if (dopo) dopo();
 }
 
-async function apriCompilazioneManualeAttivazione(att, contenitore, dopo) {
+async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRispondentiSi) {
   const manifestId = await assicuraManifesto(att.id, att.team);
-  const [pers, membri, storico] = await Promise.all([
+  const [pers, membri, risposte] = await Promise.all([
     supabase.from('profili').select('id, nome, cognome, patente, grado').order('cognome'),
     supabase.from('manifesti_membri').select('*, profili(nome, cognome, patente, grado)').eq('manifesto_id', manifestId),
-    supabase.from('programmi_membri').select('operatore_id, programmi_mensili!inner(mese)')
-      .lt('programmi_mensili.mese', new Date().toISOString().slice(0, 7) + '-01')
+    soloRispondentiSi
+      ? supabase.from('risposte_attivazione').select('operatore_id').eq('attivazione_id', att.id).eq('risposta', 'si')
+      : Promise.resolve({ data: null })
   ]);
-  const tutti = pers.data || [];
+  const idSi = new Set((risposte.data || []).map(r => r.operatore_id));
+  const tutti = (pers.data || []).filter(o => !soloRispondentiSi || idSi.has(o.id) || (membri.data || []).some(m => m.operatore_id === o.id));
   const perPosto = {};
   (membri.data || []).forEach(m => { perPosto[m.posto] = m; });
   const occupati = new Set((membri.data || []).map(m => m.operatore_id));
@@ -1343,7 +1354,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo) {
   };
   contenitore.querySelectorAll('[data-mvuota]').forEach(b => b.onclick = async () => {
     await supabase.from('manifesti_membri').delete().eq('id', b.dataset.mvuota);
-    apriCompilazioneManualeAttivazione(att, contenitore, dopo);
+    apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRispondentiSi);
   });
   contenitore.querySelectorAll('input[id^="mcerca-"]').forEach(inp => {
     const n = inp.id.replace('mcerca-', '');
@@ -1393,7 +1404,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo) {
       .insert({ manifesto_id: manifestId, operatore_id: opId, posto: n });
     if (error) { alert('Errore: ' + error.message); return; }
     ripulisci(n);
-    apriCompilazioneManualeAttivazione(att, contenitore, dopo);
+    apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRispondentiSi);
   });
   document.getElementById('att-man-chiudi').onclick = () => { contenitore.innerHTML = '' };
 }
