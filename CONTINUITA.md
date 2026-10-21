@@ -326,6 +326,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Etichette con icone specializzazioni**: 🏗️ strutturista, ☣️ NBCR, 🐕 K9, 🧗 SAF, ⭐ caposquadra — oltre a 🚚patente, [grado], 🏖 ferie
 - **Ricerca nominativo**: la select nativa è sostituita da **casella di ricerca + tendina filtrabile** (si scrive, la lista si restringe in tempo reale); gruppi «N MESI FA»/«MAI INSERITI» e regole ROS (capi prima, ⭐) conservati; click sul nome seleziona e riempie la casella; ➕ conferma
 
+### Inserimento cumulativo Programmazione (21/10/2026, richiesta utente)
+- Pulsante **«➕ INSERISCI TUTTI»** in cima: inserisce in un colpo tutti i nomi scelti nelle caselle di ricerca; i pulsanti ➕ singoli per posto restano e fanno la stessa cosa (inserisce solo quella riga)
+- **Rapporto cumulativo unico** dopo l'inserimento: ✅ N inseriti; ❌ posti già occupati (numeri); 🏖 ferie per operatore con date e posto; ⚔️ presenti anche nell'altra squadra dello stesso mese (nome + squadra) — un solo alert, non uno per persona
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)

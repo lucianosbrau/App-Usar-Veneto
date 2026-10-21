@@ -683,7 +683,10 @@ async function apriProgramma(cont, programmi) {
           <div style="font-size:22px; font-weight:800;">${meseIt(progMese)} — SQUADRA ${progTeam === 'alpha' ? 'ALPHA' : 'BRAVO'}</div>
           <div style="font-size:13px; color:var(--grigio);">${prog.pubblicato ? '✅ Pubblicato' : '✏️ Bozza'} · ${compilati}/38 unità · 🚚 ${autisti.length} autisti</div>
         </div>
-        <button class="btn-primary" id="prog-pubblica" style="max-width:210px; height:44px; background:${prog.pubblicato ? 'var(--verde)' : 'var(--rosso)'};">${prog.pubblicato ? 'RIPUBBLICA' : 'PUBBLICA'} SU TELEGRAM</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-primary" id="prog-inserisci-tutti" style="height:44px;">➕ INSERISCI TUTTI</button>
+          <button class="btn-primary" id="prog-pubblica" style="max-width:210px; height:44px; background:${prog.pubblicato ? 'var(--verde)' : 'var(--rosso)'};">${prog.pubblicato ? 'RIPUBBLICA' : 'PUBBLICA'} SU TELEGRAM</button>
+        </div>
       </div>
       <div class="barra" style="margin-top:12px;"><div style="width:${compilati / 38 * 100}%;"></div></div>
     </div>
@@ -750,19 +753,52 @@ async function apriProgramma(cont, programmi) {
     inp.oninput = () => { disegnaLista(); lista.style.display = 'block'; };
     inp.onblur = () => setTimeout(() => lista.style.display = 'none', 200);
   });
-  cont.querySelectorAll('[data-posto]').forEach(b => b.onclick = async () => {
-    const sel = document.getElementById(`posto-${b.dataset.posto}`);
-    if (!sel.value) { alert('Scegli prima un operatore.'); return; }
-    const { error } = await supabase.from('programmi_membri').insert({ programma_id: progId, operatore_id: sel.value, posto: Number(b.dataset.posto) });
-    if (error) { alert('Posto già occupato.'); return; }
-    const gf = (feriePerOp[sel.value] || []).sort();
-    if (gf.length) {
-      const op = (pers.data || []).find(p => p.id === sel.value);
-      const fmt = (d) => { const [y, m, g] = d.split('-'); return `${g}/${m}`; };
-      alert(`⚠️ Attenzione: ${op?.cognome} ${op?.nome} è in ferie dal ${fmt(gf[0])} al ${fmt(gf[gf.length - 1])} (${gf.length} giorni).`);
+  const inserisciSelezionati = async () => {
+    const avvisi = [];
+    const errorePosti = [];
+    let fatti = 0;
+    const celle = cont.querySelectorAll('input[id^="posto-"]');
+    for (const cella of celle) {
+      const n = Number(cella.id.replace('posto-', ''));
+      const opId = cella.value;
+      if (!opId) continue;
+      const { error } = await supabase.from('programmi_membri')
+        .insert({ programma_id: progId, operatore_id: opId, posto: n });
+      if (error) { errorePosti.push(n); continue; }
+      cella.value = '';
+      const cerca = document.getElementById(`cerca-${n}`);
+      if (cerca) cerca.value = '';
+      fatti++;
+      const gf = (feriePerOp[opId] || []).sort();
+      if (gf.length) {
+        const op = (pers.data || []).find(p => p.id === opId);
+        const fmt = (d) => { const [y, m, g] = d.split('-'); return `${g}/${m}`; };
+        avvisi.push(`🏖 ${op?.cognome} ${op?.nome} (posto ${n}): ferie dal ${fmt(gf[0])} al ${fmt(gf[gf.length - 1])}`);
+      }
     }
-    renderPagina();
-  });
+    // doppioni nell'altra squadra dello stesso mese
+    const inseriti = (membri.data || []);
+    const { data: altroProg } = await supabase.from('programmi_mensili').select('id, team').eq('mese', progMese).neq('team', progTeam).maybeSingle();
+    if (altroProg && fatti) {
+      const { data: altriMembri } = await supabase.from('programmi_membri').select('operatore_id, profili(cognome, nome)').eq('programma_id', altroProg.id);
+      const inAltro = new Set((altriMembri || []).map(m => m.operatore_id));
+      for (const m of inseriti) {
+        if (inAltro.has(m.operatore_id)) {
+          const op = (pers.data || []).find(p => p.id === m.operatore_id);
+          avvisi.push(`⚔️ ${op?.cognome} ${op?.nome} è presente anche nell'altra squadra (${altroProg.team === 'alpha' ? 'ALPHA' : 'BRAVO'})`);
+        }
+      }
+    }
+    let messaggio = '';
+    if (fatti) messaggio += `✅ Inseriti ${fatti} operatori.`;
+    if (errorePosti.length) messaggio += `\n❌ Posti già occupati: ${errorePosti.join(', ')}.`;
+    if (avvisi.length) messaggio += `\n` + avvisi.join('\n');
+    if (messaggio) alert(messaggio);
+    if (fatti || errorePosti.length) renderPagina();
+  };
+  cont.querySelectorAll('[data-posto]').forEach(b => b.onclick = inserisciSelezionati);
+  const btnTutti = document.getElementById('prog-inserisci-tutti');
+  if (btnTutti) btnTutti.onclick = inserisciSelezionati;
   cont.querySelectorAll('[data-vuota]').forEach(b => b.onclick = async () => {
     await supabase.from('programmi_membri').delete().eq('id', b.dataset.vuota);
     renderPagina();
