@@ -892,11 +892,13 @@ function generaPdfManifesto(prog, membri) {
   const team = prog.team === 'alpha' ? 'TEAM ALPHA' : 'TEAM BRAVO';
 
   const BIANCO = [255,255,255];
+  const BIANCO_SEZ = [255,255,255];
   const BLU_TL = [0,102,204];
   const BLU_CHIARO = [167,212,255];
   const GIALLO = [255,243,176];
+  const SENAPE = [201,151,0];
   const ROSSO = [178,34,34];
-  const ROSSO_CH = [254,226,226];
+  const ROSSO_CH = [178,34,34];
   const GRIGIO_TX = [71,85,105];
   const ANTRACITE = [30,41,59];
 
@@ -906,13 +908,15 @@ function generaPdfManifesto(prog, membri) {
     doc.setLineWidth(0.3);
     doc.rect(x, y, w, h, 'FD');
     const scuro = stile === 'capo';
+    const lum = (sfondo[0]*0.299 + sfondo[1]*0.587 + sfondo[2]*0.114) < 150;
     const cx = x + w / 2;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.5);
-    doc.setTextColor(scuro ? 255 : 178, scuro ? 255 : 34, scuro ? 255 : 34);
+    if (scuro || lum) { doc.setTextColor(255,255,255); }
+    else { doc.setTextColor(178,34,34); }
     doc.text(`${n} - ${ruolo.toUpperCase()}`, cx, y + 4.2, { align: 'center' });
     doc.setFontSize(8);
-    if (scuro) { doc.setTextColor(255,255,255); }
+    if (scuro || lum) { doc.setTextColor(255,255,255); }
     else if (nome) { doc.setTextColor(...ANTRACITE); }
     else { doc.setTextColor(150,150,150); }
     doc.text(nome || '—', cx, y + 9.5, { align: 'center' });
@@ -965,10 +969,10 @@ function generaPdfManifesto(prog, membri) {
   y0 = y;
   const yV = y + 7.5;
   const wV = 43.6;
-  sezioneBg(y0, yV + H + 2.5, GIALLO);
+  sezioneBg(y0, yV + H + 2.5, BIANCO_SEZ);
   titoloSezione(y0 + 4, 'VALUTAZIONE E SICUREZZA');
   [[7,'Strutturista'],[8,'NBCR'],[9,'Strutturista'],[10,'NBCR']].forEach(([n, r], i) => {
-    box(15.5 + i * (wV + 1.6), yV, wV, H, n, r, perPosto[n], GIALLO, null);
+    box(15.5 + i * (wV + 1.6), yV, wV, H, n, r, perPosto[n], SENAPE, null);
   });
   y = yV + H + 4.5;
 
@@ -996,7 +1000,7 @@ function generaPdfManifesto(prog, membri) {
   y0 = y;
   const yL = y + 7.5;
   const yL2 = yL + STEPS;
-  sezioneBg(y0, yL2 + HS + 2.5, GIALLO);
+  sezioneBg(y0, yL2 + HS + 2.5, BIANCO_SEZ);
   titoloSezione(y0 + 4, 'LOGISTICA');
   box(15, yL, 58, HS, 33, 'Responsabile Logistica', perPosto[33], GIALLO, null);
   box(76, yL, 58, HS, 34, 'Vice Responsabile Logistica', perPosto[34], GIALLO, null);

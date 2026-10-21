@@ -362,6 +362,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Anteprima aggiornata: `public/manifesto-preview.pdf` (Team Alpha settembre con i nominativi del modello) — per la revisione dell'utente
 ### Modifiche layout PDF richieste all'utente (21/10/2026, 3ª iterazione)
 - **Fix box Valutazione che sbordava**: il 4° box usciva dalla cornice destra; larghezza ridotta (43,6) e riposizionati con margine interno
+- **Colori ufficiali sui box** (chiarito dall'utente): Valutazione e Sicurezza = **senape #C99700**, Operazioni (Ricerca e Soccorso) = **rosso ufficiale #B22222** — entrambi con **testo bianco** (i box scuri usano testo bianco automaticamente); Direzione resta blu chiaro, Logistica giallo limone chiaro
 - **Testo centrato** in tutti i box (numero+ruolo e nome), non più allineato a sinistra
 - **Colori invertiti**: le sezioni ora hanno **sfondo BIANCO** e i **box colorati** (Direzione=blu chiaro, Valutazione/Logistica=giallo, Operazioni=rosso chiaro #FEE2E2; TL resta blu scuro #0066CC testo bianco)
 - **Bordo nero alle sezioni**: le 4 sezioni hanno un rettangolo di contorno nero ben visibile (linea 0.7)
