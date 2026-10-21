@@ -964,11 +964,11 @@ function generaPdfManifesto(prog, membri) {
   // ===== VALUTAZIONE E SICUREZZA (sfondo giallo) =====
   y0 = y;
   const yV = y + 7.5;
-  const wV = 45.5;
+  const wV = 43.6;
   sezioneBg(y0, yV + H + 2.5, GIALLO);
   titoloSezione(y0 + 4, 'VALUTAZIONE E SICUREZZA');
   [[7,'Strutturista'],[8,'NBCR'],[9,'Strutturista'],[10,'NBCR']].forEach(([n, r], i) => {
-    box(15 + i * (wV + 1.3), yV, wV, H, n, r, perPosto[n], GIALLO, null);
+    box(15.5 + i * (wV + 1.6), yV, wV, H, n, r, perPosto[n], GIALLO, null);
   });
   y = yV + H + 4.5;
 
