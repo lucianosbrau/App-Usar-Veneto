@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bozza grafica — Manifesto organigramma</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #f1f5f9; margin: 0; padding: 24px; color: #1E293B; }
+  .foglio { max-width: 820px; margin: 0 auto; background: #fff; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+  .testata { display: flex; align-items: center; gap: 16px; border-bottom: 3px solid #B22222; padding-bottom: 12px; }
+  .testata img { width: 64px; height: 64px; border-radius: 50%; }
+  .testata h1 { font-size: 22px; margin: 0; color: #B22222; }
+  .testata h2 { font-size: 15px; margin: 4px 0 0; color: #1E293B; }
+  .tricolore { display: flex; height: 4px; margin: 10px 0 18px; }
+  .tricolore div { flex: 1; }
+  .sezione { margin-bottom: 18px; }
+  .sezione h3 { font-size: 12px; letter-spacing: 1px; color: #64748B; margin: 0 0 8px; border-bottom: 1px solid #CBD5E1; padding-bottom: 4px; }
+  .riga { display: flex; gap: 8px; flex-wrap: wrap; }
+  .box { flex: 1; min-width: 140px; border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 10px; background: #F8FAFC; }
+  .box.obbl { border-left: 4px solid #B22222; background: #FEF2F2; }
+  .box .n { font-size: 11px; font-weight: 700; color: #B22222; }
+  .box .ruolo { font-size: 10px; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; margin: 2px 0 6px; }
+  .box .nome { font-size: 13px; font-weight: 700; }
+  .box .nome.vuoto { color: #94A3B8; font-weight: 400; }
+  .coppia-note { font-size: 11px; color: #94A3B8; margin-top: 6px; font-style: italic; }
+  .verde { color: #059669; font-size: 11px; }
+  h4.hint { background:#FEF3C7; padding:10px 14px; border-radius:8px; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="foglio">
+  <div class="testata">
+    <img src="/App-Usar-Veneto/assets/logo-usar.jpg" alt="">
+    <div>
+      <h1>Nucleo USAR Veneto</h1>
+      <h2>SQUADRA ALPHA — Novembre 2026</h2>
+    </div>
+  </div>
+  <div class="tricolore"><div style="background:#008C45"></div><div style="background:#fff"></div><div style="background:#CD212A"></div></div>
+
+  <h4 class="hint">BOZZA — come ho capito il COMPOSIZIONE: sezioni orizzontali, ruoli in riquadri affiancati. Dimmi cosa correggere: disposizione, dimensioni, colori, titoli.</h4>
+
+  <div class="sezione">
+    <h3>DIREZIONE E COMANDO</h3>
+    <div class="riga">
+      <div class="box"><div class="n">1</div><div class="ruolo">Team Leader</div><div class="nome">CICIRELLO FRANCESCO</div></div>
+      <div class="box"><div class="n">2</div><div class="ruolo">Vice Team Leader</div><div class="nome vuoto">—</div></div>
+      <div class="box"><div class="n">3</div><div class="ruolo">Ufficiale di Collegamento</div><div class="nome">PIOMBINI GRAZIA</div></div>
+      <div class="box"><div class="n">4</div><div class="ruolo">Staff Comando</div><div class="nome">FUNES JEKY</div></div>
+      <div class="box"><div class="n">5</div><div class="ruolo">Staff</div><div class="nome">BORRELLO MARCO</div></div>
+      <div class="box"><div class="n">6</div><div class="ruolo">Staff</div><div class="nome">TENAN MICHELE</div></div>
+    </div>
+  </div>
+
+  <div class="sezione">
+    <h3>VALUTAZIONE E SICUREZZA</h3>
+    <div class="riga">
+      <div class="box obbl"><div class="n">7</div><div class="ruolo">Strutturista ●</div><div class="nome">DI SALVO ANTONIO</div></div>
+      <div class="box obbl"><div class="n">8</div><div class="ruolo">NBCR ●</div><div class="nome">GASPAROTTO DEVIS</div></div>
+      <div class="box obbl"><div class="n">9</div><div class="ruolo">Strutturista ●</div><div class="nome">ANTONIUTTI CLAUDIO</div></div>
+      <div class="box obbl"><div class="n">10</div><div class="ruolo">NBCR ●</div><div class="nome">BUSATO LUCA</div></div>
+    </div>
+    <div class="coppia-note">I riquadri con ● sono i posti con specializzazione obbligatoria (evidenziati in rosso chiaro nella bozza)</div>
+  </div>
+
+  <div class="sezione">
+    <h3>RICERCA</h3>
+    <div class="riga">
+      <div class="box obbl"><div class="n">11</div><div class="ruolo">Unità Cinofila ●</div><div class="nome">TOMASELLA MARCO</div></div>
+      <div class="box obbl"><div class="n">12</div><div class="ruolo">Unità Cinofila ●</div><div class="nome">SCARPA ALBERTO</div></div>
+      <div class="box"><div class="n">13</div><div class="ruolo">Tecnico Strumentista</div><div class="nome">ANAFI MARCO</div></div>
+      <div class="box obbl"><div class="n">14</div><div class="ruolo">Unità Cinofila ●</div><div class="nome">ROSSO ENRICO</div></div>
+      <div class="box obbl"><div class="n">15</div><div class="ruolo">Unità Cinofila ●</div><div class="nome vuoto">—</div></div>
+      <div class="box"><div class="n">16</div><div class="ruolo">Tecnico Strumentista</div><div class="nome vuoto">—</div></div>
+    </div>
+  </div>
+
+  <div class="sezione">
+    <h3>SOCCORSO — TURNAZIONE 1</h3>
+    <div class="riga">
+      <div class="box obbl"><div class="n">17</div><div class="ruolo">ROS ●</div><div class="nome">IPPOLITO CLAUDIO</div></div>
+      <div class="box"><div class="n">18</div><div class="ruolo">Soccorritore Tecnico</div><div class="nome">CASAPINTA DAVIDE</div></div>
+      <div class="box"><div class="n">19</div><div class="ruolo">Soccorritore Tecnico</div><div class="nome">BARBERO SILVIA</div></div>
+      <div class="box"><div class="n">20</div><div class="ruolo">Soccorritore Tecnico</div><div class="nome">PIANON SAMUELE</div></div>
+      <div class="box"><div class="n">21</div><div class="ruolo">Soccorritore Tecnico</div><div class="nome vuoto">—</div></div>
+      <div class="box obbl"><div class="n">22</div><div class="ruolo">SAF ●</div><div class="nome">FERRI LUCA</div></div>
+      <div class="box"><div class="n">23</div><div class="ruolo">Addetto Sicurezza</div><div class="nome">FANTIN CLAUDIO</div></div>
+      <div class="box"><div class="n">24</div><div class="ruolo">Sentinella</div><div class="nome">DA MEDA GIULIO</div></div>
+    </div>
+  </div>
+
+  <div class="sezione">
+    <h3>SOCCORSO — TURNAZIONE 2</h3>
+    <div class="riga">
+      <div class="box obbl"><div class="n">25</div><div class="ruolo">ROS ●</div><div class="nome">BANZATO FILIPPO</div></div>
+      <div class="box"><div class="n">26</div><div class="ruolo">Soccorritore Tecnico</div><div class="nome">CASAROTTO DEVIS</div></div>
+      <div class="box"><div class="n">27</div><div class="ruolo">Soccorritore Tecnico</div><div class="nome">CONTESSO ANDREA</div></div>
+      <div class="box"><div class="n">28</div><div class="ruolo">Soccorritore Tecnico</div><div class="nome vuoto">—</div></div>
+      <div class="box"><div class="n">29</div><div class="ruolo">Soccorritore Tecnico</div><div class="nome vuoto">—</div></div>
+      <div class="box obbl"><div class="n">30</div><div class="ruolo">SAF ●</div><div class="nome">RIGON DIMITRI</div></div>
+      <div class="box"><div class="n">31</div><div class="ruolo">Addetto Sicurezza</div><div class="nome">FURLAN LUCA</div></div>
+      <div class="box"><div class="n">32</div><div class="ruolo">Sentinella</div><div class="nome">BIBAN MANUEL</div></div>
+    </div>
+  </div>
+
+  <div class="sezione">
+    <h3>LOGISTICA</h3>
+    <div class="riga">
+      <div class="box"><div class="n">33</div><div class="ruolo">Resp. Logistica</div><div class="nome">BILLIO DAVIDE</div></div>
+      <div class="box"><div class="n">34</div><div class="ruolo">Vice Resp. Log.</div><div class="nome">RUBIN MARCO</div></div>
+      <div class="box"><div class="n">35</div><div class="ruolo">Logista</div><div class="nome">LORENZET MASSIMO</div></div>
+      <div class="box"><div class="n">36</div><div class="ruolo">Logista</div><div class="nome">FRISO SIMONE</div></div>
+      <div class="box"><div class="n">37</div><div class="ruolo">Logista</div><div class="nome">CREMA RICCARDO</div></div>
+      <div class="box"><div class="n">38</div><div class="ruolo">Logista</div><div class="nome">SANTI PAOLO</div></div>
+    </div>
+  </div>
+
+  <p style="font-size:10px; color:#94A3B8; margin-top:24px;">Bozza per revisione utente — Nucleo USAR Veneto</p>
+</div>
+</body>
+</html>
