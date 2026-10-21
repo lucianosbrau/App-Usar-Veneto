@@ -368,6 +368,12 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Bordo nero alle sezioni**: le 4 sezioni hanno un rettangolo di contorno nero ben visibile (linea 0.7)
 - Verificato con rendering: tutto in una pagina, nessun taglio
 
+### Fix GENERA PDF da mobile (21/10/2026, segnalazione utente)
+- **Problema**: su telefono il pulsante 📄 GENERA PDF non faceva nulla (su PC funzionava)
+- **Causa**: jsPDF non riesce a incorporare i loghi passando solo il percorso file (`addImage('/assets/...')`) — su PC il fetch locale a volte funziona, su browser mobile fallisce in silenzio e bloccava tutta la generazione
+- **Soluzione**: i loghi ora vengono **precaricati come data URL** (Image + canvas) prima di generare il PDF; se un logo non carica, il PDF viene generato comunque senza logo (fallback con warning in console). Aggiunto `alert` di errore visibile se la generazione fallisce
+- `generaPdfManifesto` ora è **async**; il click gestisce l'errore con messaggio esplicito
+
 ### Modifiche precedenti
 - **Logo VVF aggiunto** (caricato dall'utente in `assets/Logo vvf.png`): nell'intestazione del PDF ora VVF a sinistra + USAR a destra, come nel modello. Nota: CONTINUITA sez. 9 diceva "logo VVF rimosso" per i documenti (infografica); nel **manifesto PDF invece ci va**, come da modello COMPOSIZIONE con entrambi i loghi
 

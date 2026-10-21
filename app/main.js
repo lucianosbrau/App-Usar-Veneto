@@ -880,10 +880,28 @@ async function apriProgramma(cont, programmi) {
     alert('Programma pubblicato (invio Telegram con il bot).');
     renderPagina();
   };
-  document.getElementById('prog-genera-pdf').onclick = () => generaPdfManifesto(prog, membri.data || []);
+  document.getElementById('prog-genera-pdf').onclick = () => generaPdfManifesto(prog, membri.data || []).catch(err => {
+    console.error('Errore generazione PDF:', err);
+    alert('Errore nella generazione del PDF: ' + err.message);
+  });
 }
 
-function generaPdfManifesto(prog, membri) {
+function caricaImmaginePdf(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      c.getContext('2d').drawImage(img, 0, 0);
+      try { resolve(c.toDataURL('image/jpeg', 0.92)); } catch (e) { reject(e); }
+    };
+    img.onerror = () => reject(new Error('logo non caricato: ' + url));
+    img.src = url;
+  });
+}
+
+async function generaPdfManifesto(prog, membri) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const perPosto = {};
   membri.forEach(m => {
@@ -934,8 +952,17 @@ function generaPdfManifesto(prog, membri) {
   }
 
   // ===== INTESTAZIONE =====
-  doc.addImage('/App-Usar-Veneto/assets/Logo vvf.png', 'PNG', 12, 8, 15, 15);
-  doc.addImage('/App-Usar-Veneto/assets/logo-usar.jpg', 'JPEG', 183, 8, 15, 15);
+  let logoVvf = null, logoUsar = null;
+  try {
+    [logoVvf, logoUsar] = await Promise.all([
+      caricaImmaginePdf('/App-Usar-Veneto/assets/Logo vvf.png'),
+      caricaImmaginePdf('/App-Usar-Veneto/assets/logo-usar.jpg')
+    ]);
+  } catch (e) {
+    console.warn('Logo non caricati nel PDF:', e);
+  }
+  if (logoVvf) doc.addImage(logoVvf, 'JPEG', 12, 8, 15, 15);
+  if (logoUsar) doc.addImage(logoUsar, 'JPEG', 183, 8, 15, 15);
   doc.setFont('helvetica', 'bold'); doc.setFontSize(20); doc.setTextColor(...ANTRACITE);
   doc.text(team, 105, 16, { align: 'center' });
   doc.setFontSize(12); doc.setTextColor(37,99,235);
