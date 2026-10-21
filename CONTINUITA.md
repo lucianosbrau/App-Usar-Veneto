@@ -374,6 +374,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Soluzione**: i loghi ora vengono **precaricati come data URL** (Image + canvas) prima di generare il PDF; se un logo non carica, il PDF viene generato comunque senza logo (fallback con warning in console). Aggiunto `alert` di errore visibile se la generazione fallisce
 - `generaPdfManifesto` ora è **async**; il click gestisce l'errore con messaggio esplicito
 
+### Fix loghi mancanti nel PDF scaricato (21/10/2026)
+- **Causa**: `Logo vvf.png` era solo in `assets/` (radice repo, non pubblicata) e non in `public/assets/` — il build Vite pubblica solo `public/`, quindi sul sito il logo VVF non esisteva e il caricamento falliva per entrambi
+- **Fix**: copiato `Logo vvf.png` in `public/assets/`. Regola: **tutti i file che l'app scarica a runtime vanno in `public/`** (assets, manifest, sw)
+
 ### Modifiche precedenti
 - **Logo VVF aggiunto** (caricato dall'utente in `assets/Logo vvf.png`): nell'intestazione del PDF ora VVF a sinistra + USAR a destra, come nel modello. Nota: CONTINUITA sez. 9 diceva "logo VVF rimosso" per i documenti (infografica); nel **manifesto PDF invece ci va**, come da modello COMPOSIZIONE con entrambi i loghi
 
