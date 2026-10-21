@@ -9,6 +9,19 @@ let progId = null;
 let SPEC_IDS = {};
 let mieFerieGlobali = {};
 
+async function caricaSpecializzazioni() {
+  const [specs, ops] = await Promise.all([
+    supabase.from('specializzazioni').select('id, nome'),
+    supabase.from('operatori_specializzazioni').select('operatore_id, specializzazione_id')
+  ]);
+  SPEC_IDS = {};
+  (specs.data || []).forEach(s => { SPEC_IDS[s.nome] = []; });
+  (ops.data || []).forEach(o => {
+    const nome = (specs.data || []).find(s => s.id === o.specializzazione_id)?.nome;
+    if (nome) SPEC_IDS[nome].push(o.operatore_id);
+  });
+}
+
 const TIPI_MAN = ['Mantenimento', 'Manovra', 'Intervento', 'Lavorazione', 'Tutor Mantenimento', 'Tutor Corso', 'Altra formazione'];
 
 function esc(t) {
@@ -43,6 +56,7 @@ async function init() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
     await caricaUtente(session.user);
+    await caricaSpecializzazioni();
     render();
   } else {
     renderLogin();
@@ -179,6 +193,7 @@ async function accedi() {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
   if (error) return mostraErrore('Credenziali non valide');
   await caricaUtente(data.user);
+  await caricaSpecializzazioni();
   render();
 }
 
