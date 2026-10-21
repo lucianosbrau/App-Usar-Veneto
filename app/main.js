@@ -345,6 +345,16 @@ async function pagCalendario(el) {
 async function disegnaCalendario(el, anno, mese) {
   localStorage.setItem('cal-mese', `${anno}-${String(mese + 1).padStart(2, '0')}`);
   const mioSalto = utente.salto_turno || '';
+  const inizioMese = `${anno}-${String(mese + 1).padStart(2, '0')}-01`;
+  const fineMese = `${anno}-${String(mese + 1).padStart(2, '0')}-${String(new Date(anno, mese + 1, 0).getDate()).padStart(2, '0')}`;
+  const [fe] = await Promise.all([
+    supabase.from('disponibilita').select('operatore_id, data, tipo, profili(nome, cognome)')
+      .eq('tipo', 'ferie').gte('data', inizioMese).lte('data', fineMese)
+  ]);
+  const ferieGiorno = {};
+  (fe.data || []).forEach(f => {
+    (ferieGiorno[f.data] = ferieGiorno[f.data] || []).push(`${f.profili?.cognome} ${f.profili?.nome}`);
+  });
   const nomiMesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   const primaValida = Date.UTC(2024, 0, 1), ultimaValida = Date.UTC(2028, 11, 31);
 
@@ -373,8 +383,14 @@ async function disegnaCalendario(el, anno, mese) {
           const clsG = cp.giorno === mioSalto ? 'background:var(--giallo-bg); color:var(--giallo-tx); font-weight:800;' : '';
           const clsN = cp.notte === mioSalto ? 'background:var(--giallo-bg); color:var(--giallo-tx); font-weight:800;' : '';
           const [gg, sett] = [new Date(anno, mese, giorno).getDate(), ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'][new Date(anno, mese, giorno).getDay()]];
-          return `<tr style="border-top:1px solid var(--bordo); text-align:center;">
-            <td style="text-align:left; padding:8px 4px;"><b>${gg}</b> <span style="color:var(--grigio); font-size:12px;">${sett}</span></td>
+          const dataIso = `${anno}-${String(mese + 1).padStart(2, '0')}-${String(gg).padStart(2, '0')}`;
+          const inFerie = ferieGiorno[dataIso] || [];
+          const mieFerie = inFerie.some(n => n.startsWith(`${utente.cognome || ''} ${utente.nome || ''}`.trim()));
+          const badge = utente.ruolo === 'admin' && inFerie.length
+            ? `<span class="pill giallo" style="font-size:10px; cursor:help;" title="${esc(inFerie.join(', '))}">🏖 ${inFerie.length} in ferie</span>` : '';
+          const sfondo = mieFerie ? 'background:#DBEAFE;' : '';
+          return `<tr style="border-top:1px solid var(--bordo); text-align:center; ${sfondo}">
+            <td style="text-align:left; padding:8px 4px;"><b>${gg}</b> <span style="color:var(--grigio); font-size:12px;">${sett}</span> ${badge}</td>
             <td style="padding:8px 4px; ${clsG}">${cp.giorno}</td>
             <td style="padding:8px 4px; ${clsN}">${cp.notte}</td>
           </tr>`;
