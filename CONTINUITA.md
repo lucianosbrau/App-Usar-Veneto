@@ -360,6 +360,13 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Layout fedele al modello, ora implementato**: header TEAM + mese centrati con loghi ai lati; DIREZIONE E COMANDO (sfondo blu chiaro #A7D4FF) con **Team Leader centrato da solo** (riquadro blu #0066CC, testo bianco), poi Vice + Ufficiale affiancati, poi 3 Staff in riga; VALUTAZIONE E SICUREZZA (giallo) con **4 box in una riga**; OPERAZIONI (rosso deciso #B22222) con sottotitoli RICERCA (2 colonne da 3) e SOCCORSO (2 colonne da 8 = le 2 turnazioni affiancate); LOGISTICA (giallo) con **2 righe da 3** (33-35 sopra, 36-38 sotto — ordine logico). Box bianchi con bordo nero; dentro ogni box: numero+ruolo in alto (rosso), nome sotto
 - Tutto in **una pagina A4 portrait**, verificato con rendering locale (pymupdf) + analisi immagine: nessun testo tagliato, nessuna sovrapposizione
 - Anteprima aggiornata: `public/manifesto-preview.pdf` (Team Alpha settembre con i nominativi del modello) — per la revisione dell'utente
+### Modifiche layout PDF richieste dall'utente (21/10/2026, 3ª iterazione)
+- **Testo centrato** in tutti i box (numero+ruolo e nome), non più allineato a sinistra
+- **Colori invertiti**: le sezioni ora hanno **sfondo BIANCO** e i **box colorati** (Direzione=blu chiaro, Valutazione/Logistica=giallo, Operazioni=rosso chiaro #FEE2E2; TL resta blu scuro #0066CC testo bianco)
+- **Bordo nero alle sezioni**: le 4 sezioni hanno un rettangolo di contorno nero ben visibile (linea 0.7)
+- Verificato con rendering: tutto in una pagina, nessun taglio
+
+### Modifiche precedenti
 - **Logo VVF aggiunto** (caricato dall'utente in `assets/Logo vvf.png`): nell'intestazione del PDF ora VVF a sinistra + USAR a destra, come nel modello. Nota: CONTINUITA sez. 9 diceva "logo VVF rimosso" per i documenti (infografica); nel **manifesto PDF invece ci va**, come da modello COMPOSIZIONE con entrambi i loghi
 
 ### Prossimi passi (in ordine proposto)

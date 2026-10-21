@@ -896,6 +896,7 @@ function generaPdfManifesto(prog, membri) {
   const BLU_CHIARO = [167,212,255];
   const GIALLO = [255,243,176];
   const ROSSO = [178,34,34];
+  const ROSSO_CH = [254,226,226];
   const GRIGIO_TX = [71,85,105];
   const ANTRACITE = [30,41,59];
 
@@ -905,20 +906,23 @@ function generaPdfManifesto(prog, membri) {
     doc.setLineWidth(0.3);
     doc.rect(x, y, w, h, 'FD');
     const scuro = stile === 'capo';
+    const cx = x + w / 2;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.5);
     doc.setTextColor(scuro ? 255 : 178, scuro ? 255 : 34, scuro ? 255 : 34);
-    doc.text(`${n} - ${ruolo.toUpperCase()}`, x + 2, y + 4.2);
+    doc.text(`${n} - ${ruolo.toUpperCase()}`, cx, y + 4.2, { align: 'center' });
     doc.setFontSize(8);
     if (scuro) { doc.setTextColor(255,255,255); }
     else if (nome) { doc.setTextColor(...ANTRACITE); }
     else { doc.setTextColor(150,150,150); }
-    doc.text(nome || '—', x + 2, y + 9.5);
+    doc.text(nome || '—', cx, y + 9.5, { align: 'center' });
   }
 
   function sezioneBg(y1, y2, colore) {
-    doc.setFillColor(...colore);
-    doc.rect(12, y1, 186, y2 - y1, 'F');
+    doc.setFillColor(255,255,255);
+    doc.setDrawColor(0,0,0);
+    doc.setLineWidth(0.7);
+    doc.rect(12, y1, 186, y2 - y1, 'FD');
   }
   function titoloSezione(y, testo) {
     doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(...ANTRACITE);
@@ -950,11 +954,11 @@ function generaPdfManifesto(prog, membri) {
   sezioneBg(y0, yD3 + H + 2.5, BLU_CHIARO);
   titoloSezione(y0 + 4, 'DIREZIONE E COMANDO');
   box(75, yD, 60, H, 1, 'Team Leader', perPosto[1], BLU_TL, 'capo');
-  box(15, yD2, 88, H, 2, 'Vice Team Leader', perPosto[2], BIANCO, null);
-  box(107, yD2, 88, H, 3, 'Ufficiale di Collegamento', perPosto[3], BIANCO, null);
-  box(15, yD3, 58, H, 4, 'Staff Comando', perPosto[4], BIANCO, null);
-  box(76, yD3, 58, H, 5, 'Staff', perPosto[5], BIANCO, null);
-  box(137, yD3, 58, H, 6, 'Staff', perPosto[6], BIANCO, null);
+  box(15, yD2, 88, H, 2, 'Vice Team Leader', perPosto[2], BLU_CHIARO, null);
+  box(107, yD2, 88, H, 3, 'Ufficiale di Collegamento', perPosto[3], BLU_CHIARO, null);
+  box(15, yD3, 58, H, 4, 'Staff Comando', perPosto[4], BLU_CHIARO, null);
+  box(76, yD3, 58, H, 5, 'Staff', perPosto[5], BLU_CHIARO, null);
+  box(137, yD3, 58, H, 6, 'Staff', perPosto[6], BLU_CHIARO, null);
   y = yD3 + H + 4.5;
 
   // ===== VALUTAZIONE E SICUREZZA (sfondo giallo) =====
@@ -964,7 +968,7 @@ function generaPdfManifesto(prog, membri) {
   sezioneBg(y0, yV + H + 2.5, GIALLO);
   titoloSezione(y0 + 4, 'VALUTAZIONE E SICUREZZA');
   [[7,'Strutturista'],[8,'NBCR'],[9,'Strutturista'],[10,'NBCR']].forEach(([n, r], i) => {
-    box(15 + i * (wV + 1.3), yV, wV, H, n, r, perPosto[n], BIANCO, null);
+    box(15 + i * (wV + 1.3), yV, wV, H, n, r, perPosto[n], GIALLO, null);
   });
   y = yV + H + 4.5;
 
@@ -979,13 +983,13 @@ function generaPdfManifesto(prog, membri) {
   sottoTitolo(yO + 3, 'RICERCA');
   const colR1 = [[11,'Unit\u00e0 Cinofila'],[12,'Unit\u00e0 Cinofila'],[13,'Tecnico Strumentista']];
   const colR2 = [[14,'Unit\u00e0 Cinofila'],[15,'Unit\u00e0 Cinofila'],[16,'Tecnico Strumentista']];
-  colR1.forEach(([n, r], i) => box(15, yR + i * STEPS, 88, HS, n, r, perPosto[n], BIANCO, null));
-  colR2.forEach(([n, r], i) => box(107, yR + i * STEPS, 88, HS, n, r, perPosto[n], BIANCO, null));
+  colR1.forEach(([n, r], i) => box(15, yR + i * STEPS, 88, HS, n, r, perPosto[n], ROSSO_CH, null));
+  colR2.forEach(([n, r], i) => box(107, yR + i * STEPS, 88, HS, n, r, perPosto[n], ROSSO_CH, null));
   sottoTitolo(yS - 1.5, 'SOCCORSO');
   const colS1 = [[17,'ROS'],[18,'Soccorritore Tecnico'],[19,'Soccorritore Tecnico'],[20,'Soccorritore Tecnico'],[21,'Soccorritore Tecnico'],[22,'SAF'],[23,'Addetto Sicurezza'],[24,'Sentinella']];
   const colS2 = [[25,'ROS'],[26,'Soccorritore Tecnico'],[27,'Soccorritore Tecnico'],[28,'Soccorritore Tecnico'],[29,'Soccorritore Tecnico'],[30,'SAF'],[31,'Addetto Sicurezza'],[32,'Sentinella']];
-  colS1.forEach(([n, r], i) => box(15, yS + i * STEPS, 88, HS, n, r, perPosto[n], BIANCO, null));
-  colS2.forEach(([n, r], i) => box(107, yS + i * STEPS, 88, HS, n, r, perPosto[n], BIANCO, null));
+  colS1.forEach(([n, r], i) => box(15, yS + i * STEPS, 88, HS, n, r, perPosto[n], ROSSO_CH, null));
+  colS2.forEach(([n, r], i) => box(107, yS + i * STEPS, 88, HS, n, r, perPosto[n], ROSSO_CH, null));
   y = yEndO + 2;
 
   // ===== LOGISTICA (sfondo giallo): 2 righe da 3 =====
@@ -994,12 +998,12 @@ function generaPdfManifesto(prog, membri) {
   const yL2 = yL + STEPS;
   sezioneBg(y0, yL2 + HS + 2.5, GIALLO);
   titoloSezione(y0 + 4, 'LOGISTICA');
-  box(15, yL, 58, HS, 33, 'Responsabile Logistica', perPosto[33], BIANCO, null);
-  box(76, yL, 58, HS, 34, 'Vice Responsabile Logistica', perPosto[34], BIANCO, null);
-  box(137, yL, 58, HS, 35, 'Logista', perPosto[35], BIANCO, null);
-  box(15, yL2, 58, HS, 36, 'Logista', perPosto[36], BIANCO, null);
-  box(76, yL2, 58, HS, 37, 'Logista', perPosto[37], BIANCO, null);
-  box(137, yL2, 58, HS, 38, 'Logista', perPosto[38], BIANCO, null);
+  box(15, yL, 58, HS, 33, 'Responsabile Logistica', perPosto[33], GIALLO, null);
+  box(76, yL, 58, HS, 34, 'Vice Responsabile Logistica', perPosto[34], GIALLO, null);
+  box(137, yL, 58, HS, 35, 'Logista', perPosto[35], GIALLO, null);
+  box(15, yL2, 58, HS, 36, 'Logista', perPosto[36], GIALLO, null);
+  box(76, yL2, 58, HS, 37, 'Logista', perPosto[37], GIALLO, null);
+  box(137, yL2, 58, HS, 38, 'Logista', perPosto[38], GIALLO, null);
   y = yL2 + HS + 4.5;
 
   doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184);
