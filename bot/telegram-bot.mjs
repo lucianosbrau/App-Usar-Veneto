@@ -40,18 +40,25 @@ async function inserisciFerie(chatId, testo) {
 
   // formato atteso: /ferie 05/11/2026 - 16/11/2026  (o date singole: /ferie 05/11/2026)
   const match = testo.match(/(\d{2})\/(\d{2})\/(\d{4})\s*(?:-|a|to)?\s*(?:(\d{2})\/(\d{2})\/(\d{4}))?/);
-  if (!match) return 'Formato: /ferie gg/mm/aaaa - gg/mm/aaaa\nEsempio: /ferie 05/11/2026 - 16/11/2026';
+  if (!match) return 'Formato: /ferie gg/mm/aaaa - gg/mm/aaaa [continuative]\nEsempio: /ferie 05/11/2026 - 16/11/2026 continuative\n\nCon "continuative" le ferie valgono per giorno E notte di ogni data.';
   const d1 = `${match[3]}-${match[2]}-${match[1]}`;
   const d2 = match[4] ? `${match[6]}-${match[5]}-${match[4]}` : d1;
   if (d2 < d1) return 'La seconda data è prima della prima.';
+  const continuative = /continuative/i.test(testo);
 
   const righe = [];
   for (let d = new Date(d1); d <= new Date(d2); d.setDate(d.getDate() + 1)) {
-    righe.push({ operatore_id: op.id, data: d.toISOString().slice(0, 10), tipo: 'ferie' });
+    const data = d.toISOString().slice(0, 10);
+    if (continuative) {
+      righe.push({ operatore_id: op.id, data, tipo: 'ferie', turno_ferie: 'giorno' });
+      righe.push({ operatore_id: op.id, data, tipo: 'ferie', turno_ferie: 'notte' });
+    } else {
+      righe.push({ operatore_id: op.id, data, tipo: 'ferie', turno_ferie: 'giorno' });
+    }
   }
   const { error } = await sb.from('disponibilita').insert(righe);
   if (error) return 'Errore salvataggio: ' + error.message;
-  return `🏖 Ferie registrate: ${match[1]}/${match[2]}/${match[3]}${match[4] ? ` → ${match[4]}/${match[5]}/${match[6]}` : ''} (${righe.length} giorni). Se vedi un errore scrivimi di nuovo.`;
+  return `🏖 Ferie registrate: ${match[1]}/${match[2]}/${match[3]}${match[4] ? ` → ${match[4]}/${match[5]}/${match[6]}` : ''} — ${righe.length} giorni${continuative ? ' (continuative: giorno e notte)' : ' (solo turno diurno)'}.`;
 }
 
 let offset = 0;

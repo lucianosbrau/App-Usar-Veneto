@@ -277,9 +277,12 @@ function renderPagina() {
     case 'programmazione': return pagProgrammazione(c);
     case 'calendario': return pagCalendario(c);
     case 'profilo': return pagProfilo(c);
-    default:
-      c.innerHTML = `<div class="pagina-titolo">${esc(pagina)}</div><div class="pagina-sotto">Pagina in costruzione</div>
+    case 'resoconti': return pagResoconti(c);
+    default: {
+      const TITOLI = { squadre: 'Squadre', internazionale: 'Internazionale', report: 'Report e Statistiche' };
+      c.innerHTML = `<div class="pagina-titolo">${TITOLI[pagina] || esc(pagina)}</div><div class="pagina-sotto">Pagina in costruzione</div>
         <div class="card">Questa sezione sarà sviluppata nei prossimi passi.</div>`;
+    }
   }
 }
 
@@ -311,6 +314,49 @@ async function pagOperatori(el) {
     </div>`;
 }
 
+
+
+/* ============ RESOCONTI ============ */
+
+async function pagResoconti(el) {
+  el.innerHTML = `
+    <div class="pagina-titolo">📄 Resoconti</div>
+    <div class="pagina-sotto">Sintesi operativa</div>
+    <div id="res-cont">Caricamento…</div>`;
+  const cont = document.getElementById('res-cont');
+  const now = new Date();
+  const inizioMese = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+  const fineMese = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()).padStart(2, '0')}`;
+  const { data: ferie } = await supabase.from('disponibilita').select('operatore_id, data, turno_ferie, profili(cognome, nome)')
+    .eq('tipo', 'ferie').gte('data', inizioMese).lte('data', fineMese);
+
+  const perOp = {};
+  (ferie || []).forEach(f => {
+    const nome = `${f.profili?.cognome} ${f.profili?.nome}`;
+    perOp[nome] = perOp[nome] || { g: 0, n: 0 };
+    if (f.turno_ferie === 'notte') perOp[nome].n++;
+    else perOp[nome].g++;  // giorno o intera giornata
+  });
+  const totaleG = Object.values(perOp).reduce((s, v) => s + v.g, 0);
+  const totaleN = Object.values(perOp).reduce((s, v) => s + v.n, 0);
+  const nomi = Object.keys(perOp).sort();
+
+  cont.innerHTML = `
+    <div class="card" style="margin-bottom:20px;">
+      <div style="font-weight:700; margin-bottom:10px;">🏖 Ferie di ${['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'][now.getMonth()]} ${now.getFullYear()}</div>
+      <div style="display:flex; gap:20px; margin-bottom:14px;">
+        <div><div style="font-size:32px; font-weight:800; color:var(--royal);">${totaleG}</div>☀️ Giorni ferie diurne</div>
+        <div><div style="font-size:32px; font-weight:800; color:var(--royal);">${totaleN}</div>🌙 Notti ferie</div>
+        <div><div style="font-size:32px; font-weight:800;">${nomi.length}</div>👥 Operatori coinvolti</div>
+      </div>
+      ${nomi.length ? `
+      <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr style="text-align:left; color:var(--grigio); font-size:12px;"><th style="padding:6px 0;">Operatore</th><th>☀️ Giorno</th><th>🌙 Notte</th></tr>
+        ${nomi.map(n => `<tr style="border-top:1px solid var(--bordo);"><td style="padding:7px 0;">${esc(n)}</td><td>${perOp[n].g}</td><td>${perOp[n].n}</td></tr>`).join('')}
+      </table>` : '<div style="color:var(--grigio);">Nessuna ferie registrata questo mese.</div>'}
+    </div>
+    <div class="card"><div style="font-weight:700; margin-bottom:8px;">📋 Resoconti attivazioni</div><div style="color:var(--grigio); font-size:14px;">Saranno disponibili con lo sviluppo delle attivazioni di emergenza.</div></div>`;
+}
 
 /* ============ CALENDARIO TURNI ============ */
 /* Ciclo salti turno: parte da 01/11/2026 (B2 giorno / A2 notte).
@@ -395,8 +441,10 @@ async function disegnaCalendario(el, anno, mese) {
           const dataIso = `${anno}-${String(mese + 1).padStart(2, '0')}-${String(gg).padStart(2, '0')}`;
           const inFerie = ferieGiorno[dataIso] || [];
           const mieFerie = inFerie.some(n => n.startsWith(`${utente.cognome || ''} ${utente.nome || ''}`.trim()));
-          const badge = utente.ruolo === 'admin' && inFerie.length
-            ? `<span class="pill giallo" style="font-size:10px; cursor:help;" title="${esc(inFerie.join(', '))}">🏖 ${inFerie.length} in ferie</span>` : '';
+          const elencoGiorno = inFerie.filter(n => n.includes('☀️') || (!n.includes('☀️') && !n.includes('🌙'))).map(n => n.replace(' (☀️)','').replace(' (🌙)',''));
+          const dettaglio = inFerie.length
+            ? `<div style="font-size:11px; color:var(--giallo-tx); text-align:left; padding:4px 0 0 28px;">GIORNO: ${elencoGiorno.join(', ') || '—'}<br>NOTTE: ${inFerie.filter(n => n.includes('🌙')).map(n => n.replace(' (🌙)','')).join(', ') || '—'}</div>`
+            : '';
           const dicituraFerie = mieFerie ? '<span class="pill" style="font-size:10px; background:#DBEAFE; color:#1E40AF; margin-left:6px;">Ferie</span>' : '';
           const sfondo = mieFerie ? 'background:#DBEAFE;' : '';
           const settCompleto = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'][new Date(anno, mese, giorno).getDay()];
@@ -405,7 +453,7 @@ async function disegnaCalendario(el, anno, mese) {
           const cellaG = miaG ? 'background:#DBEAFE; color:#1E40AF; font-weight:800; cursor:pointer; border-radius:6px;' : 'cursor:pointer;';
           const cellaN = miaN ? 'background:#DBEAFE; color:#1E40AF; font-weight:800; cursor:pointer; border-radius:6px;' : 'cursor:pointer;';
           return `<tr style="border-top:1px solid var(--bordo); text-align:center; ${sfondo}">
-            <td style="text-align:left; padding:8px 4px;"><b>${gg}</b> <span style="color:var(--grigio); font-size:12px;">${settCompleto}</span>${dicituraFerie} ${badge}</td>
+            <td style="text-align:left; padding:8px 4px;"><b>${gg}</b> <span style="color:var(--grigio); font-size:12px;">${settCompleto}</span> ${inFerie.length ? `<span class="pill giallo" style="font-size:10px;">🏖 ${inFerie.length}</span>` : ''}${dettaglio}</td>
             <td data-ferie-g="${dataIso}" style="padding:8px 4px; ${clsG} ${cellaG}" title="Ferie diurna: clicca per toglierla / metterla">${cp.giorno}</td>
             <td data-ferie-n="${dataIso}" style="padding:8px 4px; ${clsN} ${cellaN}" title="Ferie notturna: clicca per toglierla / metterla">${cp.notte}</td>
           </tr>`;
