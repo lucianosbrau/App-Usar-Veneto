@@ -659,6 +659,15 @@ async function apriProgramma(cont, programmi) {
     if (!o.patente) return '';
     return ' 🚚' + o.patente + (o.estensioni_patente?.length ? '+' + o.estensioni_patente.map(e => e === 'Autoscala' ? 'AS' : e === 'Autogru' ? 'AG' : e === 'Anfibio' ? 'AN' : e).join('') : '');
   };
+  const iconeSpecPdf = (opId) => {
+    let icone = '';
+    if ((SPEC_IDS['Strutturista'] || []).includes(opId)) icone += ' \u{1F3D7}\u{FE0F}';
+    if ((SPEC_IDS['NBCR 3° livello'] || []).includes(opId)) icone += ' \u{2623}\u{FE0F}';
+    if ((SPEC_IDS['Unità cinofila K9'] || []).includes(opId)) icone += ' \u{1F415}';
+    if ((SPEC_IDS['SAF 2A (corda)'] || []).includes(opId)) icone += ' \u{1F9D7}';
+    if ((SPEC_IDS['Caposquadra/Capireparto'] || []).includes(opId)) icone += ' \u{2B50}';
+    return icone;
+  };
   const iconeSpec = (opId) => {
     let icone = '';
     if ((SPEC_IDS['Strutturista'] || []).includes(opId)) icone += '🏗️';
@@ -724,7 +733,7 @@ async function apriProgramma(cont, programmi) {
             <span style="width:28px; font-weight:800; color:${p.spec || p.ros ? 'var(--rosso)' : 'var(--grigio)'};">${p.n}</span>
             <span style="flex:1; font-size:14px;">${esc(p.t)}${p.spec || p.ros ? ' <span style="color:var(--rosso); font-size:11px;">● OBBL.</span>' : ''}</span>
             ${occ
-              ? `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${occ.profili?.patente ? ` <span class="pill giallo" style="font-size:10px;">🚚 ${esc(occ.profili.patente)}</span>` : ''}</span>
+              ? `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpec(occ.operatore_id)}${occ.profili?.patente ? ` <span class="pill giallo" style="font-size:10px;">🚚 ${esc(occ.profili.patente)}</span>` : ''}</span>
                  <button class="pill rosso" data-vuota="${occ.id}" style="border:none; cursor:pointer;">✕</button>`
               : `<div style="display:flex; gap:6px; align-items:center; max-width:300px;">
                    <div style="position:relative; flex:1;">
@@ -875,7 +884,10 @@ async function apriProgramma(cont, programmi) {
 
 function generaPdfManifesto(prog, membri) {
   const perPosto = {};
-  membri.forEach(m => { perPosto[m.posto] = `${(m.profili?.cognome || '').toUpperCase()} ${(m.profili?.nome || '').toUpperCase()}`.trim(); });
+  membri.forEach(m => {
+    const nome = `${(m.profili?.cognome || '').toUpperCase()} ${(m.profili?.nome || '').toUpperCase()}`.trim();
+    perPosto[m.posto] = nome + iconeSpecPdf(m.operatore_id);
+  });
   const team = prog.team === 'alpha' ? 'SQUADRA ALPHA' : 'SQUADRA BRAVO';
 
   const SEZ = [
