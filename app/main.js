@@ -703,7 +703,7 @@ async function apriProgramma(cont, programmi) {
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn-primary" id="prog-inserisci-tutti" style="height:44px;">➕ INSERISCI TUTTI</button>
-          <button class="btn-primary" id="prog-elimina" style="height:44px; background:var(--rosso);">🗑 ELIMINA PROGRAMMA</button>
+          <button class="btn-primary" id="prog-elimina" style="height:44px; background:var(--rosso);">🗑 ELIMINA COMPILAZIONE</button>
           <button class="btn-primary" id="prog-genera-pdf" style="height:44px;">📄 GENERA PDF</button>
           <button class="btn-primary" id="prog-pubblica" style="max-width:210px; height:44px; background:${prog.pubblicato ? 'var(--verde)' : 'var(--rosso)'};">${prog.pubblicato ? 'RIPUBBLICA' : 'PUBBLICA'} SU TELEGRAM</button>
         </div>
@@ -1043,20 +1043,359 @@ async function generaPdfManifesto(prog, membri) {
   doc.save(`manifesto-${prog.team}-${progMese}.pdf`);
 }
 
-function pagAttivazione(el) {
+/* ============ ATTIVAZIONE EMERGENZA ============ */
+
+let attivazioneId = null;
+let attivazioneTeam = null;
+let canaleRealtime = null;
+
+function chiudiRealtime() {
+  if (canaleRealtime) { supabase.removeChannel(canaleRealtime); canaleRealtime = null; }
+}
+
+async function pagAttivazione(el) {
+  chiudiRealtime();
+  if (utente.ruolo === 'admin') return pagAttivazioneAdmin(el);
+  return pagAttivazioneOperatore(el);
+}
+
+async function pagAttivazioneOperatore(el) {
   el.innerHTML = `
     <div class="pagina-titolo">🚨 Attivazione Emergenza</div>
-    <div class="pagina-sotto">Seleziona il team da allertare</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:600px;">
-      <button class="btn-primary" style="height:80px; font-size:18px; font-weight:800;">🚨 ATTIVA ALPHA</button>
-      <button class="btn-primary" style="height:80px; font-size:18px; font-weight:800;">🚨 ATTIVA BRAVO</button>
-    </div>
-    <div class="card" style="margin-top:20px; max-width:600px;">
-      <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--grigio); margin-bottom:6px;">Messaggio di emergenza (modificabile)</div>
-      <textarea id="msg" rows="4" style="width:100%; border:1.5px solid var(--grigio-ch); border-radius:10px; padding:12px; font-family:inherit; font-size:14px;">🚨 ATTIVAZIONE TEAM — Emergenza USAR. Ritrovo: Centrale VVF Mestre. Confermare la propria disponibilità.</textarea>
-      <button class="btn-primary" style="margin-top:12px;">📡 INVIA ALLERTA</button>
-    </div>
-    <p style="color:var(--grigio); font-size:12px; margin-top:12px;">L'invio reale richiede il bot Telegram configurato (in sviluppo).</p>`;
+    <div class="pagina-sotto">Stato di allerta del nucleo</div>
+    <div id="att-op-cont">Caricamento…</div>`;
+  const cont = document.getElementById('att-op-cont');
+
+  const disegna = async () => {
+    const { data: att } = await supabase.from('attivazioni')
+      .select('*, risposte_attivazione(*)').eq('chiusa', false).order('creata_il', { ascending: false }).limit(1);
+    const a = att?.[0];
+    if (!a) {
+      cont.innerHTML = `<div class="card">✅ Nessuna attivazione in corso.</div>`;
+      return;
+    }
+    const mia = (a.risposte_attivazione || []).find(r => r.operatore_id === utente.id);
+    let centrale = '';
+    if (mia) {
+      centrale = `<div class="pill verde" style="display:inline-block; padding:8px 14px;">✅ Hai risposto: ${mia.risposta === 'si' ? 'DISPONIBILE' : 'NON DISPONIBILE'}</div>`;
+    } else {
+      centrale = `<div style="display:grid; gap:10px; max-width:400px; margin-top:14px;">
+        <button class="btn-primary" data-risposta="si" style="height:64px; background:var(--verde); font-size:18px; font-weight:800;">✅ SONO DISPONIBILE</button>
+        <button class="btn-primary" data-risposta="no" style="height:56px; background:var(--grigio-ch); font-size:15px;">✖️ NON SONO DISPONIBILE</button>
+      </div>`;
+    }
+    cont.innerHTML = `
+      <div class="card">
+        <div style="font-size:12px; color:var(--grigio);">${new Date(a.creata_il).toLocaleString('it-IT')}</div>
+        <div style="font-size:20px; font-weight:800; margin:6px 0;">🚨 TEAM ${a.team === 'alpha' ? 'ALPHA' : 'BRAVO'} ATTIVATO</div>
+        <div style="background:#FEF2F2; border-left:4px solid var(--rosso); padding:12px; border-radius:8px; margin:10px 0; font-size:15px;">${esc(a.messaggio)}</div>
+        ${centrale}
+      </div>`;
+    cont.querySelectorAll('[data-risposta]').forEach(b => b.onclick = async () => {
+      const { error } = await supabase.from('risposte_attivazione')
+        .insert({ attivazione_id: a.id, operatore_id: utente.id, risposta: b.dataset.risposta });
+      if (error) alert('Errore: ' + error.message);
+      disegna();
+    });
+  };
+  await disegna();
+  canaleRealtime = supabase.channel('att-op')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'attivazioni' }, disegna)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'risposte_attivazione' }, disegna)
+    .subscribe();
+}
+async function pagAttivazioneAdmin(el) {
+  el.innerHTML = `
+    <div class="pagina-titolo">🚨 Attivazione Emergenza</div>
+    <div class="pagina-sotto">Lancio allerta e monitoraggio risposte in tempo reale</div>
+    <div id="att-adm-cont">Caricamento…</div>`;
+  const cont = document.getElementById('att-adm-cont');
+
+  const disegna = async () => {
+    const { data: atts } = await supabase.from('attivazioni')
+      .select('*, risposte_attivazione(*, profili(nome, cognome, patente, grado))')
+      .eq('chiusa', false).order('creata_il', { ascending: false });
+    const aperta = atts?.[0];
+
+    if (!aperta) {
+      cont.innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:600px;">
+          <button class="btn-primary" data-avvia="alpha" style="height:80px; font-size:18px; font-weight:800;">🚨 ATTIVA ALPHA</button>
+          <button class="btn-primary" data-avvia="bravo" style="height:80px; font-size:18px; font-weight:800;">🚨 ATTIVA BRAVO</button>
+        </div>
+        <div class="card" style="margin-top:20px; max-width:600px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--grigio); margin-bottom:6px;">Messaggio di emergenza (modificabile)</div>
+          <textarea id="att-msg" rows="4" style="width:100%; border:1.5px solid var(--grigio-ch); border-radius:10px; padding:12px; font-family:inherit; font-size:14px;">🚨 ATTIVAZIONE TEAM — Emergenza USAR. Ritrovo: Centrale VVF Mestre. Confermare la propria disponibilità.</textarea>
+          <button class="btn-primary" id="att-invia" style="margin-top:12px;">📡 INVIA ALLERTA</button>
+        </div>`;
+      let teamScelto = null;
+      cont.querySelectorAll('[data-avvia]').forEach(b => b.onclick = () => {
+        cont.querySelectorAll('[data-avvia]').forEach(x => x.style.outline = '');
+        b.style.outline = '4px solid var(--ambra)';
+        teamScelto = b.dataset.avvia;
+      });
+      document.getElementById('att-invia').onclick = async () => {
+        if (!teamScelto) { alert('Seleziona prima ATTIVA ALPHA o ATTIVA BRAVO.'); return; }
+        const messaggio = document.getElementById('att-msg').value.trim();
+        if (!messaggio) { alert('Scrivi il messaggio di emergenza.'); return; }
+        const { data: nuova, error } = await supabase.from('attivazioni')
+          .insert({ team: teamScelto, messaggio, creata_da: utente.id }).select().single();
+        if (error) { alert('Errore: ' + error.message); return; }
+        attivazioneId = nuova.id;
+        attivazioneTeam = nuova.team;
+        alert('🚨 Allerta lanciata! (Invio Telegram ai colleghi appena il bot è online — le risposte arrivano comunque qui in tempo reale)');
+        disegna();
+      };
+      return;
+    }
+
+    attivazioneId = aperta.id;
+    attivazioneTeam = aperta.team;
+    const risp = aperta.risposte_attivazione || [];
+    const si = risp.filter(r => r.risposta === 'si');
+    const no = risp.filter(r => r.risposta === 'no');
+
+    // copertura requisiti: conta tra i SÌ (prioritariamente chi è nel programma del mese)
+    const meseCorrente = new Date().toISOString().slice(0, 7) + '-01';
+    const { data: progMese } = await supabase.from('programmi_mensili')
+      .select('id, programmi_membri(operatore_id, posto)')
+      .eq('mese', meseCorrente).eq('team', aperta.team).maybeSingle();
+    const inProgramma = new Set((progMese?.programmi_membri || []).map(m => m.operatore_id));
+    const idonei = (spec) => si.filter(r => (SPEC_IDS[spec] || []).includes(r.operatore_id));
+    const copre = (spec, min) => { const n = idonei(spec).length; return n >= min; };
+    const righeCop = [
+      ['🏗️ Strutturisti', idonei('Strutturista').length, 2],
+      ['☣️ NBCR 3°', idonei('NBCR 3° livello').length, 2],
+      ['🐕 Unità cinofile', idonei('Unità cinofila K9').length, 4],
+      ['⭐ Capi squadra', idonei('Caposquadra/Caporeparto').length, 2],
+      ['🧗 SAF 2A', idonei('SAF 2A (corda)').length, 2],
+      ['👥 Personale (totale)', si.length, 38]
+    ];
+
+    cont.innerHTML = `
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div style="font-size:22px; font-weight:800;">🚨 TEAM ${aperta.team === 'alpha' ? 'ALPHA' : 'BRAVO'} ATTIVATO</div>
+            <div style="font-size:13px; color:var(--grigio);">${new Date(aperta.creata_il).toLocaleString('it-IT')} · allertati: in attesa del bot Telegram</div>
+          </div>
+          <button class="btn-primary" id="att-chiudi" style="height:44px; background:var(--grigio-ch);">✔️ CHIUDI ATTIVAZIONE</button>
+        </div>
+        <div style="background:#FEF2F2; border-left:4px solid var(--rosso); padding:12px; border-radius:8px; margin:12px 0;">${esc(aperta.messaggio)}</div>
+        <div style="display:flex; gap:14px; flex-wrap:wrap; font-size:14px; margin-bottom:12px;">
+          <span class="pill verde">✅ SÌ: ${si.length}</span>
+          <span class="pill rosso">✖️ NO: ${no.length}</span>
+          <span class="pill giallo">⏳ Nessuna risposta: —</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <div style="font-weight:800; margin-bottom:10px;">📦 COPERTURA REQUISITI (su chi ha risposto SÌ)</div>
+        ${righeCop.map(([t, n, min]) => `
+          <div style="display:flex; align-items:center; gap:10px; padding:6px 0; border-top:1px solid var(--bordo);">
+            <span style="flex:1;">${t}</span>
+            <span style="font-weight:800; color:${n >= min ? 'var(--verde)' : 'var(--rosso)'};">${n}/${min}</span>
+            <div class="barra" style="width:120px; margin:0;"><div style="width:${Math.min(n / min * 100, 100)}%; background:${n >= min ? 'var(--verde)' : 'var(--rosso)'};"></div></div>
+            <span>${n >= min ? '✅' : '➖'.repeat(Math.max(min - n, 0))}</span>
+          </div>`).join('')}
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <div style="font-weight:800; margin-bottom:10px;">✅ RISPOSTE — SÌ (${si.length})</div>
+        ${si.length ? si.map(r => `<div style="padding:7px 0; border-top:1px solid var(--bordo); display:flex; justify-content:space-between;">
+          <span><b>${esc(r.profili?.cognome)} ${esc(r.profili?.nome)}</b>${inProgramma.has(r.operatore_id) ? ' <span class="pill verde" style="font-size:10px;">IN PROGRAMMA</span>' : ''}</span>
+          <span style="color:var(--grigio); font-size:12px;">${new Date(r.risposto_il).toLocaleTimeString('it-IT')}</span>
+        </div>`).join('') : '<div style="color:var(--grigio);">Nessuna risposta positiva finora.</div>'}
+        ${no.length ? `<div style="font-weight:800; margin:14px 0 6px;">✖️ NO (${no.length})</div>
+        ${no.map(r => `<div style="padding:7px 0; border-top:1px solid var(--bordo); color:var(--grigio);">${esc(r.profili?.cognome)} ${esc(r.profili?.nome)}</div>`).join('')}` : ''}
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <div style="font-weight:800;">📋 MANIFESTO DELL'ATTIVAZIONE — TEAM ${aperta.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</div>
+        <div style="color:var(--grigio); font-size:13px; margin:6px 0 12px;">Compila i 38 posti: <b>automaticamente</b> dal programma del mese (ogni pressione aggiorna la maschera, non invia nulla) o <b>manualmente</b> con gli stessi criteri della Programmazione.</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-primary" id="att-auto" style="height:44px;">⚡ COMPILAZIONE AUTOMATICA</button>
+          <button class="btn-primary" id="att-manuale" style="height:44px;">✏️ COMPILAZIONE MANUALE</button>
+          <button class="btn-primary" id="att-pdf" style="height:44px;">📄 GENERA PDF</button>
+        </div>
+        <div id="att-manifesto"></div>
+      </div>`;
+
+    document.getElementById('att-chiudi').onclick = async () => {
+      if (!confirm('Chiudere l\'attivazione? Non sarà più possibile rispondere.')) return;
+      await supabase.from('attivazioni').update({ chiusa: true }).eq('id', aperta.id);
+      attivazioneId = null; attivazioneTeam = null;
+      disegna();
+    };
+    document.getElementById('att-pdf').onclick = async () => {
+      const membri = await caricaManifestoAttivazione(aperta.id);
+      if (!membri.length) { alert('Il manifesto è vuoto: fai prima la compilazione (automatica o manuale).'); return; }
+      generaPdfManifesto({ team: aperta.team }, membri).catch(err => alert('Errore PDF: ' + err.message));
+    };
+    document.getElementById('att-auto').onclick = () => compilazioneAutomaticaAttivazione(aperta, disegna);
+    document.getElementById('att-manuale').onclick = () => apriCompilazioneManualeAttivazione(aperta, cont.querySelector('#att-manifesto'), disegna);
+  };
+
+  await disegna();
+  canaleRealtime = supabase.channel('att-adm')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'risposte_attivazione' }, disegna)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'attivazioni' }, disegna)
+    .subscribe();
+}
+
+async function caricaManifestoAttivazione(attId) {
+  const { data } = await supabase.from('manifesti_membri')
+    .select('posto, profili(nome, cognome)')
+    .eq('manifesto_id', (await supabase.from('manifesti').select('id').eq('attivazione_id', attId).maybeSingle()).data?.id || '00000000-0000-0000-0000-000000000000');
+  return data || [];
+}
+
+async function assicuraManifesto(attId, team) {
+  const { data: esiste } = await supabase.from('manifesti').select('id').eq('attivazione_id', attId).maybeSingle();
+  if (esiste) return esiste.id;
+  const { data: nuovo, error } = await supabase.from('manifesti')
+    .insert({ attivazione_id: attId, team }).select().single();
+  if (error) throw error;
+  return nuovo.id;
+}
+
+async function compilazioneAutomaticaAttivazione(att, dopo) {
+  const meseCorrente = new Date().toISOString().slice(0, 7) + '-01';
+  const { data: prog } = await supabase.from('programmi_mensili')
+    .select('id, programmi_membri(operatore_id, posto)')
+    .eq('mese', meseCorrente).eq('team', att.team).maybeSingle();
+  if (!prog || !prog.programmi_membri?.length) {
+    alert(`Nessun programma trovato per la squadra ${att.team === 'alpha' ? 'ALPHA' : 'BRAVO'} di ${meseIt(meseCorrente)}. Compila prima la Programmazione mensile oppure usa la compilazione manuale.`);
+    return;
+  }
+  const manifestId = await assicuraManifesto(att.id, att.team);
+  await supabase.from('manifesti_membri').delete().eq('manifesto_id', manifestId);
+  const { error } = await supabase.from('manifesti_membri')
+    .insert(prog.programmi_membri.map(m => ({ manifesto_id: manifestId, operatore_id: m.operatore_id, posto: m.posto })));
+  if (error) { alert('Errore: ' + error.message); return; }
+  alert(`⚡ Manifesto precompilato dal programma ${att.team === 'alpha' ? 'ALPHA' : 'BRAVO'} di ${meseIt(meseCorrente)}: ${prog.programmi_membri.length}/38 posti.\n\nPuoi ripremere COMPILAZIONE AUTOMATICA per aggiornarlo, correggerlo con la manuale, o generare il PDF.`);
+  if (dopo) dopo();
+}
+
+async function apriCompilazioneManualeAttivazione(att, contenitore, dopo) {
+  const manifestId = await assicuraManifesto(att.id, att.team);
+  const [pers, membri, storico] = await Promise.all([
+    supabase.from('profili').select('id, nome, cognome, patente, grado').order('cognome'),
+    supabase.from('manifesti_membri').select('*, profili(nome, cognome, patente, grado)').eq('manifesto_id', manifestId),
+    supabase.from('programmi_membri').select('operatore_id, programmi_mensili!inner(mese)')
+      .lt('programmi_mensili.mese', new Date().toISOString().slice(0, 7) + '-01')
+  ]);
+  const tutti = pers.data || [];
+  const perPosto = {};
+  (membri.data || []).forEach(m => { perPosto[m.posto] = m; });
+  const occupati = new Set((membri.data || []).map(m => m.operatore_id));
+  const idCapi = new Set(SPEC_IDS['Caposquadra/Caporeparto'] || []);
+  const idSpec = (s) => new Set(SPEC_IDS[SPEC_DB[s]] || []);
+  const iconeSpecAtt = (opId) => {
+    let icone = '';
+    if ((SPEC_IDS['Strutturista'] || []).includes(opId)) icone += '🏗️';
+    if ((SPEC_IDS['NBCR 3° livello'] || []).includes(opId)) icone += '☣️';
+    if ((SPEC_IDS['Unità cinofila K9'] || []).includes(opId)) icone += '🐕';
+    if ((SPEC_IDS['SAF 2A (corda)'] || []).includes(opId)) icone += '🧗';
+    if ((SPEC_IDS['Caposquadra/Caporeparto'] || []).includes(opId)) icone += '⭐';
+    return icone ? ' ' + icone : '';
+  };
+
+  const rigaPosto = (p) => {
+    const occ = perPosto[p.n];
+    let cella = '';
+    if (occ) {
+      cella = `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpecAtt(occ.operatore_id)}</span>
+        <button class="pill rosso" data-mvuota="${occ.id}" style="border:none; cursor:pointer;">✖</button>`;
+    } else {
+      cella = `<div style="position:relative; width:min(300px, 55%);">
+          <input id="mcerca-${p.n}" placeholder="Cerca nome…" autocomplete="off"
+            style="width:100%; height:38px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; font-size:13px;">
+          <div id="mlista-${p.n}" style="display:none; position:absolute; top:40px; left:0; right:0; background:#fff; border:1px solid var(--bordo); border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.15); z-index:40; max-height:240px; overflow-y:auto;"></div>
+        </div>
+        <input type="hidden" id="mposto-${p.n}">
+        <button class="btn-primary" data-minserti="${p.n}" style="height:38px; font-size:12px;">➕</button>`;
+    }
+    return `
+    <div style="display:flex; gap:10px; align-items:center; padding:6px 0; border-top:1px solid var(--bordo);">
+      <span style="width:28px; font-weight:800; color:${p.spec || p.ros ? 'var(--rosso)' : 'var(--grigio)'};">${p.n}</span>
+      <span style="flex:1; font-size:13px;">${esc(p.t)}</span>
+      ${cella}
+    </div>`;
+  };
+
+  contenitore.innerHTML = `
+    <div style="margin-top:16px; border-top:2px solid var(--bordo); padding-top:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+        <div style="font-weight:700;">✏️ Compilazione manuale (${(membri.data || []).length}/38)</div>
+        <button class="btn-primary" id="att-man-chiudi" style="height:36px; background:var(--grigio-ch);">✖️ Chiudi maschera</button>
+      </div>
+      ${SEZIONI_MODULO.map(s => `
+      <div style="margin-bottom:12px;">
+        <div style="font-weight:800; font-size:12px; color:var(--grigio); margin:8px 0;">${s.t}</div>
+        ${s.posti.map(rigaPosto).join('')}
+      </div>`).join('')}
+    </div>`;
+
+  const ripulisci = (n) => {
+    const c = document.getElementById(`mcerca-${n}`); const h = document.getElementById(`mposto-${n}`);
+    if (c) c.value = ''; if (h) h.value = '';
+  };
+  contenitore.querySelectorAll('[data-mvuota]').forEach(b => b.onclick = async () => {
+    await supabase.from('manifesti_membri').delete().eq('id', b.dataset.mvuota);
+    apriCompilazioneManualeAttivazione(att, contenitore, dopo);
+  });
+  contenitore.querySelectorAll('input[id^="mcerca-"]').forEach(inp => {
+    const n = inp.id.replace('mcerca-', '');
+    const lista = document.getElementById(`mlista-${n}`);
+    const ros = TUTTI_POSTI.find(pp => pp.n === Number(n))?.ros;
+    inp.oninput = () => {
+      const q = inp.value.trim().toLowerCase();
+      const giaScelti = new Set();
+      contenitore.querySelectorAll('input[id^="mposto-"]').forEach(c => { if (c.value) giaScelti.add(c.value); });
+      let idonei = tutti.filter(o => {
+        if (giaScelti.has(o.id)) return false;
+        if (ros && idCapi.has(o.id)) return true;
+        const p = TUTTI_POSTI.find(pp => pp.n === Number(n));
+        if (p?.spec) return idSpec(p.spec).has(o.id);
+        return true;
+      });
+      if (ros) idonei = idonei.concat(tutti.filter(o => idCapi.has(o.id) && !giaScelti.has(o.id) && !idonei.includes(o)));
+      const filtrati = idonei.filter(o => !q || `${o.cognome} ${o.nome}`.toLowerCase().includes(q));
+      filtrati.sort((a, b) => (ros ? (idCapi.has(b.id) - idCapi.has(a.id)) : 0) || a.cognome.localeCompare(b.cognome));
+      let html = '';
+      let ultimoCapo = null;
+      filtrati.forEach(o => {
+        const capo = ros && idCapi.has(o.id);
+        if (ros && capo !== ultimoCapo) {
+          html += `<div style="padding:4px 10px; font-size:11px; font-weight:700; color:${capo ? '#059669' : '#94A3B8'};">${capo ? '⭐ CAPI SQUADRA' : 'ALTRI'}</div>`;
+          ultimoCapo = capo;
+        }
+        const pat = o.patente ? ' 🚚' + esc(o.patente) : '';
+        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9;">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o.id)}${pat}</div>`;
+      });
+      lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
+      lista.style.display = 'block';
+      lista.querySelectorAll('[data-mscelta]').forEach(d => d.addEventListener('pointerdown', (ev) => {
+        ev.preventDefault();
+        document.getElementById(`mposto-${n}`).value = d.dataset.mscelta;
+        inp.value = d.textContent.trim();
+        lista.style.display = 'none';
+      }));
+    };
+    inp.onblur = () => setTimeout(() => lista.style.display = 'none', 200);
+  });
+  contenitore.querySelectorAll('[data-minserti]').forEach(b => b.onclick = async () => {
+    const n = Number(b.dataset.minserti);
+    const opId = document.getElementById(`mposto-${n}`)?.value;
+    if (!opId) { alert('Cerca e seleziona un nome per il posto ' + n); return; }
+    const { error } = await supabase.from('manifesti_membri')
+      .insert({ manifesto_id: manifestId, operatore_id: opId, posto: n });
+    if (error) { alert('Errore: ' + error.message); return; }
+    ripulisci(n);
+    apriCompilazioneManualeAttivazione(att, contenitore, dopo);
+  });
+  document.getElementById('att-man-chiudi').onclick = () => { contenitore.innerHTML = '' };
 }
 
 /* ============ MANTENIMENTI ============ */

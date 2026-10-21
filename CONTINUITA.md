@@ -381,6 +381,18 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 ### Modifiche precedenti
 - **Logo VVF aggiunto** (caricato dall'utente in `assets/Logo vvf.png`): nell'intestazione del PDF ora VVF a sinistra + USAR a destra, come nel modello. Nota: CONTINUITA sez. 9 diceva "logo VVF rimosso" per i documenti (infografica); nel **manifesto PDF invece ci va**, come da modello COMPOSIZIONE con entrambi i loghi
 
+### Scheda ATTIVAZIONE sviluppata (21/10/2026)
+- **Dicitura**: pulsante "ELIMINA PROGRAMMA" → **"ELIMINA COMPILAZIONE"** in Programmazione
+- **Pagina Attivazione completa** (sostituisce il mockup):
+  - **Admin**: selezione ATTIVA ALPHA/BRAVO + messaggio modificabile + INVIA ALLERTA (crea riga in `attivazioni`; invio Telegram in attesa del bot, ma le risposte arrivano già in tempo reale). Vista attivazione aperta: contatori SÌ/NO, **copertura requisiti** (2 strutturisti, 2 NBCR, 4 K9, 2 capi, 2 SAF, 38 totale — conteggi su chi ha risposto SÌ), elenco risposte con orario e badge IN PROGRAMMA per chi è nel programma del mese, pulsante CHIUDI ATTIVAZIONE
+  - **Compilazione del manifesto dell'attivazione** (nuova tabella `manifesti_membri`, migrazione `db/migrazione-manifesti.sql` **da eseguire in SQL Editor**):
+    - **⚡ COMPILAZIONE AUTOMATICA** (chiarimento utente): precompila i 38 posti con i componenti della squadra attivata (Alpha o Bravo) inseriti **nel programma del mese corrente**; **ogni pressione sovrascrive/aggiorna la maschera precedente senza inviare nulla** (nuove conferme → ripremere per aggiornare)
+    - **✏️ COMPILAZIONE MANUALE**: stessi criteri della Programmazione (casella ricerca + tendina filtrabile, icone specializzazioni, capi ⭐ prima nei posti ROS, ➕ per inserire, ✖ per liberare un posto)
+    - **📄 GENERA PDF**: manifesto dell'attivazione con lo stesso PDF della Programmazione (loghi, sezioni colorate)
+  - **Operatore**: vede l'attivazione aperta con il messaggio e risponde **✅ SONO DISPONIBILE / ✖️ NON SONO DISPONIBILE** (scrive in `risposte_attivazione`); le risposte del bot Telegram future finiranno nella stessa tabella
+  - **Tempo reale**: canale Supabase Realtime su `attivazioni` e `risposte_attivazione` — admin e operatore vedono aggiornarsi tutto senza ricaricare; canale chiuso quando si esce dalla pagina
+- **Da fare**: collegare l'invio allerta al bot Telegram quando online (ora l'allerta si crea nel DB; il bot la leggerà e la inoltrerà)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
