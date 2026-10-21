@@ -896,9 +896,9 @@ function generaPdfManifesto(prog, membri) {
   const BLU_TL = [0,102,204];
   const BLU_CHIARO = [167,212,255];
   const GIALLO = [255,243,176];
-  const SENAPE = [201,151,0];
+  const SENAPE = [255,215,0];
   const ROSSO = [178,34,34];
-  const ROSSO_CH = [178,34,34];
+  const ROSSO_CH = [255,0,0];
   const GRIGIO_TX = [71,85,105];
   const ANTRACITE = [30,41,59];
 

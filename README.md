@@ -7,7 +7,7 @@ Gestione squadre, mantenimenti e attivazioni di emergenza per il **Nucleo USAR V
 ## Cos'è
 
 Sistema per la gestione operativa del nucleo:
-- **Programmazione mensile** dei manifesti Alpha e Bravo (38 unità su modello USAR Medium, rotazione del personale, ricerca nominativi, ferie, contatori, **PDF nativo del manifesto scaricabile da mobile** — jsPDF)
+- **Programmazione mensile** dei manifesti Alpha e Bravo (38 unità su modello USAR Medium, rotazione del personale, ricerca nominativi, ferie, contatori, **PDF nativo del manifesto scaricabile da mobile** — jsPDF; layout a sezioni: Direzione blu, Valutazione oro #FFD700, Operazioni rosso #FF0000, Logistica giallo)
 - **Calendario turni** ciclico (salti turno giorno/notte, vista personale, ferie con inserimento a click, range 2024-2028)
 - **Mantenimenti**: registro ore con validazione admin, soglia annua (36 h) configurabile
 - **Attivazioni di emergenza** con risposta SÌ/NO (doppio canale PWA + Telegram) — in sviluppo
