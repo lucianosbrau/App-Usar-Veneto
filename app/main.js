@@ -926,7 +926,7 @@ function generaPdfManifesto(prog, membri) {
   }
 
   // ===== INTESTAZIONE =====
-  doc.addImage('/App-Usar-Veneto/assets/logo-usar.jpg', 'JPEG', 12, 8, 15, 15);
+  doc.addImage('/App-Usar-Veneto/assets/Logo vvf.png', 'PNG', 12, 8, 15, 15);
   doc.addImage('/App-Usar-Veneto/assets/logo-usar.jpg', 'JPEG', 183, 8, 15, 15);
   doc.setFont('helvetica', 'bold'); doc.setFontSize(20); doc.setTextColor(...ANTRACITE);
   doc.text(team, 105, 16, { align: 'center' });
