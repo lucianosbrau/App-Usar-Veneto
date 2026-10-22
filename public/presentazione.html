@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nucleo USAR Veneto — Presentazione Progetto</title>
+<style>
+  :root {
+    --notte: #B22222;
+    --royal: #B22222;
+    --royal-dark: #8B1A1A;
+    --arancio: #B22222;
+    --ambra: #CD3A3A;
+    --perla: #FFFFFF;
+    --card-bg: #FFFFFF;
+    --antracite: #1E293B;
+    --grigio: #64748B;
+    --grigio-chiaro: #CBD5E1;
+    --bordo: #E2E8F0;
+    --verde-bg: #D1FAE5; --verde-tx: #065F46;
+    --giallo-bg: #FEF3C7; --giallo-tx: #92400E;
+    --rosso-bg: #FEE2E2; --rosso-tx: #991B1B;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', 'Roboto', -apple-system, 'Segoe UI', sans-serif; background: var(--perla); color: var(--antracite); line-height: 1.6; }
+
+  /* HERO */
+  .hero { background: linear-gradient(160deg, #8B1A1A 0%, #B22222 55%, #CD3A3A 100%); color: #fff; padding: 90px 24px 70px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 22px 22px; }
+  .hero > * { position: relative; }
+  .hero .scudo { width: 84px; height: 84px; margin: 0 auto 24px; }
+  .hero h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.5px; }
+  .hero p.sub { font-size: 17px; color: #CBD5E1; margin-top: 12px; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .hero .badges { margin-top: 28px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .hero .badge { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); padding: 8px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+
+  /* SEZIONI */
+  section { max-width: 1080px; margin: 0 auto; padding: 56px 24px; }
+  h2.sezione { font-size: 28px; font-weight: 800; color: var(--notte); margin-bottom: 6px; }
+  p.desc { color: var(--grigio); font-size: 15px; margin-bottom: 28px; }
+
+  /* CARD GRID */
+  .grid { display: grid; gap: 20px; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 860px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } }
+
+  .card { background: #DCDCDC; border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); border: 1px solid #C8C8C8; }
+  .card h3 { font-size: 17px; font-weight: 700; color: var(--notte); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .card p, .card li { font-size: 14px; color: var(--grigio); }
+  .card ul { list-style: none; }
+  .card ul li { padding: 5px 0; padding-left: 22px; position: relative; }
+  .card ul li::before { content: '✓'; position: absolute; left: 0; color: var(--royal); font-weight: 700; }
+
+  .bordo-blu { border-left: 6px solid var(--royal); }
+  .bordo-arancio { border-left: 6px solid var(--arancio); }
+  .bordo-verde { border-left: 6px solid #10B981; }
+  .bordo-ambra { border-left: 6px solid var(--ambra); }
+  .bordo-viola { border-left: 6px solid #7C3AED; }
+
+  /* TABELLE */
+  table { width: 100%; border-collapse: collapse; background: #DCDCDC; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 14px; border: 1px solid #C8C8C8; }
+  th { background: #8B1A1A; color: #FFFFFF; text-align: left; padding: 14px 18px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 13px 18px; border-bottom: 1px solid #C8C8C8; background: #DCDCDC; color: var(--antracite); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .tbl-wrap { overflow-x: auto; border-radius: 16px; }
+
+  /* PILL STATO */
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .pill.verde { background: var(--verde-bg); color: var(--verde-tx); }
+  .pill.giallo { background: var(--giallo-bg); color: var(--giallo-tx); }
+  .pill.rosso { background: var(--rosso-bg); color: var(--rosso-tx); }
+  .pill.blu { background: #DBEAFE; color: #1E40AF; }
+  .pill.arancio { background: #FFEDD5; color: #9A3412; }
+
+  /* ARCHITETTURA */
+  .arch { background: #FFFFFF; border: 2px solid var(--arancio); border-radius: 20px; color: var(--antracite); padding: 32px; box-shadow: 0 10px 30px -12px rgba(200,16,46,0.25); }
+  .arch h3 { color: var(--arancio); font-size: 18px; margin-bottom: 20px; text-align: center; }
+  .arch .blocco { background: #FFFFFF; border: 1px solid var(--bordo); border-radius: 12px; padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .arch .blocco b { color: var(--arancio); font-size: 14px; display: block; margin-bottom: 6px; }
+  .arch .blocco span { font-size: 13px; color: var(--grigio); }
+  .arch .freccia { text-align: center; font-size: 30px; color: var(--arancio); margin: 8px 0 14px; line-height:1; }
+
+  /* FLUSSO ATTIVAZIONE */
+  .flusso { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
+  .step { flex: 1; min-width: 200px; background: #DCDCDC; border-radius: 14px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; border: 1px solid #C8C8C8; }
+  .step .num { width: 32px; height: 32px; border-radius: 50%; background: var(--royal); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-bottom: 12px; }
+  .step.arancio .num { background: var(--arancio); }
+  .step h4 { font-size: 15px; margin-bottom: 6px; color: var(--notte); }
+  .step p { font-size: 13px; color: var(--grigio); }
+
+  .btn-attiva { display: inline-block; width: 100%; text-align: center; padding: 18px; border-radius: 12px; color: #fff; font-weight: 800; font-size: 16px; letter-spacing: 0.5px; }
+  .btn-alpha { background: var(--royal); box-shadow: 0 10px 15px -3px rgba(37,99,235,0.4); }
+  .btn-bravo { background: var(--arancio); box-shadow: 0 10px 15px -3px rgba(234,88,12,0.4); }
+  .attiva-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+  @media (max-width: 700px) { .attiva-row { grid-template-columns: 1fr; } }
+
+  footer { background: var(--notte); color: #94A3B8; text-align: center; padding: 36px 24px; font-size: 13px; margin-top: 40px; }
+  footer b { color: #E2E8F0; }
+
+  .tag { display: inline-block; background: var(--perla); border: 1px solid var(--bordo); color: var(--grigio); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 6px; margin: 3px 3px 0 0; }
+  .num-big { font-size: 40px; font-weight: 800; color: var(--royal); line-height: 1.1; }
+  .num-big small { font-size: 18px; color: var(--grigio-chiaro); font-weight: 600; }
+  .tricolore { display: flex; height: 5px; }
+  .tricolore div { flex: 1; }
+  .tricolore .verde { background: #008C45; }
+  .tricolore .bianco { background: #FFFFFF; }
+  .tricolore .rosso { background: #CD212A; }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<div class="hero">
+  <img class="scudo" src="assets/logo-usar.jpg" alt="Logo USAR Veneto" style="border-radius:50%;">
+  <h1>Nucleo USAR Veneto</h1>
+  <p class="sub">Gestione squadre, addestramenti e attivazioni di emergenza per ~250 operatori — su architettura moderna a costo quasi zero.</p>
+  <div class="badges">
+    <span class="badge">📱 PWA installabile</span>
+    <span class="badge">⚡ Supabase Realtime</span>
+    <span class="badge">🤖 Bot Telegram + Mini App</span>
+    <span class="badge">🔒 Dati in UE (Frankfurt)</span>
+  </div>
+</div>
+<div class="tricolore"><div class="verde"></div><div class="bianco"></div><div class="rosso"></div></div>
+
+<!-- ============ OBIETTIVO ============ -->
+<section>
+  <h2 class="sezione">🎯 Obiettivo del progetto</h2>
+  <p class="desc">Un sistema unico per organizzare mensilmente il personale in due squadre operative e gestirne l'attivazione in emergenza.</p>
+  <div class="grid g3">
+    <div class="card bordo-blu">
+      <div class="num-big">2×38<span style="font-size:20px; color:inherit;"> unità</span></div>
+      <p><b>Squadre operative</b> — Team Alpha e Team Bravo, ciascuno un modulo USAR Medium da 38 unità. Bravo parte quando Alpha è già stata attivata. Composizione su disponibilità, specializzazioni e abilitazioni.</p>
+    </div>
+    <div class="card bordo-arancio">
+      <div class="num-big">250</div>
+      <p><b>Operatori gestiti</b> — ognuno con profilo, disponibilità, specializzazioni, abilitazioni e registro addestramento.</p>
+    </div>
+    <div class="card bordo-verde">
+      <div class="num-big">~0€</div>
+      <p><b>Costo di partenza</b> — servizi gratuiti (Supabase Free, Telegram, GitHub Pages) entro i limiti d'uso.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCHITETTURA ============ -->
+<section>
+  <h2 class="sezione">🏗️ Architettura</h2>
+  <p class="desc">Mobile-first, aggiornamenti in tempo reale, doppio canale di notifica e nessun lock-in irreversibile sul fornitore del database.</p>
+  <div class="arch">
+    <h3>Stack tecnologico</h3>
+    <div class="blocco"><b>📱 Frontend — PWA (Progressive Web App)</b>
+      <span>Web app responsive installabile su PC, tablet e smartphone: icona sulla home, schermo intero, notifiche push, consultazione offline dei propri dati, aggiornamenti automatici. UI con optimistic update per risposta istantanea anche su connessioni lente.</span>
+    </div>
+    <div class="freccia">↓</div>
+    <div class="blocco"><b>🗄️ Backend — Supabase (regione Frankfurt)</b>
+      <span>PostgreSQL + autenticazione + API automatiche + <b>Realtime</b> — durante un'attivazione la dashboard si aggiorna da sola (contatore SÌ/NO in tempo reale) senza ricaricare la pagina. Dati primari nell'UE. <b>Nessun lock-in irreversibile</b> (nessun "sistema chiuso" che trattiene dati e codice): l'app resta migrabile altrove senza essere rifatta.</span>
+    </div>
+    <div class="freccia">↓</div>
+    <div class="blocco"><b>🤖 Telegram — Bot + Mini App</b>
+      <span>Comunicazioni, calendario mensile e attivazioni con risposta ✅ SÌ / ❌ NO. La Mini App apre la PWA dentro Telegram con autenticazione automatica: zero attrito per l'operatore. Doppio canale di notifica (push PWA + Telegram) per affidabilità.</span>
+    </div>
+    <div class="freccia">↓</div>
+    <div class="blocco"><b>📄 PDF — Manifesto del personale</b>
+      <span>Generazione automatica del Manifesto pronto per la stampa quando l'attivazione è confermata e coerente con la composizione prevista, sul modello grafico fornito.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAGINE ============ -->
+<section>
+  <h2 class="sezione">📑 Le pagine dell'app</h2>
+  <p class="desc">Undici pagine, ruoli distinti tra operatore e amministratore.</p>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Pagina</th><th>Chi la vede</th><th>Cosa fa</th></tr>
+      <tr><td>🏠 <b>Dashboard</b></td><td>Tutti</td><td>Panoramica generale: stato squadre, statistiche rapide, attivazione rapida (admin)</td></tr>
+      <tr><td>👥 <b>Operatori</b></td><td>Admin</td><td>Gestione completa: ricerca, filtri, dettaglio, modifica, inserimento</td></tr>
+      <tr><td>⚔️ <b>Squadre</b></td><td>Admin</td><td>Composizione Alpha/Bravo con proposta automatica e drag &amp; drop</td></tr>
+      <tr><td>🗓️ <b>Programmazione mensile</b></td><td>Admin</td><td>Compilazione <b>manuale</b> del manifesto programmato di Alpha e Bravo del mese successivo: l'admin sceglie mese e squadra, poi inserisce i nominativi per ruolo. Le tendine propongono prima gli operatori <b>usati meno di recente</b>, raggruppati («4 mesi fa», «3 mesi fa», …), per ruotare il personale. Conteggio in tempo reale dei requisiti del modulo (38 unità, 2 strutturisti, 4 K9) e degli <b>autisti con grado di patente</b>. Pubblicazione su Telegram; l'admin può sempre modificare e ripubblicare</td></tr>
+      <tr><td>📅 <b>Calendario</b></td><td>Tutti</td><td>Turni mensili, pubblicazione e invio via Telegram</td></tr>
+      <tr><td>✅ <b>Disponibilità</b></td><td>Operatore</td><td>Inserimento disponibilità, ferie e indisponibilità</td></tr>
+      <tr><td>🚨 <b>Attivazione</b></td><td>Admin</td><td>Lancio dell'emergenza ALPHA/BRAVO con messaggio modificabile</td></tr>
+      <tr><td>🎓 <b>Addestramento</b></td><td>Admin + Operatore (proprio)</td><td>Registro ore annue, evidenziazione sotto-soglia, storico per anno</td></tr>
+      <tr><td>🌍 <b>Internazionale</b></td><td>Admin + Operatore (proprio)</td><td>Gestione degli operatori <b>abilitati alle missioni internazionali</b> e delle relative <b>vaccinazioni</b>: registro abilitazioni, stato vaccinazioni e scadenze</td></tr>
+      <tr><td>📊 <b>Report / Statistiche</b></td><td>Admin</td><td>Statistiche personali e di intervento, esportazione Excel/CSV</td></tr>
+      <tr><td>📋 <b>Resoconti</b></td><td>Admin</td><td>Storico attivazioni: allertati, SÌ, NO, nessuna risposta, orari</td></tr>
+      <tr><td>👤 <b>Profilo</b></td><td>Tutti</td><td>Dati personali, specializzazioni e abilitazioni proprie</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ RUOLI ============ -->
+<section>
+  <h2 class="sezione">👥 Ruoli e funzioni</h2>
+  <p class="desc">Chi può fare cosa nel sistema.</p>
+  <div class="grid g2">
+    <div class="card bordo-blu">
+      <h3>👤 Operatore</h3>
+      <ul>
+        <li>Modifica i propri dati consentiti</li>
+        <li>Aggiorna specializzazioni e abilitazioni</li>
+        <li>Inserisce disponibilità, ferie e indisponibilità</li>
+        <li>Consulta il proprio calendario</li>
+        <li>Riceve comunicazioni e calendari via Telegram</li>
+        <li>Risponde alle attivazioni (✅ SÌ / ❌ NO)</li>
+        <li>Consulta il proprio registro addestramento</li>
+      </ul>
+    </div>
+    <div class="card bordo-arancio">
+      <h3>🛡️ Amministratore</h3>
+      <ul>
+        <li>Gestisce gli operatori e le loro abilitazioni</li>
+        <li>Definisce i requisiti di Alpha e Bravo</li>
+        <li>Programma il manifesto mensile di Alpha e Bravo (compilazione manuale con rotazione del personale)</li>
+        <li>Usa la proposta automatica di composizione e la raffina a mano</li>
+        <li>Crea e invia il calendario mensile via Telegram</li>
+        <li>Attiva ALPHA o BRAVO, con messaggio modificabile prima dell'invio</li>
+        <li>Consulta report, resoconti e registra gli addestramenti</li>
+        <li>Genera il Manifesto del personale in PDF</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ATTIVAZIONE ============ -->
+<section>
+  <h2 class="sezione">🚨 Attivazione di emergenza</h2>
+  <p class="desc">Il cuore operativo del sistema: allertamento rapido, risposta tracciata, resoconto immediato. La copertura requisiti confronta le risposte SÌ con il modulo da 38 unità e le sue specializzazioni obbligatorie.</p>
+  <div class="attiva-row">
+    <div class="btn-attiva btn-alpha">🚨 ATTIVA ALPHA</div>
+    <div class="btn-attiva btn-bravo">🚨 ATTIVA BRAVO</div>
+  </div>
+  <div class="flusso" style="margin-top:24px;">
+    <div class="step"><div class="num">1</div><h4>Admin attiva</h4><p>Seleziona ATTIVA ALPHA o ATTIVA BRAVO, modifica il messaggio di emergenza e invia.</p></div>
+    <div class="step"><div class="num">2</div><h4>Allertamento</h4><p>Il bot invia il messaggio al gruppo Telegram + notifica push PWA. Doppio canale.</p></div>
+    <div class="step"><div class="num">3</div><h4>Risposta</h4><p>Ogni operatore risponde ✅ SÌ o ❌ NO. Il sistema registra risposta e orario.</p></div>
+    <div class="step arancio"><div class="num">4</div><h4>Resoconto + Manifesto</h4><p>Al raggiungimento delle 38 unità, l'admin compila il Manifesto (automaticamente o manualmente) e lo esporta in PDF.</p></div>
+  </div>
+
+  <div class="card bordo-blu" style="margin-top:20px;">
+    <h3>📄 Maschera di compilazione del Manifesto</h3>
+    <ul>
+      <li>All'apertura: scelta <b>compilazione automatica</b> (precompilata da risposte e specializzazioni) o <b>manuale</b></li>
+      <li>38 funzioni con elenchi a discesa: <b>escludono i già inseriti</b> e ordinano prima gli idonei alla funzione</li>
+      <li>Funzioni obbligatorie evidenziate (2 strutturisti, 2 NBCR, 4 K9, 2 capisquadra, 2 SAF 2A)</li>
+      <li>Validazione in tempo reale: "34/38 — mancano 1 NBCR, 2 soccorritori, 1 logista"</li>
+      <li>Export incompleto solo con conferma esplicita; PDF secondo modello ufficiale (1 pagina, 38 voci, sezioni, nomi in maiuscolo)</li>
+      <li>Invio PDF su Telegram: opzionale, da valutare</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ REGISTRAZIONE BOT ============ -->
+<section>
+  <h2 class="sezione">🤖 Registrazione dell'operatore al bot Telegram</h2>
+  <p class="desc">Procedura una tantum per collegare il profilo dell'operatore al bot e ricevere comunicazioni e allerte. Nessuna conoscenza tecnica richiesta: tutto guidato, in pochi minuti.</p>
+  <div class="flusso">
+    <div class="step"><div class="num">1</div><h4>Accedi all'app</h4><p>L'operatore accede alla web app con le credenziali fornite dall'amministratore e apre la pagina <b>Profilo</b>.</p></div>
+    <div class="step"><div class="num">2</div><h4>Codice di collegamento</h4><p>Nella pagina Profilo, alla voce "Collega Telegram", l'app mostra un <b>codice numerico</b> (es. 48-21) con la scritta "scade tra 15 minuti". Il pulsante copia il codice negli appunti.</p></div>
+    <div class="step"><div class="num">3</div><h4>Apri il bot</h4><p>Su Telegram, cerca il bot ufficiale <b>@usarveneto_bot</b> (il link esatto sarà fornito dall'admin) e premi <b>AVVIA</b>. Nessun dato personale viene chiesto dal bot.</p></div>
+    <div class="step arancio"><div class="num">4</div><h4>Invia il codice</h4><p>Il bot chiede: "Invia il codice mostrato nell'app per collegare il tuo account". L'operatore digita il codice. Il bot risponde: "✅ Account collegato! Riceverai qui calendari e allerte di emergenza".</p></div>
+  </div>
+  <div class="grid g3" style="margin-top:20px;">
+    <div class="card bordo-blu">
+      <h3>🔒 Perché il codice</h3>
+      <p>Il codice dimostra che chi scrive al bot è davvero l'operatore titolare dell'account: impedisce a estranei di ricevere le allerte. Scade dopo 15 minuti e non viene mai inviato da nessuna parte: lo vede solo l'operatore nella propria app.</p>
+    </div>
+    <div class="card bordo-verde">
+      <h3>📱 Dopo la registrazione</h3>
+      <p>L'operatore riceve: conferma di ogni risposta data alle attivazioni, calendario mensile, comunicazioni dell'admin e — dalla Mini App — accesso rapido all'app con un tap, senza login.</p>
+    </div>
+    <div class="card bordo-ambra">
+      <h3>🛠️ Se qualcosa non va</h3>
+      <p>Codice scaduto o errato? Se ne genera uno nuovo dalla pagina Profilo. Telefono cambiato? Si ripete la procedura sul nuovo dispositivo. L'admin può vedere chi è collegato e aiutare chi resta indietro.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPOSIZIONE SQUADRE ============ -->
+<section>
+  <h2 class="sezione">⚔️ Composizione delle squadre</h2>
+  <p class="desc">Alpha e Bravo sono due moduli USAR Medium da <b>38 unità ciascuna</b> (struttura del Manuale Formazione USAR Medium CNVVF 2024). Bravo è la seconda squadra, che parte quando Alpha è già stata attivata.</p>
+  <div class="grid g2">
+    <div class="card bordo-blu">
+      <h3><span class="pill blu">MODULO 38 UNITÀ</span> Specializzazioni obbligatorie</h3>
+      <p>
+        <span class="tag">🏗️ 2 Strutturisti</span>
+        <span class="tag">☣️ 2 NBCR 3° livello</span>
+        <span class="tag">🐕 4 Unità cinofile K9</span>
+        <span class="tag">⛑️ 2 Capisquadra/Capireparto</span>
+        <span class="tag">🧗 2 SAF 2A (corda)</span>
+      </p>
+      <p style="margin-top:12px;">Il resto del modulo: direzione e comando (6), ricerca strumentale (2), soccorritori tecnici (12, in 2 turnazioni da 8, con sentinelle, addetti sicurezza e logisti on site), logistica off site (6). Componente sanitaria (1 responsabile + 2 medici + 2 infermieri) esclusa dalle 38 unità CNVVF.</p>
+    </div>
+    <div class="card bordo-arancio">
+      <h3>🛠️ Come si compila la squadra</h3>
+      <ul>
+        <li>Proposta automatica sulla base di disponibilità e requisiti</li>
+        <li>Modifica manuale con drag &amp; drop dal pool dei disponibili</li>
+        <li>In emergenza: click sul nome di un operatore Bravo/Riserva per spostarlo in Alpha</li>
+        <li>Rotazione e bilanciamento verificabili con le statistiche di impiego</li>
+      </ul>
+      <p style="margin-top:12px;">
+        <span class="pill verde">✅ PRONTA</span>
+        <span class="pill giallo">⚠️ PARZIALE</span>
+        <span class="pill rosso">⛔ INCOMPLETA</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REPORT ============ -->
+<section>
+  <h2 class="sezione">📊 Report e resoconti</h2>
+  <p class="desc">Tutto esportabile in Excel e CSV.</p>
+  <div class="grid g3">
+    <div class="card bordo-blu">
+      <h3>👤 Statistiche del personale</h3>
+      <ul>
+        <li>Assegnazioni Alpha e Bravo per operatore</li>
+        <li>Totale impieghi e media mensile</li>
+        <li>Operatore con più / meno interventi</li>
+        <li>Storico filtrabile per periodo e squadra</li>
+        <li>Esportazione Excel / CSV</li>
+      </ul>
+    </div>
+    <div class="card bordo-arancio">
+      <h3>📋 Resoconto attivazioni</h3>
+      <ul>
+        <li>Personale allertato per ogni attivazione</li>
+        <li>SÌ / NO / nessuna risposta</li>
+        <li>Orari delle risposte</li>
+        <li>Storico filtrabile delle attivazioni</li>
+        <li>Esportazione Excel / CSV</li>
+      </ul>
+    </div>
+    <div class="card bordo-ambra">
+      <h3>🎓 Addestramento</h3>
+      <ul>
+        <li>Registro ore annue per operatore</li>
+        <li>Requisito minimo ore/anno configurabile</li>
+        <li>Evidenziazione automatica <span class="pill rosso">sotto soglia</span></li>
+        <li>Dettaglio: data, tipo, ore, partecipante</li>
+        <li>Confronto anno per anno + esportazione</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COSTI ============ -->
+<section>
+  <h2 class="sezione">💰 Costi e vincoli</h2>
+  <p class="desc">Obiettivo: partire a costo zero, con un'architettura che non dipenda irreversibilmente da un fornitore.</p>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Servizio</th><th>Piano</th><th>Nota</th></tr>
+      <tr><td><b>Supabase</b> (DB, auth, Realtime)</td><td>Free — 500 MB</td><td>Regione Frankfurt (UE). Sufficiente per 250 operatori; piano Pro ~25$/mese se servisse crescere</td></tr>
+      <tr><td><b>Telegram Bot + Mini App</b></td><td>Gratuito</td><td>Canale di notifica e risposta principale</td></tr>
+      <tr><td><b>GitHub Pages</b> (hosting PWA)</td><td>Gratuito</td><td>Pubblicazione e aggiornamenti automatici</td></tr>
+      <tr><td><b>Esportazioni Excel/CSV, PDF</b></td><td>Gratuito</td><td>Generati lato client, nessun servizio esterno</td></tr>
+    </table>
+  </div>
+  <div class="card bordo-verde" style="margin-top:20px;">
+    <h3>🔒 GDPR e prossimi passi</h3>
+    <p>Dati personali e potenzialmente delicati (vaccinazioni, abilitazioni): prima della messa in produzione servono verifica specifica GDPR, ruoli di accesso, policy di conservazione e backup. La scelta del server UE aiuta ma <b>non è di per sé conformità</b>. Prossimi passi: individuare il database esistente da riutilizzare (Sheets/Excel/AppSheet) e definire l'elenco definitivo dei requisiti di Alpha e Bravo, incluse le ore minime di addestramento.</p>
+  </div>
+</section>
+
+<footer>
+  <b>Nucleo USAR Veneto</b> — Gestione squadre e attivazioni emergenze<br>
+  Documento di presentazione del progetto · Architettura PWA + Supabase + Telegram · Dati in UE
+</footer>
+
+</body>
+</html>
