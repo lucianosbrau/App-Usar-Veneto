@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 22/10/2026 12:00
+Ultimo aggiornamento: 22/10/2026 12:15
 
 ---
 
@@ -526,6 +526,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **FIX /idgruppo (22/10/2026)**: la gestione dei messaggi nei gruppi non era mai stata applicata (un replace precedente era fallito in silenzio) — il bot rispondeva col benvenuto nel gruppo. Ora: i messaggi nei gruppi sono gestiti PRIMA dei dialoghi privati (solo /idgruppo, che risponde con l'ID in formato copiabile; log di aggiunta al gruppo); gli altri comandi sono disattivati nel gruppo
 - **FIX ALERT_GROUP not defined (22/10/2026)**: la dichiarazione `let ALERT_GROUP = process.env...` era stata persa da un replace fallito in silenzio — l'invio al gruppo crashava ("Errore attivazioni"). **Gruppo confermato dai log: ID = -1004443017442** (titolo "Allerta USAR VENETO"); la variabile ALERT_GROUP_CHAT_ID su Render era GIÀ configurata correttamente dall'utente — il mancato funzionamento era SOLO la dichiarazione mancante nel codice (fixato)
 - **LEZIONE (per la AI)**: dopo ogni replace fallito con assert, RICONTROLLARE che i blocchi collegati siano coerenti — due replace silenziosi hanno causato due bug consecutivi (gestione gruppi mancante, ALERT_GROUP non dichiarata)
+
+### Badge stato operatori (22/10/2026, ore 12:15)
+- Nelle card Operatori il vecchio badge "🟢 Attivo" (senza significato) sostituito da: **🟢 In linea** (≥36h mantenimenti approvati nell'anno) / **🟡 Sotto soglia** (<36h) — l'admin vede a colpo d'occhio chi non è in regola; per gli admin resta ⭐ Admin
+- REGOLA FISSATA (utente): il badge verde/giallo riflette la regolarità coi mantenimenti, non uno stato generico
 
 ### ✅ COLLAUDO END-TO-END COMPLETATO (22/10/2026, ore 12:00)
 - **Confermato dall'utente**: allerta da PWA → ricevuta nel gruppo "Allerta USAR VENETO" + chat privata → risposta ✅ dal gruppo → **pagina Attivazione aggiornata in tempo reale** (contatori, copertura, nomi). Schede operatori e filtro funzionanti. Il sistema di attivazione è OPERATIVO

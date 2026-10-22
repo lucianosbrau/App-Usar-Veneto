@@ -491,7 +491,11 @@ async function pagOperatori(el) {
           <div style="position:absolute; top:10px; right:12px; font-size:11px; color:var(--grigio);">➤</div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <div class="avatar" style="width:56px;height:56px;font-size:18px;">${esc(iniziali(o.nome, o.cognome))}</div>
-            <span class="pill ${o.ruolo === 'admin' ? 'rosso' : 'verde'}">${o.ruolo === 'admin' ? '⭐ Admin' : '🟢 Attivo'}</span>
+            ${o.ruolo === 'admin'
+              ? '<span class="pill rosso">⭐ Admin</span>'
+              : ((oreMan[o.id] || 0) >= 36
+                ? '<span class="pill verde">🟢 In linea</span>'
+                : '<span class="pill giallo">🟡 Sotto soglia</span>')}
           </div>
           <div style="font-size:18px; font-weight:700;">${esc(o.cognome)} ${esc(o.nome)}${simboloVigile(o, 20)}${o.grado ? ` <span class="pill" style="font-size:10px; background:#F1F5F9; color:var(--grigio);">${esc(o.grado)}</span>` : ''}</div>
           <div style="font-size:13px; color:var(--grigio); margin:4px 0 8px;">${esc(o.comando || '')}${o.sede ? ' · ' + esc(o.sede) : ''}${o.salto_turno ? ' · turno ' + esc(o.salto_turno) : (o.turno ? ' · turno ' + esc(o.turno) : '')}</div>
