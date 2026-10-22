@@ -341,21 +341,26 @@ async function pagDashboard(el) {
       return { k, v, col: PALETTE[i % PALETTE.length], a1, a2, perc };
     });
     const etichetta = (f) => {
-      if (f.perc < 0.05) return '';
+      if (f.perc < 0.04) return '';
       const am = (f.a1 + f.a2) / 2;
       const rad = am * Math.PI / 180;
-      const r = 15.9;
-      const x = 21 + r * Math.cos(rad);
-      const y = 21 + r * Math.sin(rad);
-      const nomeBreve = esc(String(f.k).slice(0, 3));
-      const testo = f.perc >= 0.14 ? `${nomeBreve} ${Math.round(f.perc * 100)}%` : (f.perc >= 0.08 ? nomeBreve : `${Math.round(f.perc * 100)}%`);
-      const dim = f.perc >= 0.14 ? 2.6 : 2.2;
-      return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${dim}" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="700" style="paint-order:stroke; stroke:rgba(0,0,0,0.35); stroke-width:0.5;">${testo}</text>`;
+      const cos = Math.cos(rad), sin = Math.sin(rad);
+      const rIn = 15.9;
+      const rOut = 23.5;
+      const x1 = 42 + rIn * cos;
+      const y1 = 25 + rIn * sin;
+      const x2 = 42 + rOut * cos;
+      const y2 = 25 + rOut * sin;
+      const destra = cos >= 0;
+      const anchor = destra ? 'start' : 'end';
+      const testo = `${esc(f.k)} ${f.v}`;
+      return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${f.col}" stroke-width="0.5"></line>
+        <text x="${(x2 + (destra ? 0.9 : -0.9)).toFixed(1)}" y="${y2.toFixed(1)}" font-size="3.4" text-anchor="${anchor}" dominant-baseline="central" fill="#1E293B" font-weight="700">${testo}</text>`;
     };
     return `
     <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:center;">
-      <svg id="${id}" width="210" height="210" viewBox="0 0 42 42" style="flex-shrink:0;">
-        ${fette.map(f => `<circle r="15.9" cx="21" cy="21" fill="transparent" stroke="${f.col}" stroke-width="9" stroke-dasharray="${f.perc * 99.9} ${99.9 - f.perc * 99.9}" stroke-dashoffset="${25 - (f.a1 + 90) / 360 * 99.9}"></circle>`).join('')}
+      <svg id="${id}" width="420" height="250" viewBox="0 0 84 50" style="flex-shrink:0; max-width:100%;">
+        ${fette.map(f => `<circle r="15.9" cx="42" cy="25" fill="transparent" stroke="${f.col}" stroke-width="9" stroke-dasharray="${f.perc * 99.9} ${99.9 - f.perc * 99.9}" stroke-dashoffset="${25 - (f.a1 + 90) / 360 * 99.9}"></circle>`).join('')}
         ${fette.map(etichetta).join('')}
       </svg>
       <div style="font-size:13px;">

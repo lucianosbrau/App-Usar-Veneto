@@ -462,7 +462,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - NB: la Dashboard calcola la soglia (36) via `caricaOreMantenimenti()` su anno corrente — coerente col seed
 
 ### Ritocchi Dashboard e Operatori (22/10/2026)
-- **Torte Dashboard**: etichette direttamente sulle fette (bianche, con bordo scuro per leggibilità): comando/turno in sigla (prime 3 lettere) + percentuale per fette grandi, solo sigla per medie, solo % per piccole (<8%); niente etichetta sotto il 5%; anello leggermente più spesso; legenda a fianco invariata
+- **Torte Dashboard** (aggiornato su richiesta utente): etichette con **nome completo + numero assoluto** (niente percentuali, niente sigle troncate), collegate alle fette da **linee guida** (leader lines) colorate come la fetta, testo fuori dalla torta a destra/sinistra; sotto il 4% niente etichetta (solo legenda). Layout SVG allargato (viewBox 84x50) per ospitare i nomi completi; legenda a fianco invariata
 - **Icone Operatori**: TPSS = badge quadrato **rosso con croce bianca ✚** (chiara identificazione sanitaria); TAS = badge quadrato **blu con bussola 🧭** seguito dal livello in blu. Le icone restano solo in pagina Operatori (come da regola precedente)
 
 ### Prossimi passi (in ordine proposto)
