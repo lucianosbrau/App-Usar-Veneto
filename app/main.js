@@ -509,7 +509,7 @@ async function pagResoconti(el) {
   const disegna = async () => {
     const inizioMese = `${y}-${String(m).padStart(2, '0')}-01`;
     const fineMese = `${y}-${String(m).padStart(2, '0')}-${String(new Date(y, m, 0).getDate()).padStart(2, '0')}`;
-    const { data: ferie } = await supabase.from('disponibilita').select('operatore_id, data, turno_ferie, profili(cognome, nome, turno)')
+    const { data: ferie } = await supabase.from('disponibilita').select('operatore_id, data, turno_ferie, profili(cognome, nome, turno, salto_turno)')
       .eq('tipo', 'ferie').gte('data', inizioMese).lte('data', fineMese);
 
     const perOp = {};
@@ -520,8 +520,9 @@ async function pagResoconti(el) {
       if (!mioTurno) return;
       const [fy, fm, fg] = String(f.data).split('-').map(Number);
       const cp = coppiaGiorno(fy, fm - 1, fg);
-      const lettera = (f.turno_ferie === 'notte' ? cp.notte : cp.giorno)[0];
-      if (lettera !== mioTurno) return;
+      const salto = f.turno_ferie === 'notte' ? cp.notte : cp.giorno;
+      if (salto[0] !== mioTurno) return;
+      if (salto === f.profili?.salto_turno) return;
       perOp[nome] = perOp[nome] || { turni: 0 };
       perOp[nome].turni++;
       totTurni++;
@@ -538,7 +539,7 @@ async function pagResoconti(el) {
           <button class="pill" id="res-avanti" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">Mese dopo ▶</button>
         </div>
       </div>
-      <div style="font-size:12px; color:var(--grigio); margin-bottom:12px;">Conteggio dei turni che ciascuno avrebbe effettivamente lavorato (in base al proprio turno A–D e al calendario dei salti turno): le ferie in giorni di riposo non vengono contate.</div>
+      <div style="font-size:12px; color:var(--grigio); margin-bottom:12px;">Conteggio dei turni che ciascuno avrebbe effettivamente lavorato (in base al proprio turno A–D e al calendario dei salti turno): le ferie in giorni di riposo o nel proprio salto turno non vengono contate.</div>
       <div style="display:flex; gap:20px; margin-bottom:14px; flex-wrap:wrap;">
         <div><div style="font-size:32px; font-weight:800; color:var(--royal);">${totTurni}</div>🕓 Turni di ferie</div>
         <div><div style="font-size:32px; font-weight:800;">${nomi.length}</div>👥 Operatori coinvolti</div>

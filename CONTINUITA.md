@@ -440,11 +440,16 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Rimosse dalla risposta del bot le diciture "Massimo 31 giorni per comando" (il limite tecnico resta attivo, il messaggio dedicato esce solo quando serve)
 - **Regola fissata (NON reinventare)**: all'utente interessa sempre il conteggio in **GIORNI**, i turni sono dettaglio secondario da mostrare separato, mai sommato ai giorni
 
-### Resoconti: turni di ferie EFFETTIVI (22/10/2026, chiarimento utente)
-- La pagina Resoconti conta solo i **turni che l'operatore avrebbe effettivamente lavorato** nel suo periodo di ferie: per ogni riga ferie confronta la lettera del salto turno (giorno o notte, dal calendario ciclico) con la **lettera del proprio turno** (A-D dal profilo); conta solo le corrispondenze
-- Esempio verificato (turno A, ferie 01-05/11/2026 continuative): notte A2 dell'1 + giorno A3 del 4 + notte A3 del 5 = **3 turni** (non 5 giorni); le ferie nei giorni di riposo non contano
-- Per operatore: solo colonna **🕒 Turni di ferie**; niente distinzione giorno/notte (non richiesta); totale del mese + operatori coinvolti; chi non ha il turno impostato nel profilo è escluso dal conteggio
-- Il bot e il Calendario RESTANO come prima (bot: giorni distinti del range; Calendario: nomi per turno) — la regola "turni effettivi" vale SOLO per Resoconti, chiarito dall'utente
+### Resoconti: turni di ferie EFFETTIVI (22/10/2026, chiarimento utente, riformulato)
+- La pagina Resoconti conta solo i **turni che l'operatore avrebbe effettivamente lavorato** nel suo periodo di ferie. Regola completa per ogni riga ferie: (1) la lettera del salto di calendario (giorno o notte) deve corrispondere alla **lettera del proprio turno** (A-D dal profilo); (2) il salto NON deve essere il **proprio salto turno** (quel turno è riposo, non lavoro)
+- Esempi verificati numericamente (ferie 01-05/11/2026 continuative, calendario: 1=B2/A2, 2=C2/B2, 3=D2/C2, 4=A3/D2, 5=B3/A3):
+  - turno A salto **A4**: notte A2 dell'1 + giorno A3 del 4 + notte A3 del 5 = **3 turni** (A3 ≠ A4, non è riposo)
+  - turno A salto **A3** (esempio utente): giorno A3 del 4 e notte A3 del 5 sono IL SUO RIPOSO → resta solo notte A2 dell'1 = **1 turno**
+  - turno B salto B2: giorno B2 dell'1 e notte B2 del 2 = riposo; conta solo giorno B3 del 5 = **1 turno**
+  - turno D salto D2: l'unico D (giorno del 3) è riposo = **0 turni**
+- Chi non ha il turno impostato nel profilo è escluso dal conteggio; chi ha il turno ma non il salto turno viene contato su tutte le sue lettere (fallback sicuro)
+- Per operatore: solo colonna **🕒 Turni di ferie**; totale del mese + operatori coinvolti
+- **Verifica di non regressione fatta**: `coppiaGiorno`/`saltoGiorno` NON sono state modificate (usate solo da Calendario e Resoconti); il Calendario continua a evidenziare il proprio salto e a gestire le ferie come prima; il bot resta in giorni distinti del range. La regola "turni effettivi con esclusione riposo" vale SOLO per Resoconti
 
 ### Bot Telegram collaudato end-to-end (22/10/2026)
 - Collegamento account ✅ (codice 6 cifre es. 482-193, 15 min, monouso), pulsanti **inline sempre visibili** nei messaggi (Inserisci ferie / Come funziona), aiuto con date precompilate (+7/+14 gg)
