@@ -140,6 +140,7 @@ async function gestisciMantenimento(chatId, testo) {
 
 let offset = 0;
 let ultimaAttivazioneVista = null;
+let ALERT_GROUP = process.env.ALERT_GROUP_CHAT_ID ? Number(process.env.ALERT_GROUP_CHAT_ID) : null;
 
 async function controllaAttivazioni() {
   const { data: aperta } = await sb.from('attivazioni')
