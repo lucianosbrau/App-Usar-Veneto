@@ -481,6 +481,13 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Confermato dall'utente**: le estensioni patente (Autoscala, Autogru, Anfibio) NON entrano in questo conteggio — si conta solo il grado (3°/4°)
 - Rimosso il conteggio generico "N autisti" dalla riga di stato (Pubblicato/Bozza · N/38)
 
+### Fix Operatori/Programmazione + seed gradi D/VD/IA (22/10/2026, segnalazioni utente)
+- **Icona vigile enorme in Operatori**: bug (chiamata senza parametro pixel → dimensioni native); ora 20px
+- **Card operatore**: "Venezia · Chioggia · turno C (salto C2)" → se c'è il salto turno mostra solo lui ("turno C2"), altrimenti la lettera del turno
+- **Riepilogo Programmazione**: simbolo vigile del grado (16px) accanto ai nominativi già inseriti (con la ✖), oltre alle icone specializzazioni
+- **PDF manifesto**: tolti i simboli dei gradi (si sfalsavano/sfondo nero) — il manifesto resta pulito con solo i nomi, come da segnalazione utente
+- **Seed gradi**: `db/seed-gradi-d-vd-ia.sql` (**da eseguire**) — 8 operatori di prova: 3×D, 3×VD, 2×IA distribuiti su tutti i comandi e turni diversi; password Prova2026! come gli altri seed; pulibile rieseguendo (cancella e ricrea gli stessi nominativi)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
