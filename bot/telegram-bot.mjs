@@ -27,16 +27,17 @@ async function tg(method, params) {
 async function collega(chatId, codice) {
   const { data } = await sb.from('codici_telegram')
     .select('id, operatore_id, scade_il, usato')
-    .eq('codice', codice.trim()).eq('usato', false).single();
-  if (!data) return { ok: false, msg: 'Codice non valido o già usato. Generane uno nuovo dall\'app (Profilo → Collega Telegram).' };
-  if (new Date(data.scade_il) < new Date()) return { ok: false, msg: 'Codice scaduto. Generane uno nuovo dall\'app.' };
+    .eq('codice', codice.trim()).eq('usato', false)
+    .order('id', { ascending: false }).limit(1).maybeSingle();
+  if (!data) return { ok: false, msg: '❌ Codice non trovato o già usato. Generane uno NUOVO dall\'app (Profilo → Collega Telegram) e inviamelo subito: vale 15 minuti.' };
+  if (new Date(data.scade_il) < new Date()) return { ok: false, msg: '⏰ Codice scaduto. Generane uno nuovo dall\'app (Profilo → Collega Telegram).' };
   await sb.from('codici_telegram').update({ usato: true }).eq('id', data.id);
   await sb.from('profili').update({ telegram_chat_id: chatId }).eq('id', data.operatore_id);
   return { ok: true, msg: '✅ Account collegato! Riceverai qui allerte e comunicazioni USAR.' };
 }
 
 async function inserisciFerie(chatId, testo) {
-  const { data: op } = await sb.from('profili').select('id, nome, cognome').eq('telegram_chat_id', chatId).single();
+  const { data: op } = await sb.from('profili').select('id, nome, cognome').eq('telegram_chat_id', chatId).limit(1).maybeSingle();
   if (!op) return 'Prima collega il tuo account: apri l\'app → Profilo → "Collega Telegram" e inviami il codice.';
 
   // formato atteso: /ferie 05/11/2026 - 16/11/2026  (o date singole: /ferie 05/11/2026)
@@ -75,25 +76,67 @@ async function inserisciFerie(chatId, testo) {
 let offset = 0;
 console.log('Bot USAR Veneto in ascolto...');
 
+const tastieraPrincipale = {
+  keyboard: [
+    [{ text: '🏖️ Inserisci ferie' }, { text: 'ℹ️ Come funziona' }]
+  ],
+  resize_keyboard: true,
+  is_persistent: true
+};
+
+
+async function inserisciFerieAiuto(chatId) {
+  const { data: op } = await sb.from('profili').select('id, nome, cognome').eq('telegram_chat_id', chatId).limit(1).maybeSingle();
+  if (!op) return 'Prima collega il tuo account: apri l\'app → Profilo → "Collega Telegram" e inviami il codice.';
+  const oggi = new Date();
+  const fmt = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+  const inizio = new Date(oggi); inizio.setDate(oggi.getDate() + 7);
+  const fine = new Date(oggi); fine.setDate(oggi.getDate() + 14);
+  return `🏖️ Ciao ${op.nome}, per inserire le ferie scrivi:\n\n/ferie ${fmt(inizio)} - ${fmt(fine)}\n\n(data singola: /ferie ${fmt(inizio)})\nAggiungi la parola "continuative" per giorno E notte di ogni data.\nMassimo 31 giorni per comando.`;
+}
+
 async function loop() {
   try {
     const r = await fetch(`${API}/getUpdates?offset=${offset}&timeout=25`).then(r => r.json());
     for (const up of r.result || []) {
       offset = up.update_id + 1;
+
+      // pulsante premuto (callback inline)
+      if (up.callback_query) {
+        const cb = up.callback_query;
+        await tg('answerCallbackQuery', { callback_query_id: cb.id });
+        if (cb.data === 'ferie_help') {
+          await tg('sendMessage', { chat_id: cb.message.chat.id, text: await inserisciFerieAiuto(cb.message.chat.id) });
+        }
+        continue;
+      }
+
       const msg = up.message;
       if (!msg?.text) continue;
       const chatId = msg.chat.id;
       const testo = msg.text;
 
       if (testo.startsWith('/start')) {
-        await tg('sendMessage', { chat_id: chatId, text: '🚒 Benvenuto nel bot USAR Veneto!\n\nPer collegare il tuo account, apri l\'app → Profilo → "Collega Telegram" e inviami qui il codice che compare (es. 48-21).' });
+        await tg('sendMessage', {
+          chat_id: chatId,
+          text: '🚒 Benvenuto nel bot USAR Veneto!\n\nPer collegare il tuo account, apri l\'app → Profilo → "Collega Telegram" e inviami qui il codice che compare (es. 48-21).\n\nPoi usa i pulsanti qui sotto per le operazioni rapide.',
+          reply_markup: tastieraPrincipale
+        });
+      } else if (testo.includes('Inserisci ferie')) {
+        await tg('sendMessage', { chat_id: chatId, text: await inserisciFerieAiuto(chatId) });
+      } else if (testo.includes('Come funziona')) {
+        await tg('sendMessage', {
+          chat_id: chatId,
+          text: '📘 Come funziona:\n\n🏖️ Ferie — scrivi: /ferie gg/mm/aaaa - gg/mm/aaaa (o una data singola). Aggiungi la parola "continuative" per giorno E notte di ogni data. Massimo 31 giorni per comando.\n\n🔗 Collegamento — genera il codice nell\'app (Profilo → Collega Telegram) e inviamelo qui: vale 15 minuti.\n\n🚨 In emergenza riceverai qui le allerte: rispondi direttamente dall\'app.',
+          reply_markup: tastieraPrincipale
+        });
       } else if (testo.startsWith('/ferie')) {
         await tg('sendMessage', { chat_id: chatId, text: await inserisciFerie(chatId, testo) });
       } else if (/^\d{2}-\d{2}$/.test(testo.trim())) {
         const c = await collega(chatId, testo.trim());
-        await tg('sendMessage', { chat_id: chatId, text: c.msg });
+        await tg('sendMessage', { chat_id: chatId, text: c.msg, reply_markup: c.ok ? tastieraPrincipale : undefined });
       } else {
-        await tg('sendMessage', { chat_id: chatId, text: 'Comandi disponibili:\n/ferie gg/mm/aaaa - gg/mm/aaaa — registra le ferie\n\nPer collegarti: app → Profilo → Collega Telegram, poi inviami il codice.' });
+        await tg('sendMessage', { chat_id: chatId, text: 'Usa i pulsanti qui sotto, oppure:\n/ferie gg/mm/aaaa - gg/mm/aaaa — registra le ferie\n\nPer collegarti: app → Profilo → Collega Telegram, poi inviami il codice.', reply_markup: tastieraPrincipale });
       }
     }
   } catch (e) {
