@@ -85,7 +85,7 @@ async function inserisciFerieAiuto(chatId) {
   const fmt = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
   const inizio = new Date(oggi); inizio.setDate(oggi.getDate() + 7);
   const fine = new Date(oggi); fine.setDate(oggi.getDate() + 14);
-  return `🏖️ Ciao ${op.nome}, per inserire le ferie scrivi:\n\n/ferie ${fmt(inizio)} - ${fmt(fine)}\n\n(data singola: /ferie ${fmt(inizio)})\nAggiungi la parola "continuative" per giorno E notte di ogni data.\nMassimo 31 giorni per comando.`;
+  return `🏖️ Ciao ${op.nome}, per inserire le ferie scrivi:\n\n/ferie ${fmt(inizio)} - ${fmt(fine)}\n\n(data singola: /ferie ${fmt(inizio)})\nAggiungi la parola "continuative" per giorno E notte di ogni data.`;
 }
 
 async function loop() {
@@ -110,7 +110,7 @@ async function loop() {
         } else if (cb.data === 'come_funziona') {
           await tg('sendMessage', {
             chat_id: cb.message.chat.id,
-            text: '📘 Come funziona:\n\n🏖️ Ferie — scrivi: /ferie gg/mm/aaaa - gg/mm/aaaa (o una data singola). Aggiungi "continuative" per giorno E notte. Massimo 31 giorni per comando.\n\n🔗 Collegamento — genera il codice nell\'app (Profilo → Collega Telegram) e inviamelo: vale 15 minuti.\n\n🚨 In emergenza riceverai le allerte: rispondi direttamente dall\'app.',
+            text: '📘 Come funziona:\n\n🏖️ Ferie — scrivi: /ferie gg/mm/aaaa - gg/mm/aaaa (o una data singola). Aggiungi "continuative" per giorno E notte. \n🔗 Collegamento — genera il codice nell\'app (Profilo → Collega Telegram) e inviamelo: vale 15 minuti.\n\n🚨 In emergenza riceverai le allerte: rispondi direttamente dall\'app.',
             reply_markup: { inline_keyboard: [[
               { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' }
             ]] }
@@ -138,7 +138,7 @@ async function loop() {
       } else if (testo.includes('Come funziona')) {
         await tg('sendMessage', {
           chat_id: chatId,
-          text: '📘 Come funziona:\n\n🏖️ Ferie — scrivi: /ferie gg/mm/aaaa - gg/mm/aaaa (o una data singola). Aggiungi la parola "continuative" per giorno E notte di ogni data. Massimo 31 giorni per comando.\n\n🔗 Collegamento — genera il codice nell\'app (Profilo → Collega Telegram) e inviamelo qui: vale 15 minuti.\n\n🚨 In emergenza riceverai qui le allerte: rispondi direttamente dall\'app.',
+          text: '📘 Come funziona:\n\n🏖️ Ferie — scrivi: /ferie gg/mm/aaaa - gg/mm/aaaa (o una data singola). Aggiungi la parola "continuative" per giorno E notte di ogni data. \n🔗 Collegamento — genera il codice nell\'app (Profilo → Collega Telegram) e inviamelo qui: vale 15 minuti.\n\n🚨 In emergenza riceverai qui le allerte: rispondi direttamente dall\'app.',
           reply_markup: { inline_keyboard: [[
             { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
             { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
