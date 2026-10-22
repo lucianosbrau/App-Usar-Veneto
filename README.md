@@ -66,6 +66,8 @@ CONTINUITA.md        documento di continuità (leggere PRIMA di riprendere il la
 - `anteprima-schermate.html` — mockup delle schermate
 - `infografica-flusso.html` — infografica del flusso operativo
 - `MIGRAZIONE-SERVER-CORPO.md` — guida futura migrazione sui server del Corpo
+- `MIGRAZIONE-ACCOUNT.md` — guida passo-passo per passare dagli account personali a quelli del nucleo (GitHub/Supabase/Render)
+- `infografica-migrazione.html` — infografica della migrazione account
 
 ## Convenzioni
 

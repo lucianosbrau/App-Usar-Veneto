@@ -424,6 +424,15 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Seed mantenimenti fittizi**: `db/seed-mantenimenti.sql` (**da eseguire in SQL Editor**) — crea storico approvato distribuito (parte del personale in regola, parte sotto), più alcune richieste IN VALIDAZIONE per popolare la coda admin; marcate con colonna `note_seed` per cancellarle pulitamente (`delete from mantenimenti where note_seed is true;`)
 - **Sotto soglia nelle selezioni**: in TUTTE le tendine (Programmazione e Attivazione manuale) chi ha **meno di 36 ore** di mantenimenti approvati nell'anno: va **in fondo alla lista**, riga **evidenziata in rosso** (sfondo rosso chiaro) con **⚠️ MAN.** nell'etichetta — decisione sempre dell'admin, solo informazione. L'ordinamento privilegia: 1) in regola coi mantenimenti, 2) poi i criteri esistenti (capi ⭐ nei ROS, meno recenti, ecc.)
 
+### Bot Telegram ONLINE (22/10/2026)
+- **Nome bot: @Usar_veneto_bot** — attivo su Render (piano Free), in ascolto
+- Config Render: Build `npm install`, Start `node bot/telegram-bot.mjs`, variabili TELEGRAM_BOT_TOKEN / SUPABASE_URL / SUPABASE_SERVICE_KEY
+- Account attuali: GitHub personale (lucianosbrau), Supabase personale (linkato al GitHub personale), Render (accesso con GitHub personale)
+
+### Documento e infografica migrazione account (22/10/2026)
+- Creati `MIGRAZIONE-ACCOUNT.md` (guida dettagliata: principi, scelta Gmail nucleo vs @dipvvf.it, 6 fasi GitHub/Supabase/Render/Telegram/PWA/dati, checklist, costi, rischi) e `infografica-migrazione.html` (stile progetto: rosso #B22222, tricolore, entrambi i loghi come nel modello manifesto)
+- Punti chiave: transfer del repo GitHub (mantiene redirect), transfer progetto Supabase o dump SQL (opz. A/B), Render con email nucleo, bot Telegram invariato, redirect PWA automatico; raccomandato Gmail del nucleo per gli account tecnici (posta VVF filtra terze parti)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
