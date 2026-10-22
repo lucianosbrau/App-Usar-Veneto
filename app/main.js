@@ -34,6 +34,24 @@ const GRADI_VIGILE = {
   CRE: 'rosso', CR: 'rosso', CSE: 'rosso', CS: 'rosso',
   VC: 'nero', VE: 'nero', VF: 'nero'
 };
+
+// selezione touch-safe: distingue il TAP dallo SCROLL (il dito si muove > 8px = scroll, nessuna selezione)
+function selezioneTouch(elLista, selettore, onChoose) {
+  elLista.querySelectorAll(selettore).forEach(d => {
+    let startX = 0, startY = 0, startEl = null;
+    d.addEventListener('pointerdown', (ev) => {
+      startX = ev.clientX; startY = ev.clientY; startEl = d;
+      ev.preventDefault();
+    });
+    d.addEventListener('pointerup', (ev) => {
+      if (!startEl) return;
+      const dx = Math.abs(ev.clientX - startX), dy = Math.abs(ev.clientY - startY);
+      startEl = null;
+      if (dx < 8 && dy < 8) onChoose(d, ev);
+    });
+  });
+}
+
 function simboloVigile(o, px) {
   const tipo = GRADI_VIGILE[o?.grado];
   if (!tipo) return '';
@@ -1137,13 +1155,10 @@ async function apriProgramma(cont, programmi) {
         html += `<div data-scelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9; ${o.sottoMan ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${pref}${esc(o.etichetta)} ${simboloVigile(o, 16)}</div>`;
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
-      lista.querySelectorAll('[data-scelta]').forEach(d => {
-        d.addEventListener('pointerdown', (ev) => {
-          ev.preventDefault();
-          document.getElementById(`posto-${n}`).value = d.dataset.scelta;
-          inp.value = d.textContent.trim();
-          lista.style.display = 'none';
-        });
+      selezioneTouch(lista, '[data-scelta]', (d) => {
+        document.getElementById(`posto-${n}`).value = d.dataset.scelta;
+        inp.value = d.textContent.trim();
+        lista.style.display = 'none';
       });
     };
     inp.onfocus = () => { disegnaLista(); lista.style.display = 'block'; };
@@ -1770,12 +1785,11 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
       lista.style.display = 'block';
-      lista.querySelectorAll('[data-mscelta]').forEach(d => d.addEventListener('pointerdown', (ev) => {
-        ev.preventDefault();
+      selezioneTouch(lista, '[data-mscelta]', (d) => {
         document.getElementById(`mposto-${n}`).value = d.dataset.mscelta;
         inp.value = d.textContent.trim();
         lista.style.display = 'none';
-      }));
+      });
     };
     inp.onblur = () => setTimeout(() => lista.style.display = 'none', 200);
   });
