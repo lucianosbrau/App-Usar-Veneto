@@ -7,6 +7,7 @@
 //   SUPABASE_SERVICE_KEY (chiave service_role di Supabase — SEGRETA, mai nel codice lato client)
 
 import { createClient } from '@supabase/supabase-js';
+import { createServer } from 'http';
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -101,3 +102,10 @@ async function loop() {
   setTimeout(loop, 1000);
 }
 loop();
+
+// --- server HTTP minimo per Render (il Web Service esige una porta aperta) ---
+const PORT = process.env.PORT || 3000;
+createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Bot USAR Veneto attivo');
+}).listen(PORT, () => console.log('HTTP su porta ' + PORT));
