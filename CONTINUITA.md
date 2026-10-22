@@ -461,6 +461,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Idempotente: rieseguirlo non aggiunge nulla a chi è già in regola; pulibile con `delete from mantenimenti where note_seed is true;`
 - NB: la Dashboard calcola la soglia (36) via `caricaOreMantenimenti()` su anno corrente — coerente col seed
 
+### Ritocchi Dashboard e Operatori (22/10/2026)
+- **Torte Dashboard**: etichette direttamente sulle fette (bianche, con bordo scuro per leggibilità): comando/turno in sigla (prime 3 lettere) + percentuale per fette grandi, solo sigla per medie, solo % per piccole (<8%); niente etichetta sotto il 5%; anello leggermente più spesso; legenda a fianco invariata
+- **Icone Operatori**: TPSS = badge quadrato **rosso con croce bianca ✚** (chiara identificazione sanitaria); TAS = badge quadrato **blu con bussola 🧭** seguito dal livello in blu. Le icone restano solo in pagina Operatori (come da regola precedente)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)

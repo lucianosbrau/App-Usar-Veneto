@@ -340,14 +340,23 @@ async function pagDashboard(el) {
       angolo = a2;
       return { k, v, col: PALETTE[i % PALETTE.length], a1, a2, perc };
     });
+    const etichetta = (f) => {
+      if (f.perc < 0.05) return '';
+      const am = (f.a1 + f.a2) / 2;
+      const rad = am * Math.PI / 180;
+      const r = 15.9;
+      const x = 21 + r * Math.cos(rad);
+      const y = 21 + r * Math.sin(rad);
+      const nomeBreve = esc(String(f.k).slice(0, 3));
+      const testo = f.perc >= 0.14 ? `${nomeBreve} ${Math.round(f.perc * 100)}%` : (f.perc >= 0.08 ? nomeBreve : `${Math.round(f.perc * 100)}%`);
+      const dim = f.perc >= 0.14 ? 2.6 : 2.2;
+      return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${dim}" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="700" style="paint-order:stroke; stroke:rgba(0,0,0,0.35); stroke-width:0.5;">${testo}</text>`;
+    };
     return `
     <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:center;">
-      <svg id="${id}" width="190" height="190" viewBox="0 0 42 42" style="flex-shrink:0;">
-        ${fette.map(f => {
-          const x1 = 21 + 15.9 * Math.cos((f.a1 - 90) * Math.PI / 180 * 1); 
-          const large = (f.a2 - f.a1) > 180 ? 1 : 0;
-          return `<circle r="15.9" cx="21" cy="21" fill="transparent" stroke="${f.col}" stroke-width="7" stroke-dasharray="${f.perc * 99.9} ${99.9 - f.perc * 99.9}" stroke-dashoffset="${25 - (f.a1 + 90) / 360 * 99.9}"></circle>`;
-        }).join('')}
+      <svg id="${id}" width="210" height="210" viewBox="0 0 42 42" style="flex-shrink:0;">
+        ${fette.map(f => `<circle r="15.9" cx="21" cy="21" fill="transparent" stroke="${f.col}" stroke-width="9" stroke-dasharray="${f.perc * 99.9} ${99.9 - f.perc * 99.9}" stroke-dashoffset="${25 - (f.a1 + 90) / 360 * 99.9}"></circle>`).join('')}
+        ${fette.map(etichetta).join('')}
       </svg>
       <div style="font-size:13px;">
         ${fette.map(f => `<div style="display:flex; align-items:center; gap:8px; padding:3px 0;">
@@ -416,8 +425,8 @@ async function pagOperatori(el) {
   const iconeAbilitazioni = (o) => {
     let icone = '';
     if (o.patente) icone += ` <span title="Patente ${esc(o.patente)}">🚚${esc(o.patente)}</span>`;
-    if (o.tpss) icone += ' <span title="TPSS — Soccorso sanitario">🎒</span>';
-    if (o.tas) icone += ` <span title="TAS livello ${o.tas}">📍${o.tas}</span>`;
+    if (o.tpss) icone += ' <span title="TPSS — Soccorso sanitario" style="display:inline-block; width:22px; height:22px; border-radius:5px; background:#B22222; color:#fff; font-size:13px; font-weight:800; text-align:center; line-height:22px; vertical-align:middle;">✚</span>';
+    if (o.tas) icone += ` <span title="TAS livello ${o.tas}" style="display:inline-block; width:22px; height:22px; border-radius:5px; background:#2563EB; color:#fff; font-size:13px; text-align:center; line-height:22px; vertical-align:middle;">🧭</span><b style="color:#2563EB; font-size:12px;">${o.tas}</b>`;
     return icone;
   };
 
