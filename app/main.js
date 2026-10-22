@@ -465,6 +465,7 @@ async function pagDashboard(el) {
 }
 
 async function pagOperatori(el) {
+  if (/^#\/operatori\/.+/.test(location.hash)) history.replaceState({ pagina: 'operatori' }, '', '#/operatori');
   el.innerHTML = `<div class="pagina-titolo">👥 Gestione Operatori</div><div class="pagina-sotto">Specializzazioni e abilitazioni</div><div id="op-cont">Caricamento…</div>`;
   const cont = document.getElementById('op-cont');
   const [opRes, specRes, mantRes] = await Promise.all([
@@ -2050,7 +2051,10 @@ async function schedaOperatore(el, o, oreMan) {
       </div>` : ''}
     </div>`;
 
-  document.getElementById('op-indietro').onclick = () => pagOperatori(el);
+  document.getElementById('op-indietro').onclick = () => {
+    if (history.state?.scheda) { history.back(); }
+    else { history.replaceState({ pagina: 'operatori' }, '', '#/operatori'); pagOperatori(el); }
+  };
   const btnP = document.getElementById('op-promuovi');
   if (btnP) btnP.onclick = async () => {
     if (!confirm(`Promuovere ${o.cognome} ${o.nome} ad AMMINISTRATORE? Potrà gestire squadre, validare mantenimenti e lanciare allerte.`)) return;
