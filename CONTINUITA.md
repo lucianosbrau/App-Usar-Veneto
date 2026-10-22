@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 22/10/2026 13:00
+Ultimo aggiornamento: 22/10/2026 13:10
 
 ---
 
@@ -526,6 +526,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **FIX /idgruppo (22/10/2026)**: la gestione dei messaggi nei gruppi non era mai stata applicata (un replace precedente era fallito in silenzio) — il bot rispondeva col benvenuto nel gruppo. Ora: i messaggi nei gruppi sono gestiti PRIMA dei dialoghi privati (solo /idgruppo, che risponde con l'ID in formato copiabile; log di aggiunta al gruppo); gli altri comandi sono disattivati nel gruppo
 - **FIX ALERT_GROUP not defined (22/10/2026)**: la dichiarazione `let ALERT_GROUP = process.env...` era stata persa da un replace fallito in silenzio — l'invio al gruppo crashava ("Errore attivazioni"). **Gruppo confermato dai log: ID = -1004443017442** (titolo "Allerta USAR VENETO"); la variabile ALERT_GROUP_CHAT_ID su Render era GIÀ configurata correttamente dall'utente — il mancato funzionamento era SOLO la dichiarazione mancante nel codice (fixato)
 - **LEZIONE (per la AI)**: dopo ogni replace fallito con assert, RICONTROLLARE che i blocchi collegati siano coerenti — due replace silenziosi hanno causato due bug consecutivi (gestione gruppi mancante, ALERT_GROUP non dichiarata)
+
+### Bozze vs Squadre pubblicate (22/10/2026, ore 13:10)
+- **REGOLA FISSATA (utente)**: quando un programma viene pubblicato su SQUADRE, NON è più una bozza — sparisce dall'elenco "Programmi esistenti" della Programmazione (resta raggiungibile per correzioni dal pulsante ✏️ MODIFICA nella pagina Squadre, che riapre il programma)
+- Implementato: l'elenco filtra via i programmi con pubblicato_su_squadre = true
 
 ### Infografica flusso aggiornata (22/10/2026, ore 13:00)
 - Allineata allo stato reale del sistema: attivazione con PERSONALIZZATA e via rapida da Squadre; allerta al gruppo "Allerta USAR Veneto" + private con pulsanti (bot su Render, non più "server da definire"); compilazione automatica dal programma del mese (non più il vecchio "clicca per spostare da Bravo/Riserve" mai implementato); PDF generato nel browser (jsPDF) da inoltrare manualmente nel gruppo; chiusura attivazione; resoconti con turni ferie effettivi; tabella "Dove risiede cosa" con bot definitivo e realtime collaudato

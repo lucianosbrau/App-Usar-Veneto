@@ -921,7 +921,7 @@ async function pagProgrammazione(el) {
       ${(prog.data || []).length ? `
       <div class="card" style="margin-top:20px;">
         <div style="font-weight:700; margin-bottom:10px;">📅 Programmi esistenti</div>
-        ${(prog.data || []).map(p => `
+        ${(prog.data || []).filter(p => !p.pubblicato_su_squadre).map(p => `
           <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--bordo);">
             <div>${meseIt(p.mese)} — <b>${p.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</b> (${p.programmi_membri.length}/38)</div>
             <span style="display:flex; gap:6px;">
