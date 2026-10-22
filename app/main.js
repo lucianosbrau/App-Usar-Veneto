@@ -933,7 +933,8 @@ async function apriProgramma(cont, programmi) {
   });
 
   const compilati = (membri.data || []).length;
-  const autisti = (membri.data || []).filter(m => m.profili?.patente);
+  const autisti3 = (membri.data || []).filter(m => m.profili?.patente === '3°');
+  const autisti4 = (membri.data || []).filter(m => m.profili?.patente === '4°');
   const inSquadra = (set) => (membri.data || []).filter(m => set.has(m.operatore_id)).length;
   const nStrutt = inSquadra(new Set(SPEC_IDS['Strutturista'] || []));
   const nNbcr = inSquadra(new Set(SPEC_IDS['NBCR 3° livello'] || []));
@@ -946,7 +947,7 @@ async function apriProgramma(cont, programmi) {
       <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
         <div>
           <div style="font-size:22px; font-weight:800;">${meseIt(progMese)} — SQUADRA ${progTeam === 'alpha' ? 'ALPHA' : 'BRAVO'}</div>
-          <div style="font-size:13px; color:var(--grigio);">${prog.pubblicato ? '✅ Pubblicato' : '✏️ Bozza'} · ${compilati}/38 unità · 🚚 ${autisti.length} autisti</div>
+          <div style="font-size:13px; color:var(--grigio);">${prog.pubblicato ? '✅ Pubblicato' : '✏️ Bozza'} · ${compilati}/38 unità</div>
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn-primary" id="prog-inserisci-tutti" style="height:44px;">➕ INSERISCI TUTTI</button>
@@ -962,7 +963,8 @@ async function apriProgramma(cont, programmi) {
         <span>☣️ NBCR 3°: <b>${nNbcr}</b></span>
         <span>🐕 Unità cinofile: <b>${nK9}</b></span>
         <span>🧗 SAF 2A/Avanzato: <b>${nSaf}</b></span>
-        <span>🚚 Autisti: <b>${autisti.length}</b></span>
+        <span>🚚 Autisti 3° grado: <b>${autisti3.length}</b></span>
+        <span>🚚 Autisti 4° grado: <b>${autisti4.length}</b></span>
       </div>
     </div>
 

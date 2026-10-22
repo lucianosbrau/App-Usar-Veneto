@@ -476,6 +476,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Frecce del browser (indietro/avanti)**: implementata la cronologia con History API — ogni pagina visitata diventa un hash nell'URL (`#/operatori`, `#/calendario`, ecc.); il tasto indietro torna alla pagina precedente, avanti riavanza; ricaricando l'app si riapre l'ultima pagina (l'hash viene ripristinato al login); URL condivisibile/link diretto alle pagine. I redraw interni (inserimento nomi ecc.) NON creano voci di cronologia
 - Limitazione nota: la navigazione interna della Programmazione (mese/squadra) non è nell'hash — il back torna alla pagina, non al passaggio intermedio
 
+### Contatore autisti per grado (22/10/2026, richiesta utente)
+- Nel riepilogo della Programmazione i contatori autisti ora sono **separati per grado**: "🚚 Autisti 3° grado: X" e "🚚 Autisti 4° grado: Y" — contano SONO chi ha patente **3° o 4°** (i gradi abilitati alla guida dei mezzi pesanti); chi ha 1°/2° non è più contato tra gli autisti (prima contava chiunque avesse una patente)
+- Rimosso il conteggio generico "N autisti" dalla riga di stato (Pubblicato/Bozza · N/38)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
