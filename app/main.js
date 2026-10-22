@@ -477,8 +477,8 @@ async function pagOperatori(el) {
             <div class="avatar" style="width:56px;height:56px;font-size:18px;">${esc(iniziali(o.nome, o.cognome))}</div>
             <span class="pill ${o.ruolo === 'admin' ? 'rosso' : 'verde'}">${o.ruolo === 'admin' ? '⭐ Admin' : '🟢 Attivo'}</span>
           </div>
-          <div style="font-size:18px; font-weight:700;">${esc(o.cognome)} ${esc(o.nome)}${simboloVigile(o)}${o.grado ? ` <span class="pill" style="font-size:10px; background:#F1F5F9; color:var(--grigio);">${esc(o.grado)}</span>` : ''}</div>
-          <div style="font-size:13px; color:var(--grigio); margin:4px 0 8px;">${esc(o.comando || '')}${o.sede ? ' · ' + esc(o.sede) : ''}${o.turno ? ' · turno ' + esc(o.turno) : ''}${o.salto_turno ? ' (salto ' + esc(o.salto_turno) + ')' : ''}</div>
+          <div style="font-size:18px; font-weight:700;">${esc(o.cognome)} ${esc(o.nome)}${simboloVigile(o, 20)}${o.grado ? ` <span class="pill" style="font-size:10px; background:#F1F5F9; color:var(--grigio);">${esc(o.grado)}</span>` : ''}</div>
+          <div style="font-size:13px; color:var(--grigio); margin:4px 0 8px;">${esc(o.comando || '')}${o.sede ? ' · ' + esc(o.sede) : ''}${o.salto_turno ? ' · turno ' + esc(o.salto_turno) : (o.turno ? ' · turno ' + esc(o.turno) : '')}</div>
           <div style="font-size:15px; line-height:2;">
             <span style="font-size:11px; font-weight:700; color:var(--grigio); text-transform:uppercase;">Specializzazioni:</span> ${iconeSpec(o) || '<span style="color:var(--grigio); font-size:13px;">—</span>'}
           </div>
@@ -984,7 +984,7 @@ async function apriProgramma(cont, programmi) {
             <span style="width:28px; font-weight:800; color:${p.spec || p.ros ? 'var(--rosso)' : 'var(--grigio)'};">${p.n}</span>
             <span style="flex:1; font-size:14px;">${esc(p.t)}${p.spec || p.ros ? ' <span style="color:var(--rosso); font-size:11px;">● OBBL.</span>' : ''}</span>
             ${occ
-              ? `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpec(occ.operatore_id)}${occ.profili?.patente ? ` <span class="pill giallo" style="font-size:10px;">🚚 ${esc(occ.profili.patente)}</span>` : ''}</span>
+              ? `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpec(occ.operatore_id)}${occ.profili?.patente ? ` <span class="pill giallo" style="font-size:10px;">🚚 ${esc(occ.profili.patente)}</span>` : ''}${simboloVigile({ grado: occ.profili?.grado }, 16)}</span>
                  <button class="pill rosso" data-vuota="${occ.id}" style="border:none; cursor:pointer;">✕</button>`
               : `<div style="display:flex; gap:6px; align-items:center; max-width:400px;">
                    <div style="position:relative; flex:1;">
@@ -1197,13 +1197,6 @@ async function generaPdfManifesto(prog, membri) {
     else if (nome) { doc.setTextColor(...ANTRACITE); }
     else { doc.setTextColor(150,150,150); }
     if (nome) {
-      const tipo = GRADI_VIGILE[grado];
-      const img = tipo ? imgVigile[tipo] : null;
-      if (img) {
-        const sw = 4.2;
-        const tw = doc.getTextWidth(nome);
-        doc.addImage(img, 'PNG', cx - tw / 2 - sw - 0.8, y + 9.5 - sw / 2 - 0.9, sw, sw);
-      }
       doc.text(nome, cx, y + 9.5, { align: 'center' });
     }
   }
@@ -1229,15 +1222,6 @@ async function generaPdfManifesto(prog, membri) {
   } catch (e) {
     console.warn('Logo non caricati nel PDF:', e);
   }
-  let imgVigile = { grigio: null, rosso: null, nero: null };
-  try {
-    const [ig, ir, inr] = await Promise.all([
-      caricaImmaginePdf('/App-Usar-Veneto/assets/vigile-grigio.png').catch(() => null),
-      caricaImmaginePdf('/App-Usar-Veneto/assets/vigile-rosso.png').catch(() => null),
-      caricaImmaginePdf('/App-Usar-Veneto/assets/vigile-nero.png').catch(() => null)
-    ]);
-    imgVigile = { grigio: ig, rosso: ir, nero: inr };
-  } catch (e) { console.warn('Simboli vigile non caricati nel PDF:', e); }
   if (logoVvf) doc.addImage(logoVvf, 'JPEG', 12, 8, 15, 15);
   if (logoUsar) doc.addImage(logoUsar, 'JPEG', 183, 8, 15, 15);
   doc.setFont('helvetica', 'bold'); doc.setFontSize(20); doc.setTextColor(...ANTRACITE);
