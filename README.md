@@ -57,7 +57,7 @@ CONTINUITA.md        documento di continuità (leggere PRIMA di riprendere il la
 4. Impostare i secrets GitHub `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (Settings → Secrets and variables → Actions)
 5. In locale: file `.env` con le stesse due variabili (già in `.gitignore`)
 6. Authentication → URL Configuration → Site URL = URL di GitHub Pages; "Confirm email" disattivato
-7. Bot Telegram: creare con @BotFather, eseguire su piattaforma Node (es. Render) con variabili `TELEGRAM_BOT_TOKEN`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`; opzionale `ALERT_GROUP_CHAT_ID` (gruppo "ALLERTA USAR VENETO": aggiungere il bot al gruppo come admin e scrivere `/idgruppo` per scoprire l'ID)
+7. Bot Telegram: creare con @BotFather, eseguire su piattaforma Node (es. Render) con variabili `TELEGRAM_BOT_TOKEN`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` e `ALERT_GROUP_CHAT_ID` (ID del gruppo allerte, si scopre col comando /idgruppo nel gruppo dopo aver aggiunto il bot come admin)
 
 ## Documentazione
 
