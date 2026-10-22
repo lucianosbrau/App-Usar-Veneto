@@ -477,7 +477,8 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Limitazione nota: la navigazione interna della Programmazione (mese/squadra) non è nell'hash — il back torna alla pagina, non al passaggio intermedio
 
 ### Contatore autisti per grado (22/10/2026, richiesta utente)
-- Nel riepilogo della Programmazione i contatori autisti ora sono **separati per grado**: "🚚 Autisti 3° grado: X" e "🚚 Autisti 4° grado: Y" — contano SONO chi ha patente **3° o 4°** (i gradi abilitati alla guida dei mezzi pesanti); chi ha 1°/2° non è più contato tra gli autisti (prima contava chiunque avesse una patente)
+- Nel riepilogo della Programmazione i contatori autisti ora sono **separati per grado**: "🚚 Autisti 3° grado: X" e "🚚 Autisti 4° grado: Y" — contano SONO chi ha patente **3° o 4°**; chi ha 1°/2° non è più contato tra gli autisti (prima contava chiunque avesse una patente)
+- **Confermato dall'utente**: le estensioni patente (Autoscala, Autogru, Anfibio) NON entrano in questo conteggio — si conta solo il grado (3°/4°)
 - Rimosso il conteggio generico "N autisti" dalla riga di stato (Pubblicato/Bozza · N/38)
 
 ### Prossimi passi (in ordine proposto)
