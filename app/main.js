@@ -66,12 +66,12 @@ window.addEventListener('popstate', async () => {
   if (paginaDaHash !== pagina) { pagina = paginaDaHash; }
   if (pagina === 'operatori') {
     const c = document.getElementById('contenuto');
-    await pagOperatori(c);
-    if (st.scheda) {
+    if (st.scheda && !/\/#\/?operatori\/?$/.test(location.hash)) {
       const { data: o } = await supabase.from('profili').select('*').eq('id', st.scheda).limit(1).maybeSingle();
       const ore = await caricaOreMantenimenti();
-      if (o) schedaOperatore(c, o, ore);
+      if (o) { schedaOperatore(c, o, ore); return; }
     }
+    await pagOperatori(c);
     return;
   }
   if (!h && pagina !== 'dashboard') { pagina = 'dashboard'; }
@@ -80,6 +80,15 @@ window.addEventListener('popstate', async () => {
 
 function iniziali(nome, cognome) {
   return ((nome?.[0] || '') + (cognome?.[0] || '')).toUpperCase() || '?';
+}
+function urlFoto(o) {
+  if (!o?.foto_path) return null;
+  return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/foto-profili/${o.foto_path}`;
+}
+function avatarHtml(o, px, fontPx) {
+  const u = urlFoto(o);
+  if (u) return `<div class="avatar" style="width:${px}px;height:${px}px; background:#fff; overflow:hidden;"><img src="${u}" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>`;
+  return `<div class="avatar" style="width:${px}px;height:${px}px;font-size:${fontPx || Math.round(px / 3)}px;">${esc(iniziali(o?.nome, o?.cognome))}</div>`;
 }
 function fmtData(d) {
   if (!d) return '';
@@ -128,6 +137,7 @@ async function caricaUtente(user) {
   } else {
     utente.nome = prof.nome; utente.cognome = prof.cognome; utente.ruolo = prof.ruolo || 'operatore';
   utente.salto_turno = prof.salto_turno; utente.turno = prof.turno; utente.comando = prof.comando; utente.sede = prof.sede;
+  utente.foto_path = prof.foto_path;
   }
 }
 
@@ -523,7 +533,7 @@ async function pagOperatori(el) {
         <div class="card" data-op="${o.id}" style="border-left:4px solid ${o.ruolo === 'admin' ? 'var(--rosso)' : 'var(--royal)'}; cursor:pointer; position:relative;">
           <div style="position:absolute; top:10px; right:12px; font-size:11px; color:var(--grigio);">➤</div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <div class="avatar" style="width:56px;height:56px;font-size:18px;">${esc(iniziali(o.nome, o.cognome))}</div>
+            ${avatarHtml(o, 56, 18)}
             ${o.ruolo === 'admin'
               ? '<span class="pill rosso">⭐ Admin</span>'
               : ((oreMan[o.id] || 0) >= 36
@@ -544,7 +554,10 @@ async function pagOperatori(el) {
   document.getElementById('fil-sottosoglia').onclick = () => { localStorage.setItem('op-filtro', 'sottosoglia'); pagOperatori(el); };
   cont.querySelectorAll('[data-op]').forEach(c => c.onclick = () => {
     const o = operatori.find(x => x.id === c.dataset.op);
-    if (o) schedaOperatore(el, o, oreMan);
+    if (o) {
+      history.pushState({ pagina: 'operatori', scheda: o.id }, '', '#/operatori/' + o.id);
+      schedaOperatore(el, o, oreMan);
+    }
   });
 }
 
@@ -2016,7 +2029,7 @@ async function schedaOperatore(el, o, oreMan) {
     <div class="card" style="max-width:680px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
         <div style="display:flex; align-items:center; gap:14px;">
-          <div class="avatar" style="width:72px;height:72px;font-size:24px;">${esc(iniziali(o.nome, o.cognome))}</div>
+          ${avatarHtml(o, 72, 24)}
           <div>
             <div style="font-size:24px; font-weight:800;">${esc(o.cognome)} ${esc(o.nome)} ${simboloVigile(o, 24)}</div>
             <div style="color:var(--grigio); font-size:13px;">${o.grado ? esc(o.grado) + ' · ' : ''}${o.ruolo === 'admin' ? '⭐ Amministratore' : 'Operatore'}</div>
@@ -2024,6 +2037,12 @@ async function schedaOperatore(el, o, oreMan) {
         </div>
         ${o.ruolo !== 'admin' ? `<button class="btn-primary" id="op-promuovi" style="background:var(--rosso); height:44px;">⭐ RENDI AMMINISTRATORE</button>` : `<button class="btn-primary" id="op-revoca" style="background:var(--grigio-ch); height:44px;">➖ REVOCA ADMIN</button>`}
       </div>
+
+      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-primary" id="op-elimina" style="background:#fff; color:var(--rosso); border:1px solid var(--rosso); height:40px; font-size:13px;">🗑️ ELIMINA ACCOUNT</button>
+        <button class="btn-primary" id="op-log" style="background:#fff; color:var(--grigio); border:1px solid var(--bordo); height:40px; font-size:13px;">📋 Registro attività admin</button>
+      </div>
+      <div id="op-log-box" style="display:none; margin-top:12px; padding:10px; border:1px solid var(--bordo); border-radius:10px; overflow-x:auto;"></div>
 
       <table style="width:100%; border-collapse:collapse;">
         ${riga('Email', o.email)}
@@ -2055,6 +2074,25 @@ async function schedaOperatore(el, o, oreMan) {
     if (history.state?.scheda) { history.back(); }
     else { history.replaceState({ pagina: 'operatori' }, '', '#/operatori'); pagOperatori(el); }
   };
+  const mostraLog = document.getElementById('op-log');
+  if (mostraLog) mostraLog.onclick = async () => {
+    const box = document.getElementById('op-log-box');
+    if (box.style.display === 'block') { box.style.display = 'none'; return; }
+    box.innerHTML = 'Caricamento…';
+    box.style.display = 'block';
+    const { data, error } = await supabase.from('log_admin').select('*, profili(cognome, nome)').order('creato_il', { ascending: false }).limit(50);
+    if (error) { box.innerHTML = `<div style="color:var(--rosso); font-size:13px;">⚠️ Errore caricamento log: ${esc(error.message)}</div>`; return; }
+    box.innerHTML = (data || []).length ? `
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <tr style="text-align:left; color:var(--grigio);"><th style="padding:6px 8px;">Data</th><th style="padding:6px 8px;">Azione</th><th style="padding:6px 8px;">Operatore</th><th style="padding:6px 8px;">Da parte di</th></tr>
+        ${data.map(l => `<tr style="border-top:1px solid var(--bordo);">
+          <td style="padding:6px 8px; white-space:nowrap;">${new Date(l.creato_il).toLocaleString('it-IT')}</td>
+          <td style="padding:6px 8px; font-weight:700;">${l.azione === 'promozione_admin' ? '⭐ Promozione admin' : l.azione === 'revoca_admin' ? '➖ Revoca admin' : '🗑️ Eliminazione account'}</td>
+          <td style="padding:6px 8px;">${esc(l.dettaglio || '')}</td>
+          <td style="padding:6px 8px;">${esc((l.profili?.cognome || '') + ' ' + (l.profili?.nome || ''))}</td>
+        </tr>`).join('')}
+      </table>` : '<div style="color:var(--grigio); font-size:13px;">Nessuna azione registrata.</div>';
+  };
   const btnP = document.getElementById('op-promuovi');
   if (btnP) btnP.onclick = async () => {
     if (!confirm(`Promuovere ${o.cognome} ${o.nome} ad AMMINISTRATORE? Potrà gestire squadre, validare mantenimenti e lanciare allerte.`)) return;
@@ -2070,6 +2108,19 @@ async function schedaOperatore(el, o, oreMan) {
     const { error } = await supabase.from('profili').update({ ruolo: 'operatore' }).eq('id', o.id);
     if (error) { alert('Errore: ' + error.message); return; }
     alert(o.cognome + ' ' + o.nome + ' è ora operatore.');
+    pagOperatori(el);
+  };
+  const btnE = document.getElementById('op-elimina');
+  if (btnE) btnE.onclick = async () => {
+    if (o.id === utente.id) { alert('Non puoi eliminare il tuo account.'); return; }
+    const motivo = prompt(`Eliminare DEFINITIVAMENTE l'account di ${o.cognome} ${o.nome}?\nVerranno cancellati profilo, mantenimenti, ferie, specializzazioni e risposte.\n\nQuesta azione è irreversibile e verrà registrata nel log.\n\nInserisci la TUA password per confermare:`);
+    if (motivo === null) return;
+    const { data, error: errA } = await supabase.auth.signInWithPassword({ email: utente.email, password: motivo });
+    if (errA || !data?.session) { alert('Password errata: eliminazione annullata.'); return; }
+    const { error: errDel } = await supabase.rpc('elimina_operatore', { target: o.id });
+    if (errDel) { alert('Eliminazione fallita: ' + errDel.message); return; }
+    if (o.foto_path) supabase.storage.from('foto-profili').remove([o.foto_path]).catch(() => {});
+    alert('Account eliminato.');
     pagOperatori(el);
   };
 }
@@ -2120,6 +2171,21 @@ function pagProfilo(el) {
     <div class="pagina-titolo">👤 Profilo</div>
     <div class="pagina-sotto">${esc(utente.email)} — ruolo: ${esc(utente.ruolo)}</div>
     <div class="card" style="max-width:600px; margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:14px;">
+        ${avatarHtml(utente, 72, 24)}
+        <div>
+          <div style="font-weight:700; margin-bottom:6px;">📷 Foto profilo</div>
+          <input type="file" id="p-foto" accept="image/*" style="display:none;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-primary" id="p-foto-scegli" style="height:38px; font-size:13px; max-width:220px;">Carica una foto</button>
+            ${utente.foto_path ? '<button class="btn-primary" id="p-foto-rimuovi" style="height:38px; font-size:13px; max-width:220px; background:#fff; color:var(--rosso); border:1px solid var(--rosso);">Rimuovi</button>' : ''}
+          </div>
+          <div style="font-size:11px; color:var(--grigio); margin-top:6px;">Visibile a tutti gli operatori al posto delle iniziali</div>
+        </div>
+      </div>
+      <div id="p-foto-msg" style="display:none; margin-bottom:10px; font-size:13px;"></div>
+    </div>
+    <div class="card" style="max-width:600px; margin-bottom:20px;">
       <div style="font-weight:700; margin-bottom:14px;">📌 Dati di servizio</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
         <div>
@@ -2159,6 +2225,38 @@ function pagProfilo(el) {
       </div>
     </div>`;
   document.getElementById('p-ok').style.display = 'none';
+  const fotoMsg = document.getElementById('p-foto-msg');
+  const mostraFotoMsg = (testo, err) => {
+    fotoMsg.textContent = testo;
+    fotoMsg.style.color = err ? 'var(--rosso)' : 'var(--verde-tx, #065F46)';
+    fotoMsg.style.display = 'block';
+    setTimeout(() => fotoMsg.style.display = 'none', 4000);
+  };
+  document.getElementById('p-foto-scegli').onclick = () => document.getElementById('p-foto').click();
+  document.getElementById('p-foto').onchange = async (ev) => {
+    const file = ev.target.files[0];
+    ev.target.value = '';
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { mostraFotoMsg('Formato non valido: usa JPG, PNG o WebP.', true); return; }
+    if (file.size > 2 * 1024 * 1024) { mostraFotoMsg('Foto troppo grande (max 2 MB).', true); return; }
+    const path = `${utente.id}/foto`;
+    const { error: errUp } = await supabase.storage.from('foto-profili').upload(path, file, { upsert: true });
+    if (errUp) { mostraFotoMsg('Errore caricamento: ' + errUp.message, true); return; }
+    const { error: errUpd } = await supabase.from('profili').update({ foto_path: path }).eq('id', utente.id);
+    if (errUpd) { mostraFotoMsg('Errore salvataggio profilo: ' + errUpd.message, true); return; }
+    utente.foto_path = path;
+    mostraFotoMsg('✅ Foto caricata.');
+    pagProfilo(el);
+  };
+  const btnRf = document.getElementById('p-foto-rimuovi');
+  if (btnRf) btnRf.onclick = async () => {
+    if (!confirm('Rimuovere la foto profilo?')) return;
+    await supabase.storage.from('foto-profili').remove([utente.foto_path]).catch(() => {});
+    const { error } = await supabase.from('profili').update({ foto_path: null }).eq('id', utente.id);
+    if (error) { mostraFotoMsg('Errore: ' + error.message, true); return; }
+    utente.foto_path = null;
+    pagProfilo(el);
+  };
   document.getElementById('p-salva').onclick = async () => {
     const { error } = await supabase.from('profili').update({
       turno: document.getElementById('p-turno').value,
