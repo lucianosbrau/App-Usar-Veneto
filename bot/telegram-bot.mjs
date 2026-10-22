@@ -139,6 +139,37 @@ async function gestisciMantenimento(chatId, testo) {
 }
 
 let offset = 0;
+let ultimaAttivazioneVista = null;
+
+async function controllaAttivazioni() {
+  const { data: aperta } = await sb.from('attivazioni')
+    .select('id, team, messaggio, creata_il').eq('chiusa', false)
+    .order('creata_il', { ascending: false }).limit(1).maybeSingle();
+  if (!aperta) { ultimaAttivazioneVista = null; return; }
+  if (aperta.id === ultimaAttivazioneVista) return;
+  const giaVista = ultimaAttivazioneVista !== null;
+  ultimaAttivazioneVista = aperta.id;
+  if (giaVista) return; // all'avvio non riinvia allerte vecchie
+  const { data: collegati } = await sb.from('profili')
+    .select('telegram_chat_id').not('telegram_chat_id', 'is', null);
+  const teamTxt = aperta.team === 'alpha' ? 'TEAM ALPHA' : aperta.team === 'bravo' ? 'TEAM BRAVO' : 'ATTIVAZIONE PERSONALIZZATA';
+  for (const p of (collegati || [])) {
+    await tg('sendMessage', {
+      chat_id: p.telegram_chat_id,
+      text: `🚨🚨🚨 ATTIVAZIONE 🚨🚨🚨
+
+${teamTxt}
+
+${aperta.messaggio}
+
+Rispondi con i pulsanti qui sotto ⭇`,
+      reply_markup: { inline_keyboard: [[
+        { text: '✅ SONO DISPONIBILE', callback_data: 'att:si:' + aperta.id },
+        { text: '❌ NON SONO DISPONIBILE', callback_data: 'att:no:' + aperta.id }
+      ]] }
+    }).catch(() => {});
+  }
+}
 console.log('Bot USAR Veneto in ascolto...');
 
 
@@ -163,7 +194,31 @@ async function loop() {
       if (up.callback_query) {
         const cb = up.callback_query;
         await tg('answerCallbackQuery', { callback_query_id: cb.id });
-        if (cb.data === 'man_start') {
+        if (cb.data.startsWith('att:')) {
+          const [ , risposta, attId ] = cb.data.split(':');
+          const { data: op } = await sb.from('profili').select('id, nome, cognome').eq('telegram_chat_id', cb.message.chat.id).limit(1).maybeSingle();
+          if (!op) {
+            await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Prima collega il tuo account (app \u2192 Profilo \u2192 Collega Telegram).' });
+            return;
+          }
+          const { data: att } = await sb.from('attivazioni').select('id, chiusa').eq('id', Number(attId)).limit(1).maybeSingle();
+          if (!att || att.chiusa) {
+            await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Attivazione gi\u00e0 chiusa.' });
+            return;
+          }
+          const { error: errIns } = await sb.from('risposte_attivazione').upsert(
+            { attivazione_id: att.id, operatore_id: op.id, risposta: risposta },
+            { onConflict: 'attivazione_id,operatore_id' }
+          );
+          if (errIns) {
+            await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Errore: ' + errIns.message });
+            return;
+          }
+          await tg('answerCallbackQuery', { callback_query_id: cb.id, text: risposta === 'si' ? '✅ Registrato: DISPONIBILE' : '❌ Registrato: NON disponibile' });
+          await tg('sendMessage', { chat_id: cb.message.chat.id, text: risposta === 'si'
+            ? '✅ Risposta registrata. Presentati al ritrovo indicato nel messaggio.'
+            : '❌ Risposta registrata: non disponibile. Grazie comunque.' });
+        } else if (cb.data === 'man_start') {
           const { data: op } = await sb.from('profili').select('id, nome, cognome').eq('telegram_chat_id', cb.message.chat.id).limit(1).maybeSingle();
           if (!op) {
             await tg('sendMessage', { chat_id: cb.message.chat.id, text: 'Prima collega il tuo account: apri l\'app → Profilo → "Collega Telegram" e inviami il codice.' });
@@ -287,6 +342,7 @@ async function loop() {
   } catch (e) {
     console.error('Errore loop:', e.message);
   }
+  try { await controllaAttivazioni(); } catch (e) { console.error('Errore attivazioni:', e.message); }
   setTimeout(loop, 1000);
 }
 loop();

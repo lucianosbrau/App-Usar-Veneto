@@ -505,6 +505,13 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Migrazione: `db/migrazione-anagrafica-estesa.sql` (**da eseguire**): nuovi campi cellulare, indirizzo, contatto_ice_nome/telefono/relazione, medico_curante, gruppo_sanguigno — pronti per l'import dal Google Sheet reale
 - Seed: `db/seed-anagrafica-estesa.sql` (**da eseguire dopo la migrazione**): valori casuali per gli operatori di prova (sostituibili coi dati veri)
 
+### Bot: allerte di attivazione + risposte SÌ/NO (22/10/2026)
+- Il bot ora **invia l'allerta** quando l'admin lancia ALPHA/BRAVO/PERSONALIZZATA dalla PWA: messaggio 🚨 a tutti gli operatori con Telegram collegato, con **pulsanti ✅ SONO DISPONIBILE / ❌ NON SONO DISPONIBILE**
+- La risposta finisce in `risposte_attivazione` (upsert: può cambiare risposta) → **appare in tempo reale nella pagina Attivazione dell'admin** (contatori, copertura requisiti, elenco nomi) — stesso canale della risposta da PWA
+- Guardie: all'avvio il bot non reinvia allerte di attivazioni già aperte; se l'attivazione è chiusa rifiuta la risposta; conferma con popup e messaggio di riscontro
+- NB: su Render serve **Manual Deploy → Deploy latest commit** per attivare questa versione
+- **PRIMA PROVA DI ATTIVAZIONE END-TO-END** (proposta all'utente): admin lancia ALPHA dalla PWA → tutti i collegati ricevono l'allerta su Telegram → rispondono coi pulsanti → l'admin vede contatori e copertura aggiornarsi in tempo reale → chiude l'attivazione
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
