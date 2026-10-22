@@ -494,6 +494,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Operatori**: simboli (vigile, TPSS, TAS) staccati dal nome (margine 6px) e allineati verticalmente (-3px); nuovo **filtro in alto**: "Tutti" / "⚠️ Sotto soglia mantenimenti" con conteggi, persistente (localStorage)
 - Fix correlati: query mantenimenti con FK esplicita (PGRST201 per doppia relazione profili), .maybeSingle() su impostazioni
 
+### Resoconti: frecce in evidenza + Ferie personali admin (22/10/2026)
+- **Frecce navigazione mesi** spostate subito sotto il titolo della sezione, a sinistra, più grandi e visibili
+- **Nuova sezione "Le mie ferie" (solo admin)** in Resoconti: conteggio dei turni di ferie effettivi PROPI (stessa regola del riepilogo generale: solo turni che avresti lavorato, escluso il proprio salto turno) + giorni coinvolti; se il turno non è impostato nel profilo mostra l'avviso; naviga coi mesi insieme al resto della pagina
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)

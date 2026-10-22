@@ -589,15 +589,45 @@ async function pagResoconti(el) {
     const nomi = Object.keys(perOp).sort();
     const nomiMesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 
+    let bloccoMieFerie = '';
+    if (utente.ruolo === 'admin') {
+      const { data: mieFerie } = await supabase.from('disponibilita').select('data, turno_ferie')
+        .eq('tipo', 'ferie').eq('operatore_id', utente.id).gte('data', inizioMese).lte('data', fineMese);
+      const mioTurno = (utente.turno || '')[0];
+      const mioSalto = utente.salto_turno;
+      let turniMiei = 0;
+      const giorniMiei = new Set();
+      (mieFerie || []).forEach(f => {
+        const [fy, fm, fg] = String(f.data).split('-').map(Number);
+        const cp = coppiaGiorno(fy, fm - 1, fg);
+        const salto = f.turno_ferie === 'notte' ? cp.notte : cp.giorno;
+        if (mioTurno && salto[0] !== mioTurno) return;
+        if (salto === mioSalto) return;
+        turniMiei++;
+        giorniMiei.add(f.data);
+      });
+      const dettaglioMio = giorniMiei.size
+        ? `<div style="display:flex; gap:20px; flex-wrap:wrap;">
+            <div><div style="font-size:32px; font-weight:800; color:var(--royal);">${turniMiei}</div>🕓 Turni di ferie</div>
+            <div><div style="font-size:32px; font-weight:800;">${giorniMiei.size}</div>📅 Giorni coinvolti</div>
+          </div>
+          <div style="font-size:12px; color:var(--grigio); margin-top:10px;">${mioTurno ? 'Turno ' + esc(mioSalto || mioTurno) : '⚠️ Imposta il tuo turno nella pagina Profilo per il conteggio esatto.'}</div>`
+        : '<div style="color:var(--grigio);">Nessuna ferie registrata in questo mese.</div>';
+      bloccoMieFerie = `
+    <div class="card" style="margin-bottom:20px;">
+      <div style="font-weight:700; margin-bottom:10px;">🏖 Le mie ferie — ${nomiMesi[m - 1]} ${y}</div>
+      <div style="font-size:13px; color:var(--grigio); margin-bottom:12px;">Turni di ferie effettivi del tuo periodo (esclusi i turni che non avresti lavorato).</div>
+      ${dettaglioMio}
+    </div>`;
+    }
+
     cont.innerHTML = `
     <div class="card" style="margin-bottom:20px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-        <div style="font-weight:700;">🏖 Ferie di ${nomiMesi[m - 1]} ${y} — turni effettivi</div>
-        <div style="display:flex; gap:8px;">
-          <button class="pill" id="res-indietro" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">◀ Mese prima</button>
-          <button class="pill" id="res-avanti" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">Mese dopo ▶</button>
-        </div>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <button class="pill" id="res-indietro" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">◀ Mese prima</button>
+        <button class="pill" id="res-avanti" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">Mese dopo ▶</button>
       </div>
+      <div style="font-weight:700; margin-bottom:14px;">🏖 Ferie di ${nomiMesi[m - 1]} ${y} — turni effettivi</div>
       <div style="font-size:12px; color:var(--grigio); margin-bottom:12px;">Conteggio dei turni che ciascuno avrebbe effettivamente lavorato (in base al proprio turno A–D e al calendario dei salti turno): le ferie in giorni di riposo o nel proprio salto turno non vengono contate.</div>
       <div style="display:flex; gap:20px; margin-bottom:14px; flex-wrap:wrap;">
         <div><div style="font-size:32px; font-weight:800; color:var(--royal);">${totTurni}</div>🕓 Turni di ferie</div>
@@ -609,6 +639,8 @@ async function pagResoconti(el) {
         ${nomi.map(n => `<tr style="border-top:1px solid var(--bordo);"><td style="padding:7px 0;">${esc(n)}</td><td><b>${perOp[n].turni}</b></td></tr>`).join('')}
       </table>` : '<div style="color:var(--grigio);">Nessun turno di ferie registrato in questo mese.</div>'}
     </div>
+
+    ${bloccoMieFerie}
     <div class="card"><div style="font-weight:700; margin-bottom:8px;">📋 Resoconti attivazioni</div><div style="color:var(--grigio); font-size:14px;">Saranno popolati con le prime attivazioni reali.</div></div>`;
     document.getElementById('res-indietro').onclick = () => { m--; if (m < 1) { m = 12; y--; } localStorage.setItem('res-mese', `${y}-${m}`); disegna(); };
     document.getElementById('res-avanti').onclick = () => { m++; if (m > 12) { m = 1; y++; } localStorage.setItem('res-mese', `${y}-${m}`); disegna(); };
