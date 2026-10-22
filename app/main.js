@@ -1684,11 +1684,19 @@ async function pagMantenimenti(el) {
     <div id="man-cont">Caricamento…</div>`;
   const anno = new Date().getFullYear();
   const [impo, tutti] = await Promise.all([
-    supabase.from('impostazioni').select('valore').eq('chiave', 'soglia_ore_mantenimenti').single(),
+    supabase.from('impostazioni').select('valore').eq('chiave', 'soglia_ore_mantenimenti').limit(1).maybeSingle(),
     supabase.from('mantenimenti').select('*, profili(nome, cognome)').order('data', { ascending: false })
   ]);
   const soglia = Number(impo?.data?.valore) || 36;
   const cont = document.getElementById('man-cont');
+  if (tutti.error) {
+    cont.innerHTML = `<div class="card" style="border-left:4px solid var(--rosso);">
+      <b>⚠️ Errore caricamento mantenimenti</b>
+      <div style="font-size:13px; color:var(--rosso-tx); margin-top:6px;">${esc(tutti.error.message)}</div>
+      <div style="font-size:12px; color:var(--grigio); margin-top:6px;">Codice: ${esc(tutti.error.code || 'n/d')} · Dettaglio: ${esc(tutti.error.details || 'n/d')}</div>
+    </div>`;
+    return;
+  }
 
   const miei = (tutti.data || []).filter(m => m.operatore_id === utente.id);
   const approvatiAnno = miei.filter(m => m.stato === 'approvato' && String(m.data).startsWith(anno));
@@ -1746,7 +1754,7 @@ async function pagMantenimenti(el) {
 
       <div class="card" style="margin-bottom:24px;">
         <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
-          <div style="font-weight:700;">Ore valide ${anno}</div>
+          <div style="font-weight:700;">Ore valide ${anno} <span style="font-size:11px; color:var(--grigio); font-weight:400;">(${(tutti.data || []).length} righe caricate)</span></div>
           <div style="font-weight:800; font-size:22px; color:${coloreStato};">${totOre} / ${soglia} h</div>
         </div>
         <div class="barra"><div style="width:${pct}%; background:${coloreStato};"></div></div>
