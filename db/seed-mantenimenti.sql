@@ -11,7 +11,7 @@ delete from mantenimenti where note_seed is true;
 insert into mantenimenti (operatore_id, data, tipo, argomento, ore, stato, validato_da, validato_il, note_seed)
 select
   p.id,
-  (now() - (random() * 200 || ' days')::interval)::date::text,
+  (now() - (random() * 200 || ' days')::interval)::date,
   (array['Mantenimento','Manovra','Intervento','Lavorazione','Tutor Mantenimento','Tutor Corso','Altra formazione'])[1 + floor(random() * 7)],
   (array['Taglio e puntellazione','Ricerca tecniche K9','NBCR base','Sicurezza sito','Movimentazione carichi','Primo soccorso','Uso strumentazione'])[1 + floor(random() * 7)],
   round((2 + random() * 6)::numeric, 1),
@@ -27,7 +27,7 @@ where p.email like 'prova.%'
 insert into mantenimenti (operatore_id, data, tipo, argomento, ore, stato, validato_da, validato_il, note_seed)
 select
   p.id,
-  (now() - (random() * 150 || ' days')::interval)::date::text,
+  (now() - (random() * 150 || ' days')::interval)::date,
   'Mantenimento',
   'Esercitazione modulo completo',
   12,
@@ -43,7 +43,7 @@ where p.email like 'prova.%'
 insert into mantenimenti (operatore_id, data, tipo, argomento, ore, stato, note_seed)
 select
   p.id,
-  (now() - (random() * 30 || ' days')::interval)::date::text,
+  (now() - (random() * 30 || ' days')::interval)::date,
   'Manovra',
   'Manovra con mezzi',
   4,
