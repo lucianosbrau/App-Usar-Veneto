@@ -41,10 +41,23 @@ function simboloVigile(o, px) {
   return `<img src="assets/vigile-${tipo}.png" alt="${esc(o.grado)}" title="${esc(o.grado)} — ${titoli[tipo]}" style="width:${px}px; height:${px}px; vertical-align:-3px; margin-left:6px; margin-right:2px;">`;
 }
 
-window.addEventListener('popstate', () => {
+window.addEventListener('popstate', async () => {
+  const st = history.state || {};
   const h = location.hash.replace(/^#\/?/, '');
-  if (h && h !== pagina) { pagina = h; render(); }
-  else if (!h && pagina !== 'dashboard') { pagina = 'dashboard'; render(); }
+  const paginaDaHash = h.split('/')[0] || 'dashboard';
+  if (paginaDaHash !== pagina) { pagina = paginaDaHash; }
+  if (pagina === 'operatori') {
+    const c = document.getElementById('contenuto');
+    await pagOperatori(c);
+    if (st.scheda) {
+      const { data: o } = await supabase.from('profili').select('*').eq('id', st.scheda).limit(1).maybeSingle();
+      const ore = await caricaOreMantenimenti();
+      if (o) schedaOperatore(c, o, ore);
+    }
+    return;
+  }
+  if (!h && pagina !== 'dashboard') { pagina = 'dashboard'; }
+  render();
 });
 
 function iniziali(nome, cognome) {
