@@ -594,3 +594,4 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Migrazione**: `db/migrazione-foto-log.sql` (**DA ESEGUIRE in SQL Editor**): colonna foto_path, bucket foto-profili + policies storage, tabella log_admin + policy, trigger log ruolo, funzione elimina_operatore
 - NB: promozione/revoca sono loggate dal trigger DA ORA IN POI (le azioni passate non sono ricostruibili)
 - **Chiarimento utente**: la foto del profilo si vede SOLO nella pagina Operatori (elenco + scheda); rimossa dal tondo in pagina Profilo (che resta con le iniziali). L'upload però resta in Profilo, dove ognuno carica la propria
+- **Rettifica utente**: la foto si vede in pagina Operatori (elenco + scheda), nel tondo della pagina Profilo E accanto a ogni nome che risponde nella pagina Attivazione (admin, 32px). L'upload resta in Profilo

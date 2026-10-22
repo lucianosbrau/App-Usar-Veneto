@@ -1512,7 +1512,7 @@ async function pagAttivazioneAdmin(el) {
 
   const disegna = async () => {
     const { data: atts } = await supabase.from('attivazioni')
-      .select('*, risposte_attivazione(*, profili(nome, cognome, patente, grado))')
+      .select('*, risposte_attivazione(*, profili(nome, cognome, patente, grado, foto_path))')
       .eq('chiusa', false).order('creata_il', { ascending: false });
     const aperta = atts?.[0];
 
