@@ -688,7 +688,9 @@ async function disegnaCalendario(el, anno, mese) {
           const dataIso = `${anno}-${String(mese + 1).padStart(2, '0')}-${String(gg).padStart(2, '0')}`;
           const inFerie = ferieGiorno[dataIso] || [];
           const mieFerie = inFerie.some(n => n.startsWith(`${utente.cognome || ''} ${utente.nome || ''}`.trim()));
-          const dicituraFerie = mieFerie ? '<span class="pill" style="font-size:10px; background:#DBEAFE; color:#1E40AF; margin-left:6px;">Ferie</span>' : '';
+          const colFerie = inFerie.length
+            ? `<div style="font-size:11px; color:var(--giallo-tx); text-align:left; line-height:1.6;">☀️ ${inFerie.filter(n => !n.includes('🌙')).map(n => n.replace(' (☀️)','').replace(' (🌙)','')).join(', ') || '—'}<br>🌙 ${inFerie.filter(n => n.includes('🌙')).map(n => n.replace(' (🌙)','')).join(', ') || '—'}</div>`
+            : '<span style="color:var(--grigio);">—</span>';
           const sfondo = mieFerie ? 'background:#DBEAFE;' : '';
           const settCompleto = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'][new Date(anno, mese, giorno).getDay()];
           const miaG = mieFerieId[dataIso + '|giorno'] || mieFerieId[dataIso + '|intera'];
@@ -1398,7 +1400,7 @@ async function pagAttivazioneAdmin(el) {
       let teamScelto = null;
       cont.querySelectorAll('[data-avvia]').forEach(b => b.onclick = () => {
         cont.querySelectorAll('[data-avvia]').forEach(x => x.style.outline = '');
-        b.style.outline = '4px solid var(--ambra)';
+        b.style.outline = '4px solid #ffffff';
         teamScelto = b.dataset.avvia;
       });
       document.getElementById('att-invia').onclick = async () => {
