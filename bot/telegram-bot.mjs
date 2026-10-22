@@ -76,13 +76,6 @@ async function inserisciFerie(chatId, testo) {
 let offset = 0;
 console.log('Bot USAR Veneto in ascolto...');
 
-const tastieraPrincipale = {
-  keyboard: [
-    [{ text: '🏖️ Inserisci ferie' }, { text: 'ℹ️ Come funziona' }]
-  ],
-  resize_keyboard: true,
-  is_persistent: true
-};
 
 
 async function inserisciFerieAiuto(chatId) {
@@ -106,7 +99,22 @@ async function loop() {
         const cb = up.callback_query;
         await tg('answerCallbackQuery', { callback_query_id: cb.id });
         if (cb.data === 'ferie_help') {
-          await tg('sendMessage', { chat_id: cb.message.chat.id, text: await inserisciFerieAiuto(cb.message.chat.id) });
+          await tg('sendMessage', {
+            chat_id: cb.message.chat.id,
+            text: await inserisciFerieAiuto(cb.message.chat.id),
+            reply_markup: { inline_keyboard: [[
+              { text: '🏖️ Nuove ferie', callback_data: 'ferie_help' },
+              { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
+            ]] }
+          });
+        } else if (cb.data === 'come_funziona') {
+          await tg('sendMessage', {
+            chat_id: cb.message.chat.id,
+            text: '📘 Come funziona:\n\n🏖️ Ferie — scrivi: /ferie gg/mm/aaaa - gg/mm/aaaa (o una data singola). Aggiungi "continuative" per giorno E notte. Massimo 31 giorni per comando.\n\n🔗 Collegamento — genera il codice nell\'app (Profilo → Collega Telegram) e inviamelo: vale 15 minuti.\n\n🚨 In emergenza riceverai le allerte: rispondi direttamente dall\'app.',
+            reply_markup: { inline_keyboard: [[
+              { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' }
+            ]] }
+          });
         }
         continue;
       }
@@ -119,8 +127,11 @@ async function loop() {
       if (testo.startsWith('/start')) {
         await tg('sendMessage', {
           chat_id: chatId,
-          text: '🚒 Benvenuto nel bot USAR Veneto!\n\nPer collegare il tuo account, apri l\'app → Profilo → "Collega Telegram" e inviami qui il codice che compare (es. 48-21).\n\nPoi usa i pulsanti qui sotto per le operazioni rapide.',
-          reply_markup: tastieraPrincipale
+          text: '🚒 Benvenuto nel bot USAR Veneto!\n\nPer collegare il tuo account, apri l\'app → Profilo → "Collega Telegram" e inviami qui il codice che compare (es. 482-193).\n\nUsa i pulsanti qui sotto 👇',
+          reply_markup: { inline_keyboard: [[
+            { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
+            { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
+          ]] }
         });
       } else if (testo.includes('Inserisci ferie')) {
         await tg('sendMessage', { chat_id: chatId, text: await inserisciFerieAiuto(chatId) });
@@ -128,15 +139,28 @@ async function loop() {
         await tg('sendMessage', {
           chat_id: chatId,
           text: '📘 Come funziona:\n\n🏖️ Ferie — scrivi: /ferie gg/mm/aaaa - gg/mm/aaaa (o una data singola). Aggiungi la parola "continuative" per giorno E notte di ogni data. Massimo 31 giorni per comando.\n\n🔗 Collegamento — genera il codice nell\'app (Profilo → Collega Telegram) e inviamelo qui: vale 15 minuti.\n\n🚨 In emergenza riceverai qui le allerte: rispondi direttamente dall\'app.',
-          reply_markup: tastieraPrincipale
+          reply_markup: { inline_keyboard: [[
+            { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
+            { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
+          ]] }
         });
       } else if (testo.startsWith('/ferie')) {
         await tg('sendMessage', { chat_id: chatId, text: await inserisciFerie(chatId, testo) });
       } else if (/^\d{2,3}-\d{3}$/.test(testo.trim())) {
         const c = await collega(chatId, testo.trim());
-        await tg('sendMessage', { chat_id: chatId, text: c.msg, reply_markup: c.ok ? tastieraPrincipale : undefined });
+        await tg('sendMessage', {
+          chat_id: chatId,
+          text: c.msg,
+          reply_markup: c.ok ? { inline_keyboard: [[
+            { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
+            { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
+          ]] } : undefined
+        });
       } else {
-        await tg('sendMessage', { chat_id: chatId, text: 'Usa i pulsanti qui sotto, oppure:\n/ferie gg/mm/aaaa - gg/mm/aaaa — registra le ferie\n\nPer collegarti: app → Profilo → Collega Telegram, poi inviami il codice.', reply_markup: tastieraPrincipale });
+        await tg('sendMessage', { chat_id: chatId, text: 'Usa i pulsanti qui sotto, oppure:\n/ferie gg/mm/aaaa - gg/mm/aaaa — registra le ferie\n\nPer collegarti: app → Profilo → Collega Telegram, poi inviami il codice.', reply_markup: { inline_keyboard: [[
+            { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
+            { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
+          ]] } });
       }
     }
   } catch (e) {
