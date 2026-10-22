@@ -119,7 +119,7 @@
     <div class="box">
       <div class="badge-disp"><span class="icone">🖥️📱</span><span>PC · mobile</span></div>
       <h2>Lancio dell'attivazione</h2>
-      <p>L'admin seleziona <b>ATTIVA ALPHA</b> o <b>ATTIVA BRAVO</b>, modifica il messaggio di emergenza se necessario e invia l'allerta.</p>
+      <p>L'admin seleziona <b>ATTIVA ALPHA</b>, <b>ATTIVA BRAVO</b> o <b>ATTIVAZIONE PERSONALIZZATA</b>, il messaggio si precompila con il team scelto (modificabile) e invia l'allerta. Via rapida: dalla pagina <b>Squadre</b> il pulsante 🚨 <b>ATTIVA</b> porta qui con la squadra già selezionata.</p>
     </div>
   </div>
 
@@ -129,7 +129,8 @@
     <div class="box">
       <div class="badge-disp"><span class="icone">📱☁️</span><span>mobile · server esterno</span></div>
       <h2>Doppio canale di allertamento</h2>
-      <p>Ogni operatore riceve l'allerta simultaneamente via <b>Bot Telegram</b> (gruppo + Mini App) e <b>notifica push</b> della PWA.</p>
+      <p>L'allerta arriva a tutti in pochi secondi: nel gruppo <b>«Allerta USAR Veneto»</b> e nella <b>chat privata</b> del bot, con pulsanti di risposta. In parallelo resta visibile nella PWA.</p>
+      <span class="tag">Bot su Render — sempre attivo</span>
     </div>
   </div>
 
@@ -139,7 +140,7 @@
     <div class="box">
       <div class="badge-disp"><span class="icone">📱</span><span>mobile</span></div>
       <h2>Risposta dell'operatore</h2>
-      <p>Ogni operatore risponde <b>&#10004; SÌ</b> o <b>&#10006; NO</b> da Telegram o dall'app. Il sistema registra la risposta e l'orario.</p>
+      <p>Ogni operatore risponde con i pulsanti <b>&#10004; SONO DISPONIBILE</b> o <b>&#10006; NON SONO DISPONIBILE</b> — dal gruppo, dalla chat privata o dall'app. Il sistema registra chi, cosa e quando; la risposta si può cambiare finché l'attivazione è aperta.</p>
     </div>
   </div>
 
@@ -161,8 +162,9 @@
 <div class="freccia-giu">&#8595;</div></div>
     <div class="box">
       <div class="badge-disp"><span class="icone">🖥️📱</span><span>PC · mobile</span></div>
-      <h2>Raggiungimento delle 38 unità</h2>
-      <p>Se mancano qualifiche, l'admin clicca sul nome di un operatore di <b>squadra Bravo</b> o delle <b>Riserve</b> e lo sposta in Alpha. La copertura si aggiorna in tempo reale.</p>
+      <h2>Composizione del modulo</h2>
+      <p>L'admin compila i 38 posti: <b>compilazione automatica</b> che copia la squadra programmata del mese (ripremibile per aggiornarla se arrivano nuove conferme) o <b>manuale</b> scegliendo tra chi ha risposto SÌ — tendine con idonei per primo, chi è sotto soglia mantenimenti in fondo evidenziato in rosso.</p>
+      <span class="tag">Ogni pressione aggiorna la maschera</span>
     </div>
   </div>
 
@@ -173,9 +175,9 @@
 <div class="freccia-giu">&#8595;</div></div>
     <div class="box">
       <div class="badge-disp"><span class="icone">📱🖥️</span><span>mobile · PC</span></div>
-      <h2>Compilazione del Manifesto</h2>
-      <p>L'app chiede <b>compilazione automatica</b> (precompila le 38 funzioni in base alle specializzazioni) o <b>manuale</b> (elenchi a discesa che escludono i già assegnati e propongono prima gli idonei).</p>
-      <span class="tag">Validazione "34/38 — mancano: 1 NBCR…"</span>
+      <h2>Chiusura e monitoraggio continuo</h2>
+      <p>La pagina mostra SÌ/NO, la <b>copertura dei requisiti</b> del modulo (strutturisti, NBCR, K9, capisquadra, SAF) e i turni di ferie. A fine emergenza l'admin preme <b>CHIUDI ATTIVAZIONE</b>: il bot smette di accettare risposte.</p>
+      <span class="tag">Realtime</span><span class="tag">Copertura requisiti live</span>
     </div>
   </div>
 
@@ -185,7 +187,8 @@
     <div class="box">
       <div class="badge-disp"><span class="icone">📱☁️</span><span>mobile · server esterno</span></div>
       <h2>Esportazione PDF</h2>
-      <p>Il <b>Manifesto del personale</b> viene generato in PDF secondo il modello ufficiale: 38 voci, sezioni, nomi in maiuscolo, loghi in testata. Invio su Telegram opzionale.</p>
+      <p>Il <b>Manifesto</b> si genera direttamente sul telefono o PC (nessun server): fedele al modello «COMPOSIZIONE TEAM USAR VENETO» — loghi VVF e USAR, sezioni colorate, 38 posti, nomi in maiuscolo. L'admin lo scarica e lo inoltra nel gruppo Telegram.</p>
+      <span class="tag">jsPDF nel browser</span>
     </div>
   </div>
 
@@ -197,7 +200,7 @@
     <div class="box">
       <div class="badge-disp"><span class="icone">🖥️</span><span>PC desktop</span></div>
       <h2>Resoconti e statistiche</h2>
-      <p>Storico dell'attivazione: allertati, SÌ, NO, nessuna risposta, orari. Statistiche del personale ed export <b>Excel/CSV</b>.</p>
+      <p>Contatori ferie del mese (turni effettivi, per operatore), resoconti delle attivazioni con allertati, SÌ/NO e orari. In arrivo: statistiche del personale ed export <b>Excel/CSV</b>.</p>
     </div>
   </div>
 
@@ -209,8 +212,8 @@
       <tr><td>🌍 Interfaccia pubblicata</td><td>L'app raggiungibile dagli operatori via browser</td><td><span class="dove">GitHub Pages</span> — lucianosbrau.github.io</td></tr>
       <tr><td>🗄️ Database</td><td>Operatori, squadre, disponibilità, attivazioni, mantenimenti, vaccinazioni</td><td><span class="dove">Supabase</span> — PostgreSQL, regione Frankfurt (UE)</td></tr>
       <tr><td>🔐 Autenticazione</td><td>Login, ruoli (operatore/admin), sessioni</td><td><span class="dove">Supabase Auth</span></td></tr>
-      <tr><td>⚡ Aggiornamenti in tempo reale</td><td>Risposte SÌ/NO e copertura requisiti durante le attivazioni</td><td><span class="dove">Supabase Realtime</span></td></tr>
-      <tr><td>🤖 Bot Telegram + Mini App</td><td>Allertamento, risposta SÌ/NO, calendario, comunicazioni</td><td><span class="dove">Telegram</span> — servizio esterno (server bot: da definire)</td></tr>
+      <tr><td>⚡ Aggiornamenti in tempo reale</td><td>Risposte SÌ/NO, copertura requisiti, attivazioni e mantenimenti</td><td><span class="dove">Supabase Realtime</span> — attivo e collaudato</td></tr>
+      <tr><td>🤖 Bot Telegram</td><td>Allertamento nel gruppo «Allerta USAR Veneto» + chat private, risposta SÌ/NO, ferie, mantenimenti</td><td><span class="dove">Telegram</span> — bot @Usar_veneto_bot, sempre attivo su <span class="dove">Render</span></td></tr>
       <tr><td>📄 PDF del Manifesto</td><td>Generazione al termine della compilazione</td><td><span class="dove">Nel browser</span> — generato sul dispositivo al momento dell'export</td></tr>
       <tr><td>📊 Export Excel/CSV</td><td>Statistiche e resoconti scaricabili</td><td><span class="dove">Nel browser</span> — generato sul dispositivo al momento dell'export</td></tr>
       <tr><td>🎨 Loghi e grafica</td><td>Logo USAR, icona VVF, palette e mockup</td><td><span class="dove">GitHub</span> — cartella assets + Google Drive (originali)</td></tr>
