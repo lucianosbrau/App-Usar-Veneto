@@ -440,6 +440,12 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Rimosse dalla risposta del bot le diciture "Massimo 31 giorni per comando" (il limite tecnico resta attivo, il messaggio dedicato esce solo quando serve)
 - **Regola fissata (NON reinventare)**: all'utente interessa sempre il conteggio in **GIORNI**, i turni sono dettaglio secondario da mostrare separato, mai sommato ai giorni
 
+### Resoconti: turni di ferie EFFETTIVI (22/10/2026, chiarimento utente)
+- La pagina Resoconti conta solo i **turni che l'operatore avrebbe effettivamente lavorato** nel suo periodo di ferie: per ogni riga ferie confronta la lettera del salto turno (giorno o notte, dal calendario ciclico) con la **lettera del proprio turno** (A-D dal profilo); conta solo le corrispondenze
+- Esempio verificato (turno A, ferie 01-05/11/2026 continuative): notte A2 dell'1 + giorno A3 del 4 + notte A3 del 5 = **3 turni** (non 5 giorni); le ferie nei giorni di riposo non contano
+- Per operatore: solo colonna **🕒 Turni di ferie**; niente distinzione giorno/notte (non richiesta); totale del mese + operatori coinvolti; chi non ha il turno impostato nel profilo è escluso dal conteggio
+- Il bot e il Calendario RESTANO come prima (bot: giorni distinti del range; Calendario: nomi per turno) — la regola "turni effettivi" vale SOLO per Resoconti, chiarito dall'utente
+
 ### Bot Telegram collaudato end-to-end (22/10/2026)
 - Collegamento account ✅ (codice 6 cifre es. 482-193, 15 min, monouso), pulsanti **inline sempre visibili** nei messaggi (Inserisci ferie / Come funziona), aiuto con date precompilate (+7/+14 gg)
 - Fix durante il collaudo: `.single()`→`.maybeSingle()` su codici multipli; server HTTP minimo per Render (il Web Service esige una porta); causa radice del "codice non trovato": SUPABASE_URL con `/rest/v1/` in coda su Render (forma corretta: solo `https://lwdcrjtbsmqammwpvrhy.supabase.co`)

@@ -509,40 +509,45 @@ async function pagResoconti(el) {
   const disegna = async () => {
     const inizioMese = `${y}-${String(m).padStart(2, '0')}-01`;
     const fineMese = `${y}-${String(m).padStart(2, '0')}-${String(new Date(y, m, 0).getDate()).padStart(2, '0')}`;
-    const { data: ferie } = await supabase.from('disponibilita').select('operatore_id, data, turno_ferie, profili(cognome, nome)')
+    const { data: ferie } = await supabase.from('disponibilita').select('operatore_id, data, turno_ferie, profili(cognome, nome, turno)')
       .eq('tipo', 'ferie').gte('data', inizioMese).lte('data', fineMese);
 
     const perOp = {};
+    let totTurni = 0;
     (ferie || []).forEach(f => {
       const nome = `${f.profili?.cognome} ${f.profili?.nome}`;
-      perOp[nome] = perOp[nome] || { g: 0, n: 0 };
-      if (f.turno_ferie === 'notte') perOp[nome].n++;
-      else perOp[nome].g++;
+      const mioTurno = (f.profili?.turno || '')[0];
+      if (!mioTurno) return;
+      const [fy, fm, fg] = String(f.data).split('-').map(Number);
+      const cp = coppiaGiorno(fy, fm - 1, fg);
+      const lettera = (f.turno_ferie === 'notte' ? cp.notte : cp.giorno)[0];
+      if (lettera !== mioTurno) return;
+      perOp[nome] = perOp[nome] || { turni: 0 };
+      perOp[nome].turni++;
+      totTurni++;
     });
-    const totaleG = Object.values(perOp).reduce((s, v) => s + v.g, 0);
-    const totaleN = Object.values(perOp).reduce((s, v) => s + v.n, 0);
     const nomi = Object.keys(perOp).sort();
     const nomiMesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 
     cont.innerHTML = `
     <div class="card" style="margin-bottom:20px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-        <div style="font-weight:700;">🏖 Ferie di ${nomiMesi[m - 1]} ${y}</div>
+        <div style="font-weight:700;">🏖 Ferie di ${nomiMesi[m - 1]} ${y} — turni effettivi</div>
         <div style="display:flex; gap:8px;">
           <button class="pill" id="res-indietro" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">◀ Mese prima</button>
           <button class="pill" id="res-avanti" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">Mese dopo ▶</button>
         </div>
       </div>
+      <div style="font-size:12px; color:var(--grigio); margin-bottom:12px;">Conteggio dei turni che ciascuno avrebbe effettivamente lavorato (in base al proprio turno A–D e al calendario dei salti turno): le ferie in giorni di riposo non vengono contate.</div>
       <div style="display:flex; gap:20px; margin-bottom:14px; flex-wrap:wrap;">
-        <div><div style="font-size:32px; font-weight:800; color:var(--royal);">${totaleG}</div>☀️ Giorni ferie diurne</div>
-        <div><div style="font-size:32px; font-weight:800; color:var(--royal);">${totaleN}</div>🌙 Notti ferie</div>
+        <div><div style="font-size:32px; font-weight:800; color:var(--royal);">${totTurni}</div>🕓 Turni di ferie</div>
         <div><div style="font-size:32px; font-weight:800;">${nomi.length}</div>👥 Operatori coinvolti</div>
       </div>
       ${nomi.length ? `
       <table style="width:100%; border-collapse:collapse; font-size:14px;">
-        <tr style="text-align:left; color:var(--grigio); font-size:12px;"><th style="padding:6px 0;">Operatore</th><th>📅 Giorni</th><th>☀️ Turni giorno</th><th>🌙 Turni notte</th></tr>
-        ${nomi.map(n => `<tr style="border-top:1px solid var(--bordo);"><td style="padding:7px 0;">${esc(n)}</td><td><b>${perOp[n].giorni.size}</b></td><td>${perOp[n].g}</td><td>${perOp[n].n}</td></tr>`).join('')}
-      </table>` : '<div style="color:var(--grigio);">Nessuna ferie registrata in questo mese.</div>'}
+        <tr style="text-align:left; color:var(--grigio); font-size:12px;"><th style="padding:6px 0;">Operatore</th><th>🕓 Turni di ferie</th></tr>
+        ${nomi.map(n => `<tr style="border-top:1px solid var(--bordo);"><td style="padding:7px 0;">${esc(n)}</td><td><b>${perOp[n].turni}</b></td></tr>`).join('')}
+      </table>` : '<div style="color:var(--grigio);">Nessun turno di ferie registrato in questo mese.</div>'}
     </div>
     <div class="card"><div style="font-weight:700; margin-bottom:8px;">📋 Resoconti attivazioni</div><div style="color:var(--grigio); font-size:14px;">Saranno popolati con le prime attivazioni reali.</div></div>`;
     document.getElementById('res-indietro').onclick = () => { m--; if (m < 1) { m = 12; y--; } localStorage.setItem('res-mese', `${y}-${m}`); disegna(); };
