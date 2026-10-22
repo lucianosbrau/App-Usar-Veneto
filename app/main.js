@@ -139,12 +139,14 @@ function renderLogin() {
         <h1>Nucleo USAR Veneto</h1>
         <p class="sub">Gestione squadre e attivazioni emergenze</p>
         <div class="errore" id="err"></div>
-        <div class="campo"><input id="email" type="email" placeholder="nome.cognome@vigilfuoco.it" autocomplete="username"></div>
-        <div class="campo">
-          <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
-          <button class="toggle-pw" id="toggle">👁</button>
-        </div>
-        <button class="btn-primary" id="accedi">ACCEDI</button>
+        <form id="login-form" autocomplete="on">
+          <div class="campo"><input id="email" name="email" type="email" placeholder="nome.cognome@vigilfuoco.it" autocomplete="username" autocapitalize="off"></div>
+          <div class="campo">
+            <input id="pw" name="password" type="password" placeholder="Password" autocomplete="current-password">
+            <button type="button" class="toggle-pw" id="toggle">👁</button>
+          </div>
+          <button type="submit" class="btn-primary" id="accedi">ACCEDI</button>
+        </form>
         <button class="link" id="registrati">Primo accesso? Registrati</button>
         <button class="link" id="reset">Password dimenticata?</button>
       </div>
@@ -153,8 +155,7 @@ function renderLogin() {
     const pw = document.getElementById('pw');
     pw.type = pw.type === 'password' ? 'text' : 'password';
   };
-  document.getElementById('accedi').onclick = accedi;
-  document.getElementById('pw').onkeydown = e => { if (e.key === 'Enter') accedi(); };
+  document.getElementById('login-form').onsubmit = (e) => { e.preventDefault(); accedi(); };
   document.getElementById('registrati').onclick = renderRegistrazione;
   document.getElementById('reset').onclick = async () => {
     const email = document.getElementById('email').value;
@@ -175,7 +176,7 @@ function renderRegistrazione() {
         <div class="successo" id="ok"></div>
         <div class="campo"><input id="nome" type="text" placeholder="Nome" autocomplete="given-name"></div>
         <div class="campo"><input id="cognome" type="text" placeholder="Cognome" autocomplete="family-name"></div>
-        <div class="campo"><input id="email" type="email" placeholder="nome.cognome@vigilfuoco.it" autocomplete="email"></div>
+        <div class="campo"><input id="email" name="email" type="email" placeholder="nome.cognome@vigilfuoco.it" autocomplete="email" autocapitalize="off"></div>
         <div class="campo">
           <input id="pw" type="password" placeholder="Password (minimo 6 caratteri)" autocomplete="new-password">
           <button class="toggle-pw" id="toggle">👁</button>

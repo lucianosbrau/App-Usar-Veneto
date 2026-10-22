@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 22/10/2026 13:25
+Ultimo aggiornamento: 22/10/2026 13:40
 
 ---
 
@@ -526,6 +526,12 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **FIX /idgruppo (22/10/2026)**: la gestione dei messaggi nei gruppi non era mai stata applicata (un replace precedente era fallito in silenzio) — il bot rispondeva col benvenuto nel gruppo. Ora: i messaggi nei gruppi sono gestiti PRIMA dei dialoghi privati (solo /idgruppo, che risponde con l'ID in formato copiabile; log di aggiunta al gruppo); gli altri comandi sono disattivati nel gruppo
 - **FIX ALERT_GROUP not defined (22/10/2026)**: la dichiarazione `let ALERT_GROUP = process.env...` era stata persa da un replace fallito in silenzio — l'invio al gruppo crashava ("Errore attivazioni"). **Gruppo confermato dai log: ID = -1004443017442** (titolo "Allerta USAR VENETO"); la variabile ALERT_GROUP_CHAT_ID su Render era GIÀ configurata correttamente dall'utente — il mancato funzionamento era SOLO la dichiarazione mancante nel codice (fixato)
 - **LEZIONE (per la AI)**: dopo ogni replace fallito con assert, RICONTROLLARE che i blocchi collegati siano coerenti — due replace silenziosi hanno causato due bug consecutivi (gestione gruppi mancante, ALERT_GROUP non dichiarata)
+
+### Login: salvataggio password (22/10/2026, ore 13:40)
+- La pagina di login ora è un vero **<form>** con `autocomplete="on"`, campi `name` (email/password), `autocomplete="username"` / `current-password` e `autocapitalize="off"`; il bottone ACCEDI è `type="submit"` con onsubmit → preventDefault + accedi()
+- Perché: i gestori password (Chrome, Safari/iOS, gestori di sistema) **salvano e propongono le credenziali solo a fronte dell'invio di un form HTML vero** — prima il login era solo div+click e il browser non si accorgeva
+- Ora: al primo login il browser/telefono propone di salvare la password; ai successivi la riempie automaticamente (e su iOS anche FaceID dove configurato)
+- Registrazione: campo email con autocomplete email (per il salvataggio della nuova password)
 
 ### Fix tendine non scrollabili da mobile (22/10/2026, ore 13:25)
 - **Problema (utente, da telefono)**: nelle tendine della Programmazione, appoggiare il dito su un nome per SCORRERE la lista lo selezionava e inseriva subito — menù non navigabili
