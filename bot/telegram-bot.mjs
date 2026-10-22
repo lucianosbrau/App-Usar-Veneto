@@ -287,10 +287,29 @@ async function loop() {
         continue;
       }
 
+      if (up.my_chat_member && (up.my_chat_member.chat.type === 'group' || up.my_chat_member.chat.type === 'supergroup')) {
+        console.log('AGGIUNTO AL GRUPPO:', JSON.stringify(up.my_chat_member.chat));
+      }
+
       const msg = up.message;
       if (!msg?.text) continue;
       const chatId = msg.chat.id;
       const testo = msg.text;
+
+      // messaggi nei gruppi: solo /idgruppo, niente dialoghi
+      if (msg.chat.type === 'group' || msg.chat.type === 'supergroup') {
+        console.log('MSG nel gruppo', msg.chat.id, 'titolo:', msg.chat.title);
+        if (testo.startsWith('/idgruppo')) {
+          await tg('sendMessage', {
+            chat_id: chatId,
+            text: `🗓️ ID di questo gruppo: <code>${chatId}</code>
+
+Copialo (il numero CON il segno meno) e inseriscilo su Render → Settings → Environment → ALERT_GROUP_CHAT_ID, poi salva.`,
+            parse_mode: 'HTML'
+          });
+        }
+        continue;
+      }
 
       if (sessioniMan[chatId]) {
         const gestito = await gestisciMantenimento(chatId, testo);
