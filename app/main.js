@@ -427,6 +427,17 @@ async function pagOperatori(el) {
     });
     return icone;
   };
+  const GRADI_VIGILE = {
+    D: 'grigio', VD: 'grigio', IA: 'grigio',
+    CRE: 'rosso', CR: 'rosso', CSE: 'rosso', CS: 'rosso',
+    VC: 'nero', VE: 'nero', VF: 'nero'
+  };
+  const simboloVigile = (o) => {
+    const tipo = GRADI_VIGILE[o.grado];
+    if (!tipo) return '';
+    const titoli = { grigio: 'Vigile (D, VD, IA)', rosso: 'Capo (CRE, CR, CSE, CS)', nero: 'Vigile scelto (VC, VE, VF)' };
+    return ` <img src="assets/vigile-${tipo}.png" alt="${o.grado}" title="${o.grado} — ${titoli[tipo]}" style="width:20px; height:20px; vertical-align:middle;">`;
+  };
   const iconeAbilitazioni = (o) => {
     let icone = '';
     if (o.patente) icone += ` <span title="Patente ${esc(o.patente)}">🚚${esc(o.patente)}</span>`;
@@ -443,7 +454,7 @@ async function pagOperatori(el) {
             <div class="avatar" style="width:56px;height:56px;font-size:18px;">${esc(iniziali(o.nome, o.cognome))}</div>
             <span class="pill ${o.ruolo === 'admin' ? 'rosso' : 'verde'}">${o.ruolo === 'admin' ? '⭐ Admin' : '🟢 Attivo'}</span>
           </div>
-          <div style="font-size:18px; font-weight:700;">${esc(o.cognome)} ${esc(o.nome)}</div>
+          <div style="font-size:18px; font-weight:700;">${esc(o.cognome)} ${esc(o.nome)}${simboloVigile(o)}${o.grado ? ` <span class="pill" style="font-size:10px; background:#F1F5F9; color:var(--grigio);">${esc(o.grado)}</span>` : ''}</div>
           <div style="font-size:13px; color:var(--grigio); margin:4px 0 8px;">${esc(o.comando || '')}${o.sede ? ' · ' + esc(o.sede) : ''}${o.turno ? ' · turno ' + esc(o.turno) : ''}${o.salto_turno ? ' (salto ' + esc(o.salto_turno) + ')' : ''}</div>
           <div style="font-size:15px; line-height:2;">
             <span style="font-size:11px; font-weight:700; color:var(--grigio); text-transform:uppercase;">Specializzazioni:</span> ${iconeSpec(o) || '<span style="color:var(--grigio); font-size:13px;">—</span>'}

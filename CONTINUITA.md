@@ -465,6 +465,11 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Torte Dashboard** (aggiornato su richiesta utente): etichette con **nome completo + numero assoluto** (niente percentuali, niente sigle troncate), collegate alle fette da **linee guida** (leader lines) colorate come la fetta, testo fuori dalla torta a destra/sinistra; sotto il 4% niente etichetta (solo legenda). Layout SVG allargato (viewBox 84x50) per ospitare i nomi completi; legenda a fianco invariata
 - **Icone Operatori**: TPSS = badge quadrato **rosso con croce bianca ✚** (chiara identificazione sanitaria); TAS = badge quadrato **blu con bussola 🧭** seguito dal livello in blu. Le icone restano solo in pagina Operatori (come da regola precedente)
 
+### Simbolo vigile per grado (22/10/2026, richiesta utente)
+- Dall'immagine fornita (elmo con fiamma, "Firefighter") ho **ritagliato il solo simbolo** (senza scritte) e creato **3 versioni** in `public/assets/`: `vigile-grigio.png`, `vigile-rosso.png`, `vigile-nero.png` (PNG con sfondo trasparente, ricolorate via luminosità mantenendo l'antialiasing)
+- **Correlazione gradi → colore** (regola utente, NON reinventare): grigio = **D, VD, IA** · rosso = **CRE, CR, CSE, CS** · nero = **VC, VE, VF**
+- Nelle schede Operatori: simbolo accanto al nome + badge col grado; tooltip con categoria ("Capo (CRE, CR, CSE, CS)" ecc.); nessun simbolo se il grado non è in tabella
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
