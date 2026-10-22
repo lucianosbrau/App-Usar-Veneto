@@ -324,7 +324,6 @@ Copialo (il numero CON il segno meno) e inseriscilo su Render → Settings → E
           reply_markup: { inline_keyboard: [[
             { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
               { text: '🎓 Mantenimento', callback_data: 'man_start' },
-            { text: '🎓 Mantenimento', callback_data: 'man_start' },
             { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
           ]] }
         });
@@ -337,7 +336,6 @@ Copialo (il numero CON il segno meno) e inseriscilo su Render → Settings → E
           reply_markup: { inline_keyboard: [[
             { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
               { text: '🎓 Mantenimento', callback_data: 'man_start' },
-            { text: '🎓 Mantenimento', callback_data: 'man_start' },
             { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
           ]] }
         });
@@ -351,7 +349,6 @@ Copialo (il numero CON il segno meno) e inseriscilo su Render → Settings → E
           reply_markup: c.ok ? { inline_keyboard: [[
             { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
               { text: '🎓 Mantenimento', callback_data: 'man_start' },
-            { text: '🎓 Mantenimento', callback_data: 'man_start' },
             { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
           ]] } : undefined
         });
@@ -359,7 +356,6 @@ Copialo (il numero CON il segno meno) e inseriscilo su Render → Settings → E
         await tg('sendMessage', { chat_id: chatId, text: 'Usa i pulsanti qui sotto, oppure:\n/ferie gg/mm/aaaa - gg/mm/aaaa — registra le ferie\n\nPer collegarti: app → Profilo → Collega Telegram, poi inviami il codice.', reply_markup: { inline_keyboard: [[
             { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
               { text: '🎓 Mantenimento', callback_data: 'man_start' },
-            { text: '🎓 Mantenimento', callback_data: 'man_start' },
             { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
           ]] } });
       }

@@ -595,3 +595,14 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - NB: promozione/revoca sono loggate dal trigger DA ORA IN POI (le azioni passate non sono ricostruibili)
 - **Chiarimento utente**: la foto del profilo si vede SOLO nella pagina Operatori (elenco + scheda); rimossa dal tondo in pagina Profilo (che resta con le iniziali). L'upload però resta in Profilo, dove ognuno carica la propria
 - **Rettifica utente**: la foto si vede in pagina Operatori (elenco + scheda), nel tondo della pagina Profilo E accanto a ogni nome che risponde nella pagina Attivazione (admin, 32px). L'upload resta in Profilo
+
+### Verifica utente pendente (23/10/2026)
+- Da verificare domani da parte dell'utente: back telefono dalla scheda, foto profilo, elimina account con password, registro attività. Migrazione foto-log ESEGUITA
+- NOTIFICHE PWA: l'utente ha deciso di NON farle per ora — Telegram resta l'unico canale di allerta. DaNON presentare come già fatte: non sono mai state implementate
+- Password: DuckDuckGo su Android non propone il salvataggio su questa app (su altri sì); l'utente verificherà con Chrome. Nessun intervento lato codice possibile
+- Prossimo lavoro concordato: infografica istruzioni collegamento Telegram (con sezione "allerte anche in silenzioso")
+
+### Revisione codice + fix (23/10/2026)
+- **Pulsanti duplicati nel bot**: alcune tastiere inline mostravano il pulsante 🎓 Mantenimento DUE volte (un vecchio replace fallito in silenzio — stessa causa già vista) — ripulite tutte
+- **Cambiare risposta dall'app**: prima chi rispondeva dall'app NON poteva più cambiare risposta (mentre da Telegram sì, l'upsert lo consente). Ora: pulsante ✏️ "Cambia risposta" nella pagina Attivazione dell'operatore (conferma → cancella la propria risposta → si ripreme SI/NO) + salvataggio con upsert. Migrazione `db/migrazione-policy-cambia-risposta.sql` (DA ESEGUIRE)
+- **Revisione complessiva (nessuna azione)**: schema DB coerente, RLS presente su tutte le tabelle, trigger anti-escalation e log funzionanti, bot senza segreti nel codice, money-path dell'attivazione realtime corretto. Nota per il futuro (NON urgente): i vari avvisi "mese corrente" usano il fuso orario del server/UTC — verso fine mese potrebbero riferirsi al mese sbagliato per un paio d'ore; nessun impatto operativo oggi

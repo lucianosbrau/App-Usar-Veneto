@@ -1476,7 +1476,8 @@ async function pagAttivazioneOperatore(el) {
     const mia = (a.risposte_attivazione || []).find(r => r.operatore_id === utente.id);
     let centrale = '';
     if (mia) {
-      centrale = `<div class="pill verde" style="display:inline-block; padding:8px 14px;">✅ Hai risposto: ${mia.risposta === 'si' ? 'DISPONIBILE' : 'NON DISPONIBILE'}</div>`;
+      centrale = `<div class="pill verde" style="display:inline-block; padding:8px 14px;">✅ Hai risposto: ${mia.risposta === 'si' ? 'DISPONIBILE' : 'NON DISPONIBILE'}</div>
+        <button class="btn-primary" id="att-cambia" style="height:40px; font-size:13px; background:#fff; color:var(--rosso); border:1px solid var(--rosso);">✏️ Cambia risposta</button>`;
     } else {
       centrale = `<div style="display:grid; gap:10px; max-width:400px; margin-top:14px;">
         <button class="btn-primary" data-risposta="si" style="height:64px; background:var(--verde); font-size:18px; font-weight:800;">✅ SONO DISPONIBILE</button>
@@ -1492,10 +1493,16 @@ async function pagAttivazioneOperatore(el) {
       </div>`;
     cont.querySelectorAll('[data-risposta]').forEach(b => b.onclick = async () => {
       const { error } = await supabase.from('risposte_attivazione')
-        .insert({ attivazione_id: a.id, operatore_id: utente.id, risposta: b.dataset.risposta });
+        .upsert({ attivazione_id: a.id, operatore_id: utente.id, risposta: b.dataset.risposta }, { onConflict: 'attivazione_id,operatore_id' });
       if (error) alert('Errore: ' + error.message);
       disegna();
     });
+    const btnCambia = document.getElementById('att-cambia');
+    if (btnCambia) btnCambia.onclick = async () => {
+      if (!confirm('Cancellare la tua risposta e sceglierne una nuova?')) return;
+      await supabase.from('risposte_attivazione').delete().eq('attivazione_id', a.id).eq('operatore_id', utente.id);
+      disegna();
+    };
   };
   await disegna();
   canaleRealtime = supabase.channel('att-op')
