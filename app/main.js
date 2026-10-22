@@ -2172,7 +2172,7 @@ function pagProfilo(el) {
     <div class="pagina-sotto">${esc(utente.email)} — ruolo: ${esc(utente.ruolo)}</div>
     <div class="card" style="max-width:600px; margin-bottom:20px;">
       <div style="display:flex; align-items:center; gap:16px; margin-bottom:14px;">
-        ${avatarHtml(utente, 72, 24)}
+        <div class="avatar" style="width:72px;height:72px;font-size:24px;">${esc(iniziali(utente.nome, utente.cognome))}</div>
         <div>
           <div style="font-weight:700; margin-bottom:6px;">📷 Foto profilo</div>
           <input type="file" id="p-foto" accept="image/*" style="display:none;">
