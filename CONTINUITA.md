@@ -456,6 +456,11 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Fix durante il collaudo: `.single()`→`.maybeSingle()` su codici multipli; server HTTP minimo per Render (il Web Service esige una porta); causa radice del "codice non trovato": SUPABASE_URL con `/rest/v1/` in coda su Render (forma corretta: solo `https://lwdcrjtbsmqammwpvrhy.supabase.co`)
 - Prossima cosa concordata: infografica istruzioni collegamento bot (stile progetto; screenshots reali Telegram servono? — in fase di valutazione)
 
+### Seed mantenimenti "in regola" (22/10/2026, richiesta utente)
+- Creato `db/seed-mantenimenti-inregola.sql` (**da eseguire in SQL Editor** dopo seed-mantenimenti.sql): per ogni operatore di prova con meno di 36 ore approvate quest'anno inserisce un "Ciclo di mantenimento annuale" (approvato, 30 gg fa) che lo porta sopra soglia — così in Dashboard la maggioranza del personale risulta in linea, come in un nucleo operativo sano
+- Idempotente: rieseguirlo non aggiunge nulla a chi è già in regola; pulibile con `delete from mantenimenti where note_seed is true;`
+- NB: la Dashboard calcola la soglia (36) via `caricaOreMantenimenti()` su anno corrente — coerente col seed
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
