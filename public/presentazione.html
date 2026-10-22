@@ -152,21 +152,29 @@
   <div class="arch">
     <h3>Stack tecnologico</h3>
     <div class="blocco"><b>📱 Frontend — PWA (Progressive Web App)</b>
-      <span>Web app responsive installabile su PC, tablet e smartphone: icona sulla home, schermo intero, notifiche push, consultazione offline dei propri dati, aggiornamenti automatici. UI con optimistic update per risposta istantanea anche su connessioni lente.</span>
+      <span>Web app responsive installabile su PC, tablet e smartphone: icona sulla home, schermo intero, aggiornamento automatico a ogni apertura. Costruita con <b>Vite</b>, deploy automatico a ogni modifica del codice. Consultazione dei turni anche senza rete (cache).</span>
     </div>
     <div class="freccia">↓</div>
-    <div class="blocco"><b>🗄️ Backend — Supabase (regione Frankfurt)</b>
-      <span>PostgreSQL + autenticazione + API automatiche + <b>Realtime</b> — durante un'attivazione la dashboard si aggiorna da sola (contatore SÌ/NO in tempo reale) senza ricaricare la pagina. Dati primari nell'UE. <b>Nessun lock-in irreversibile</b> (nessun "sistema chiuso" che trattiene dati e codice): l'app resta migrabile altrove senza essere rifatta.</span>
+    <div class="blocco"><b>🖥️ Hosting — GitHub Pages + GitHub Actions</b>
+      <span>Il codice vive su GitHub: a ogni modifica approvata il workflow <b>Deploy GitHub Pages</b> compila l'app (Vite) e la pubblica in ~2 minuti, senza intervento manuale. URL pubblico cifrato (HTTPS), versione sempre aggiornata su PC e telefoni.</span>
     </div>
     <div class="freccia">↓</div>
-    <div class="blocco"><b>🤖 Telegram — Bot + Mini App</b>
-      <span>Comunicazioni, calendario mensile e attivazioni con risposta ✅ SÌ / ❌ NO. La Mini App apre la PWA dentro Telegram con autenticazione automatica: zero attrito per l'operatore. Doppio canale di notifica (push PWA + Telegram) per affidabilità.</span>
+    <div class="blocco"><b>🗄️ Backend — Supabase (regione Frankfurt, UE)</b>
+      <span>PostgreSQL + autenticazione email/password + API automatiche + <b>Realtime</b> — durante un'attivazione la pagina si aggiorna da sola (risposte SÌ/NO, copertura requisiti) senza ricaricare. Sicurezza a livello di riga (RLS): ogni operatore vede e modifica solo ciò che gli compete; il ruolo admin è protetto da trigger anti-escalation. <b>Nessun lock-in</b>: schema e codice sono nel repo, migrabili altrove senza rifare l'app.</span>
     </div>
     <div class="freccia">↓</div>
-    <div class="blocco"><b>📄 PDF — Manifesto del personale</b>
-      <span>Generazione automatica del Manifesto pronto per la stampa quando l'attivazione è confermata e coerente con la composizione prevista, sul modello grafico fornito.</span>
+    <div class="blocco"><b>⚙️ Bot Telegram — Node.js su Render</b>
+      <span>Bot <b>@Usar_veneto_bot</b> sempre in ascolto su Render (piano gratuito, regione Frankfurt): collegamento account tramite codice a scadenza (15 minuti, monouso), comando <b>/ferie</b> (giorno/notte, "continuative", max 31 giorni), conferme delle attivazioni. Scrive sul database con chiave di servizio riservata; le date e l'identità sono validate dal bot.</span>
+    </div>
+    <div class="freccia">↓</div>
+    <div class="blocco"><b>📄 PDF — Manifesto del personale (jsPDF)</b>
+      <span>Il manifesto si genera <b>direttamente sul telefono</b> (nessun server): pulsante "GENERA PDF" → file A4 identico su Android, iPhone e PC, fedele al modello "COMPOSIZIONE TEAM USAR VENETO" (loghi VVF e USAR, sezioni colorate, 38 posti, nomi in maiuscolo). Scaricabile in emergenza anche senza stampa.</span>
     </div>
   </div>
+  <h3 style="margin-top:18px;">Come viaggiano le informazioni</h3>
+  <p class="desc" style="font-size:14px;">
+    L'operatore risponde dall'app o dal bot Telegram → la risposta finisce nel database → l'admin la vede apparire <b>in tempo reale</b> senza ricaricare. Il PDF del modulo attivato si genera dal telefono dell'admin in pochi secondi. Tutto il codice e la documentazione operativa (CONTINUITA.md) sono versionati su GitHub: ogni decisione resta scritta.
+  </p>
 </section>
 
 <!-- ============ PAGINE ============ -->
@@ -176,14 +184,13 @@
   <div class="tbl-wrap">
     <table>
       <tr><th>Pagina</th><th>Chi la vede</th><th>Cosa fa</th></tr>
-      <tr><td>🏠 <b>Dashboard</b></td><td>Tutti</td><td>Panoramica generale: stato squadre, statistiche rapide, attivazione rapida (admin)</td></tr>
-      <tr><td>👥 <b>Operatori</b></td><td>Admin</td><td>Gestione completa: ricerca, filtri, dettaglio, modifica, inserimento</td></tr>
-      <tr><td>⚔️ <b>Squadre</b></td><td>Admin</td><td>Composizione Alpha/Bravo con proposta automatica e drag &amp; drop</td></tr>
-      <tr><td>🗓️ <b>Programmazione mensile</b></td><td>Admin</td><td>Compilazione <b>manuale</b> del manifesto programmato di Alpha e Bravo del mese successivo: l'admin sceglie mese e squadra, poi inserisce i nominativi per ruolo. Le tendine propongono prima gli operatori <b>usati meno di recente</b>, raggruppati («4 mesi fa», «3 mesi fa», …), per ruotare il personale. Conteggio in tempo reale dei requisiti del modulo (38 unità, 2 strutturisti, 4 K9) e degli <b>autisti con grado di patente</b>. Pubblicazione su Telegram; l'admin può sempre modificare e ripubblicare</td></tr>
-      <tr><td>📅 <b>Calendario</b></td><td>Tutti</td><td>Turni mensili, pubblicazione e invio via Telegram</td></tr>
-      <tr><td>✅ <b>Disponibilità</b></td><td>Operatore</td><td>Inserimento disponibilità, ferie e indisponibilità</td></tr>
-      <tr><td>🚨 <b>Attivazione</b></td><td>Admin</td><td>Lancio dell'emergenza ALPHA/BRAVO con messaggio modificabile</td></tr>
-      <tr><td>🎓 <b>Addestramento</b></td><td>Admin + Operatore (proprio)</td><td>Registro ore annue, evidenziazione sotto-soglia, storico per anno</td></tr>
+      <tr><td>🏠 <b>Dashboard</b></td><td>Tutti</td><td>Contatori operativi (unità in linea con i mantenimenti, sotto soglia, totale) e <b>grafici a torta</b> del personale per Comando e per turno</td></tr>
+      <tr><td>👥 <b>Operatori</b></td><td>Admin</td><td>Schede di tutti gli operatori con icone di specializzazioni (🏗️☣️🐕🧗⭐) e abilitazioni (🚚 patente, 🎒 TPSS, 📍 TAS livello)</td></tr>
+      <tr><td>⚔️ <b>Squadre</b></td><td>Tutti (vista) / Admin (modifica)</td><td>Composizioni Alpha/Bravo pubblicate dalla Programmazione, raggruppate per sezione del modulo; pulsante di modifica rapida per l'admin</td></tr>
+      <tr><td>🗓️ <b>Programmazione mensile</b></td><td>Admin</td><td>Compilazione del manifesto Alpha e Bravo (38 posti): tendine intelligenti (prima i meno recenti, capi ⭐ prima nei ROS, chi è sotto soglia mantenimenti in fondo in rosso), inserimento cumulativo, avvisi ferie, contatori requisiti e autisti. Pubblicazione su Telegram e su Squadre; <b>GENERA PDF</b> fedele al modello COMPOSIZIONE TEAM</td></tr>
+      <tr><td>📅 <b>Calendario</b></td><td>Tutti</td><td>Turni mensili con salti turno (ciclo A1..D8, il proprio evidenziato), colonna ferie giorno/notte, inserimento ferie con un click, recap admin</td></tr>
+      <tr><td>🚨 <b>Attivazione</b></td><td>Admin (allerta) / Operatore (risposta)</td><td>Allerta ALPHA, BRAVO o <b>PERSONALIZZATA</b> con messaggio modificabile; risposte ✅SÌ/❌NO in tempo reale; copertura requisiti live; compilazione del manifesto <b>automatica</b> (dal programma del mese) o <b>manuale</b> tra chi ha risposto SÌ; PDF immediato</td></tr>
+      <tr><td>🎓 <b>Mantenimenti</b></td><td>Admin + Operatore (propri)</td><td>Registro ore con validazione: le richieste restano 🟡 in attesa di approvazione, l'admin approva o rifiuta con nota; soglia annua configurabile (36 h)</td></tr>
       <tr><td>🌍 <b>Internazionale</b></td><td>Admin + Operatore (proprio)</td><td>Gestione degli operatori <b>abilitati alle missioni internazionali</b> e delle relative <b>vaccinazioni</b>: registro abilitazioni, stato vaccinazioni e scadenze</td></tr>
       <tr><td>📊 <b>Report / Statistiche</b></td><td>Admin</td><td>Statistiche personali e di intervento, esportazione Excel/CSV</td></tr>
       <tr><td>📋 <b>Resoconti</b></td><td>Admin</td><td>Storico attivazioni: allertati, SÌ, NO, nessuna risposta, orari</td></tr>
@@ -260,7 +267,7 @@
   <div class="flusso">
     <div class="step"><div class="num">1</div><h4>Accedi all'app</h4><p>L'operatore accede alla web app con le credenziali fornite dall'amministratore e apre la pagina <b>Profilo</b>.</p></div>
     <div class="step"><div class="num">2</div><h4>Codice di collegamento</h4><p>Nella pagina Profilo, alla voce "Collega Telegram", l'app mostra un <b>codice numerico</b> (es. 48-21) con la scritta "scade tra 15 minuti". Il pulsante copia il codice negli appunti.</p></div>
-    <div class="step"><div class="num">3</div><h4>Apri il bot</h4><p>Su Telegram, cerca il bot ufficiale <b>@usarveneto_bot</b> (il link esatto sarà fornito dall'admin) e premi <b>AVVIA</b>. Nessun dato personale viene chiesto dal bot.</p></div>
+    <div class="step"><div class="num">3</div><h4>Apri il bot</h4><p>Su Telegram, cerca il bot ufficiale <b>@Usar_veneto_bot</b> (il link esatto sarà fornito dall'admin) e premi <b>AVVIA</b>. Nessun dato personale viene chiesto dal bot.</p></div>
     <div class="step arancio"><div class="num">4</div><h4>Invia il codice</h4><p>Il bot chiede: "Invia il codice mostrato nell'app per collegare il tuo account". L'operatore digita il codice. Il bot risponde: "✅ Account collegato! Riceverai qui calendari e allerte di emergenza".</p></div>
   </div>
   <div class="grid g3" style="margin-top:20px;">
@@ -298,10 +305,10 @@
     <div class="card bordo-arancio">
       <h3>🛠️ Come si compila la squadra</h3>
       <ul>
-        <li>Proposta automatica sulla base di disponibilità e requisiti</li>
-        <li>Modifica manuale con drag &amp; drop dal pool dei disponibili</li>
-        <li>In emergenza: click sul nome di un operatore Bravo/Riserva per spostarlo in Alpha</li>
-        <li>Rotazione e bilanciamento verificabili con le statistiche di impiego</li>
+        <li>Ricerca nominativo con tendine intelligenti: prima i meno recenti, idonei per ruolo evidenziati, chi è sotto soglia mantenimenti in fondo in rosso</li>
+        <li>Inserimento cumulativo "INSERISCI TUTTI" con rapporto unico (ferie, doppioni, presenza nell'altra squadra)</li>
+        <li>Compilazione automatica del manifesto d'emergenza dal programma del mese, aggiornabile con una pressione</li>
+        <li>Rotazione del personnel verificabile con lo storico dei mesi precedenti</li>
       </ul>
       <p style="margin-top:12px;">
         <span class="pill verde">✅ PRONTA</span>
