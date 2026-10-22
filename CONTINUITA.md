@@ -610,3 +610,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 ### Fix: pagina Attivazione visibile a TUTTI (23/10/2026, segnalazione utente)
 - La voce 🚨 Attivazione del menù era marcata "solo admin" per errore: gli operatori NON vedevano la pagina per rispondere alle allerte dall'app (potevano solo da Telegram). Ora è visibile a tutti: l'operatore vede l'allerta aperta con i pulsanti ✅/❌ e "Cambia risposta"; l'admin vede la schermata realtime completa come prima
 - Aggiunta Attivazione anche alla barra mobile degli operatori (accanto a Calendario/Squadre/Mantenimenti)
+
+### Notifiche PWA: ESCLUSE per decisione di costo (23/10/2026)
+- L'utente ha DECISO DI NON implementare le notifiche push PWA: richiederebbero l'account Apple Developer (99 €/anno) per gli iPhone. **Non riproporre e non presentare le notifiche PWA come pianificate** — Telegram è il canale di allerta definitivo
+- Il canale ufficiale resta: bot Telegram (gruppo "Allerta USAR VENETO" + chat private) + risposta dall'app (pagina 🚨 Attivazione, ora visibile a tutti)
