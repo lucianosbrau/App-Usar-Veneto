@@ -74,6 +74,70 @@ async function inserisciFerie(chatId, testo) {
   return `🏖 Ferie registrate: ${match[1]}/${match[2]}/${match[3]}${match[4] ? ` → ${match[4]}/${match[5]}/${match[6]}` : ''} — ${nGiorni} giorni${continuative ? ' (continuative: giorno e notte)' : ' (solo turno diurno)'}.`;
 }
 
+const sessioniMan = {};
+const TIPI_MAN = ['Mantenimento', 'Manovra', 'Intervento', 'Lavorazione', 'Tutor Mantenimento', 'Tutor Corso', 'Altra formazione'];
+
+function domandaStepMan(s) {
+  if (s.step === 'data') return '\U0001F4C5 Scrivi la DATA (gg/mm/aaaa):';
+  if (s.step === 'ore') return '\u23F0 Scrivi le ORE (es. 4 oppure 4.5):';
+  if (s.step === 'tipo') return '\U0001F4C2 Scegli il TIPO:';
+  if (s.step === 'argomento') return '\u270F\uFE0F Scrivi l\'ARGOMENTO / attività svolta:';
+  return '';
+}
+
+async function gestisciMantenimento(chatId, testo) {
+  const s = sessioniMan[chatId];
+  if (!s) return false;
+  const t = testo.trim();
+
+  if (s.step === 'data') {
+    const m = t.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    const anno = m ? Number(m[3]) : 0;
+    if (!m || anno < 2020 || anno > 2035) {
+      await tg('sendMessage', { chat_id: chatId, text: '\u274C Formato data non valido. Scrivi gg/mm/aaaa, esempio: 14/10/2026' });
+      return true;
+    }
+    s.data = `${m[3]}-${m[2]}-${m[1]}`;
+    s.step = 'ore';
+    await tg('sendMessage', { chat_id: chatId, text: '\u23F0 Ok. Ora scrivi le ORE (es. 4 oppure 4.5):' });
+    return true;
+  }
+  if (s.step === 'ore') {
+    const ore = Number(t.replace(',', '.'));
+    if (!ore || ore <= 0 || ore > 24) {
+      await tg('sendMessage', { chat_id: chatId, text: '\u274C Ore non valide: scrivi un numero tra 0.5 e 24 (es. 4 oppure 4.5).' });
+      return true;
+    }
+    s.ore = ore;
+    s.step = 'tipo';
+    await tg('sendMessage', {
+      chat_id: chatId,
+      text: '\U0001F4C2 Scegli il TIPO di attività:',
+      reply_markup: { inline_keyboard: TIPI_MAN.map(tipo => [{ text: tipo, callback_data: 'man_tipo:' + tipo }]) }
+    });
+    return true;
+  }
+  if (s.step === 'argomento') {
+    if (t.length < 3) {
+      await tg('sendMessage', { chat_id: chatId, text: '\u274C Argomento troppo corto: descrivi brevemente l\'attività.' });
+      return true;
+    }
+    s.argomento = t.slice(0, 120);
+    s.step = 'conferma';
+    await tg('sendMessage', {
+      chat_id: chatId,
+      text: `\U0001F4CB Riepilogo:\n\n\U0001F4C5 Data: ${s.data.split('-').reverse().join('/')}\n\u23F0 Ore: ${s.ore}\n\U0001F4C2 Tipo: ${s.tipo}\n\u270F\uFE0F Argomento: ${s.argomento}\n\nConfermi?`,
+      reply_markup: { inline_keyboard: [
+        [{ text: '\u2705 Confermo', callback_data: 'man_conferma' }, { text: '\u274C Annulla', callback_data: 'man_cancel' }],
+        [{ text: '\u21AA\uFE0F Riparti da capo', callback_data: 'man_start' }]
+      ] }
+    });
+    return true;
+  }
+  await tg('sendMessage', { chat_id: chatId, text: domandaStepMan(s) });
+  return true;
+}
+
 let offset = 0;
 console.log('Bot USAR Veneto in ascolto...');
 
@@ -99,12 +163,54 @@ async function loop() {
       if (up.callback_query) {
         const cb = up.callback_query;
         await tg('answerCallbackQuery', { callback_query_id: cb.id });
-        if (cb.data === 'ferie_help') {
+        if (cb.data === 'man_start') {
+          const { data: op } = await sb.from('profili').select('id, nome, cognome').eq('telegram_chat_id', cb.message.chat.id).limit(1).maybeSingle();
+          if (!op) {
+            await tg('sendMessage', { chat_id: cb.message.chat.id, text: 'Prima collega il tuo account: apri l\'app → Profilo → "Collega Telegram" e inviami il codice.' });
+          } else {
+            sessioniMan[cb.message.chat.id] = { step: 'data' };
+            await tg('sendMessage', {
+              chat_id: cb.message.chat.id,
+              text: `🎓 Nuovo mantenimento — Ciao ${op.nome}, procediamo passo passo.\n\n📅 Scrivi la DATA (gg/mm/aaaa):`,
+              reply_markup: { inline_keyboard: [[{ text: '❌ Annulla', callback_data: 'man_cancel' }]] }
+            });
+          }
+        } else if (cb.data === 'man_cancel') {
+          delete sessioniMan[cb.message.chat.id];
+          await tg('sendMessage', { chat_id: cb.message.chat.id, text: 'Inserimento mantenimento annullato.' });
+        } else if (cb.data === 'man_conferma') {
+          const s = sessioniMan[cb.message.chat.id];
+          const { data: op } = await sb.from('profili').select('id, nome, cognome').eq('telegram_chat_id', cb.message.chat.id).limit(1).maybeSingle();
+          if (s && op) {
+            const { error } = await sb.from('mantenimenti').insert({
+              operatore_id: op.id, data: s.data, tipo: s.tipo, argomento: s.argomento, ore: s.ore, stato: 'in_validazione'
+            });
+            delete sessioniMan[cb.message.chat.id];
+            await tg('sendMessage', {
+              chat_id: cb.message.chat.id,
+              text: error ? '❌ Errore salvataggio: ' + error.message : '✅ Mantenimento registrato! Resta 🟡 in attesa di approvazione dell\'admin.',
+              reply_markup: { inline_keyboard: [[{ text: '🎓 Altro mantenimento', callback_data: 'man_start' }, { text: '🏖️ Ferie', callback_data: 'ferie_help' }]] }
+            });
+          }
+        } else if (cb.data === 'man_riprenda') {
+          const s = sessioniMan[cb.message.chat.id];
+          if (s) {
+            await tg('sendMessage', { chat_id: cb.message.chat.id, text: '🎓 Riprendiamo: ' + domandaStepMan(s) });
+          }
+        } else if (cb.data.startsWith('man_tipo:')) {
+          const s = sessioniMan[cb.message.chat.id];
+          if (s) {
+            s.tipo = cb.data.slice(9);
+            s.step = 'argomento';
+            await tg('sendMessage', { chat_id: cb.message.chat.id, text: '\u270F\uFE0F Ok, ' + s.tipo + '. Ora scrivi l\'ARGOMENTO / attività svolta:' });
+          }
+        } else if (cb.data === 'ferie_help') {
           await tg('sendMessage', {
             chat_id: cb.message.chat.id,
             text: await inserisciFerieAiuto(cb.message.chat.id),
             reply_markup: { inline_keyboard: [[
               { text: '🏖️ Nuove ferie', callback_data: 'ferie_help' },
+              { text: '🎓 Mantenimento', callback_data: 'man_start' },
               { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
             ]] }
           });
@@ -113,7 +219,8 @@ async function loop() {
             chat_id: cb.message.chat.id,
             text: '📘 Come funziona:\n\n🏖️ Ferie — scrivi: /ferie gg/mm/aaaa - gg/mm/aaaa (o una data singola). Aggiungi "continuative" per giorno E notte. \n🔗 Collegamento — genera il codice nell\'app (Profilo → Collega Telegram) e inviamelo: vale 15 minuti.\n\n🚨 In emergenza riceverai le allerte: rispondi direttamente dall\'app.',
             reply_markup: { inline_keyboard: [[
-              { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' }
+              { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
+              { text: '🎓 Mantenimento', callback_data: 'man_start' }
             ]] }
           });
         }
@@ -125,12 +232,19 @@ async function loop() {
       const chatId = msg.chat.id;
       const testo = msg.text;
 
+      if (sessioniMan[chatId]) {
+        const gestito = await gestisciMantenimento(chatId, testo);
+        if (gestito) continue;
+      }
+
       if (testo.startsWith('/start')) {
         await tg('sendMessage', {
           chat_id: chatId,
           text: '🚒 Benvenuto nel bot USAR Veneto!\n\nPer collegare il tuo account, apri l\'app → Profilo → "Collega Telegram" e inviami qui il codice che compare (es. 482-193).\n\nUsa i pulsanti qui sotto 👇',
           reply_markup: { inline_keyboard: [[
             { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
+              { text: '🎓 Mantenimento', callback_data: 'man_start' },
+            { text: '🎓 Mantenimento', callback_data: 'man_start' },
             { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
           ]] }
         });
@@ -142,6 +256,8 @@ async function loop() {
           text: '📘 Come funziona:\n\n🏖️ Ferie — scrivi: /ferie gg/mm/aaaa - gg/mm/aaaa (o una data singola). Aggiungi la parola "continuative" per giorno E notte di ogni data. \n🔗 Collegamento — genera il codice nell\'app (Profilo → Collega Telegram) e inviamelo qui: vale 15 minuti.\n\n🚨 In emergenza riceverai qui le allerte: rispondi direttamente dall\'app.',
           reply_markup: { inline_keyboard: [[
             { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
+              { text: '🎓 Mantenimento', callback_data: 'man_start' },
+            { text: '🎓 Mantenimento', callback_data: 'man_start' },
             { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
           ]] }
         });
@@ -154,12 +270,16 @@ async function loop() {
           text: c.msg,
           reply_markup: c.ok ? { inline_keyboard: [[
             { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
+              { text: '🎓 Mantenimento', callback_data: 'man_start' },
+            { text: '🎓 Mantenimento', callback_data: 'man_start' },
             { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
           ]] } : undefined
         });
       } else {
         await tg('sendMessage', { chat_id: chatId, text: 'Usa i pulsanti qui sotto, oppure:\n/ferie gg/mm/aaaa - gg/mm/aaaa — registra le ferie\n\nPer collegarti: app → Profilo → Collega Telegram, poi inviami il codice.', reply_markup: { inline_keyboard: [[
             { text: '🏖️ Inserisci ferie', callback_data: 'ferie_help' },
+              { text: '🎓 Mantenimento', callback_data: 'man_start' },
+            { text: '🎓 Mantenimento', callback_data: 'man_start' },
             { text: 'ℹ️ Come funziona', callback_data: 'come_funziona' }
           ]] } });
       }

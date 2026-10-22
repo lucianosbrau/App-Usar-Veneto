@@ -488,6 +488,12 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **PDF manifesto**: tolti i simboli dei gradi (si sfalsavano/sfondo nero) — il manifesto resta pulito con solo i nomi, come da segnalazione utente
 - **Seed gradi**: `db/seed-gradi-d-vd-ia.sql` (**da eseguire**) — 8 operatori di prova: 3×D, 3×VD, 2×IA distribuiti su tutti i comandi e turni diversi; password Prova2026! come gli altri seed; pulibile rieseguendo (cancella e ricrea gli stessi nominativi)
 
+### Mantenimenti da Telegram + ritocchi (22/10/2026)
+- **Mantenimenti da Telegram**: pulsante 🎓 "Mantenimento" in tutte le tastiere del bot — procedura guidata passo passo (data gg/mm/aaaa → ore → tipo con pulsanti per le 7 causali → argomento → riepilogo con Conferma/Annulla/Riparti); validazione di ogni campo con messaggi d'errore chiari; salvataggio come in_validazione (l'admin approva dalla PWA). Sessioni per chat: durante l'inserimento i messaggi testuali vanno alla procedura, non ai comandi
+- **Calendario**: conteggio a sinistra dei nominativi in ferie ("2 ☀️ Rossi, Verdi / 1 🌎 Bianchi")
+- **Operatori**: simboli (vigile, TPSS, TAS) staccati dal nome (margine 6px) e allineati verticalmente (-3px); nuovo **filtro in alto**: "Tutti" / "⚠️ Sotto soglia mantenimenti" con conteggi, persistente (localStorage)
+- Fix correlati: query mantenimenti con FK esplicita (PGRST201 per doppia relazione profili), .maybeSingle() su impostazioni
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)

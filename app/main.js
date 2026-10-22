@@ -38,7 +38,7 @@ function simboloVigile(o, px) {
   const tipo = GRADI_VIGILE[o?.grado];
   if (!tipo) return '';
   const titoli = { grigio: 'Vigile (D, VD, IA)', rosso: 'Capo (CRE, CR, CSE, CS)', nero: 'Vigile scelto (VC, VE, VF)' };
-  return `<img src="assets/vigile-${tipo}.png" alt="${esc(o.grado)}" title="${esc(o.grado)} — ${titoli[tipo]}" style="width:${px}px; height:${px}px; vertical-align:middle;">`;
+  return `<img src="assets/vigile-${tipo}.png" alt="${esc(o.grado)}" title="${esc(o.grado)} — ${titoli[tipo]}" style="width:${px}px; height:${px}px; vertical-align:-3px; margin-left:6px; margin-right:2px;">`;
 }
 
 window.addEventListener('popstate', () => {
@@ -435,10 +435,12 @@ async function pagDashboard(el) {
 async function pagOperatori(el) {
   el.innerHTML = `<div class="pagina-titolo">👥 Gestione Operatori</div><div class="pagina-sotto">Specializzazioni e abilitazioni</div><div id="op-cont">Caricamento…</div>`;
   const cont = document.getElementById('op-cont');
-  const [opRes, specRes] = await Promise.all([
+  const [opRes, specRes, mantRes] = await Promise.all([
     supabase.from('profili').select('*').order('cognome'),
-    supabase.from('operatori_specializzazioni').select('operatore_id, specializzazione_id, specializzazioni(nome)')
+    supabase.from('operatori_specializzazioni').select('operatore_id, specializzazione_id, specializzazioni(nome)'),
+    caricaOreMantenimenti()
   ]);
+  const oreMan = mantRes || {};
   const operatori = opRes.data || [];
   const specPerOp = {};
   (specRes.data || []).forEach(s => {
@@ -464,14 +466,23 @@ async function pagOperatori(el) {
   const iconeAbilitazioni = (o) => {
     let icone = '';
     if (o.patente) icone += ` <span title="Patente ${esc(o.patente)}">🚚${esc(o.patente)}</span>`;
-    if (o.tpss) icone += ' <span title="TPSS — Soccorso sanitario" style="display:inline-block; width:22px; height:22px; border-radius:5px; background:#B22222; color:#fff; font-size:13px; font-weight:800; text-align:center; line-height:22px; vertical-align:middle;">✚</span>';
-    if (o.tas) icone += ` <span title="TAS livello ${o.tas}" style="display:inline-block; width:22px; height:22px; border-radius:5px; background:#2563EB; color:#fff; font-size:13px; text-align:center; line-height:22px; vertical-align:middle;">🧭</span><b style="color:#2563EB; font-size:12px;">${o.tas}</b>`;
+    if (o.tpss) icone += ' <span title="TPSS — Soccorso sanitario" style="display:inline-block; width:22px; height:22px; border-radius:5px; margin-left:6px; background:#B22222; color:#fff; font-size:13px; font-weight:800; text-align:center; line-height:22px; vertical-align:middle;">✚</span>';
+    if (o.tas) icone += ` <span title="TAS livello ${o.tas}" style="display:inline-block; width:22px; height:22px; border-radius:5px; margin-left:6px; background:#2563EB; color:#fff; font-size:13px; text-align:center; line-height:22px; vertical-align:middle;">🧭</span><b style="color:#2563EB; font-size:12px;">${o.tas}</b>`;
     return icone;
   };
 
+  const soloSottoSoglia = localStorage.getItem('op-filtro') === 'sottosoglia';
+  const daMostrare = soloSottoSoglia
+    ? operatori.filter(o => (oreMan[o.id] || 0) < 36)
+    : operatori;
+
   cont.innerHTML = `
+    <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+      <button class="pill ${!soloSottoSoglia ? 'verde' : ''}" id="fil-tutti" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">👥 Tutti (${operatori.length})</button>
+      <button class="pill ${soloSottoSoglia ? 'rosso' : ''}" id="fil-sottosoglia" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">⚠️ Sotto soglia mantenimenti (${operatori.filter(o => (oreMan[o.id] || 0) < 36).length})</button>
+    </div>
     <div class="grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px;">
-      ${operatori.map(o => `
+      ${daMostrare.map(o => `
         <div class="card" style="border-left:4px solid ${o.ruolo === 'admin' ? 'var(--rosso)' : 'var(--royal)'};">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <div class="avatar" style="width:56px;height:56px;font-size:18px;">${esc(iniziali(o.nome, o.cognome))}</div>
@@ -688,8 +699,13 @@ async function disegnaCalendario(el, anno, mese) {
           const dataIso = `${anno}-${String(mese + 1).padStart(2, '0')}-${String(gg).padStart(2, '0')}`;
           const inFerie = ferieGiorno[dataIso] || [];
           const mieFerie = inFerie.some(n => n.startsWith(`${utente.cognome || ''} ${utente.nome || ''}`.trim()));
+          const nGiornoFerie = inFerie.filter(n => !n.includes('🌙')).length;
+          const nNotteFerie = inFerie.filter(n => n.includes('🌙')).length;
           const colFerie = inFerie.length
-            ? `<div style="font-size:11px; color:var(--giallo-tx); text-align:left; line-height:1.6;">☀️ ${inFerie.filter(n => !n.includes('🌙')).map(n => n.replace(' (☀️)','').replace(' (🌙)','')).join(', ') || '—'}<br>🌙 ${inFerie.filter(n => n.includes('🌙')).map(n => n.replace(' (🌙)','')).join(', ') || '—'}</div>`
+            ? `<div style="font-size:11px; color:var(--giallo-tx); text-align:left; line-height:1.6;">
+                 <div><b>${nGiornoFerie}</b> ☀️ ${inFerie.filter(n => !n.includes('🌙')).map(n => n.replace(' (☀️)','').replace(' (🌙)','')).join(', ') || '—'}</div>
+                 <div><b>${nNotteFerie}</b> 🌙 ${inFerie.filter(n => n.includes('🌙')).map(n => n.replace(' (🌙)','')).join(', ') || '—'}</div>
+               </div>`
             : '<span style="color:var(--grigio);">—</span>';
           const sfondo = mieFerie ? 'background:#DBEAFE;' : '';
           const settCompleto = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'][new Date(anno, mese, giorno).getDay()];
@@ -1856,6 +1872,8 @@ function rigaCoda(m) {
         </div>
       </div>
     </div>`;
+  document.getElementById('fil-tutti').onclick = () => { localStorage.setItem('op-filtro', 'tutti'); pagOperatori(el); };
+  document.getElementById('fil-sottosoglia').onclick = () => { localStorage.setItem('op-filtro', 'sottosoglia'); pagOperatori(el); };
 }
 
 async function salvaMantenimento() {
