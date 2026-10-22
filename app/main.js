@@ -441,6 +441,10 @@ async function pagOperatori(el) {
     caricaOreMantenimenti()
   ]);
   const oreMan = mantRes || {};
+  if (opRes.error) {
+    cont.innerHTML = `<div class="card" style="border-left:4px solid var(--rosso);"><b>⚠️ Errore caricamento operatori</b><div style="font-size:13px; color:var(--rosso-tx); margin-top:6px;">${esc(opRes.error.message)}</div><div style="font-size:12px; color:var(--grigio); margin-top:6px;">Codice: ${esc(opRes.error.code || 'n/d')}</div></div>`;
+    return;
+  }
   const operatori = opRes.data || [];
   const specPerOp = {};
   (specRes.data || []).forEach(s => {
@@ -1922,6 +1926,11 @@ async function schedaOperatore(el, o, oreMan) {
     supabase.from('mantenimenti').select('ore, data, stato').eq('operatore_id', o.id).eq('stato', 'approvato'),
     supabase.from('programmi_membri').select('posto, programmi_mensili(mese, team)').eq('operatore_id', o.id).order('programmi_mensili.mese', { ascending: false }).limit(6)
   ]);
+  if (specRes.error || mantRes.error || progRes.error) {
+    const err = specRes.error || mantRes.error || progRes.error;
+    el.innerHTML += `<div class="card" style="border-left:4px solid var(--rosso);"><b>⚠️ Errore caricamento scheda</b><div style="font-size:13px; color:var(--rosso-tx); margin-top:6px;">${esc(err.message)}</div><div style="font-size:12px; color:var(--grigio); margin-top:6px;">Codice: ${esc(err.code || 'n/d')}</div></div>`;
+    return;
+  }
   const anno = new Date().getFullYear();
   const oreAnno = (mantRes.data || []).filter(m => String(m.data).startsWith(anno)).reduce((s, m) => s + Number(m.ore), 0);
   const specNomi = (specRes.data || []).map(s => s.specializzazioni?.nome).filter(Boolean);
