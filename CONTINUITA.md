@@ -419,6 +419,11 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Resoconti**: aggiunta navigazione **mese prima/dopo** (la pagina mostrava solo il mese corrente — ecco perché i contatori potevano apparire vuoti se le ferie erano in un altro mese)
 - Mobile: nessuna modifica mirata necessaria (layout già responsive: grid auto-fit, tabelle scrollabili); da verificare sul telefono
 
+### Mantenimenti nelle selezioni personale (22/10/2026, richiesta utente)
+- **TPSS solo in pagina Operatori**: rimossa l'icona 🎒 dalle etichette delle tendine (l'utente la vuole solo lì); 📍TAS rimane nelle tendine perché indica il livello
+- **Seed mantenimenti fittizi**: `db/seed-mantenimenti.sql` (**da eseguire in SQL Editor**) — crea storico approvato distribuito (parte del personale in regola, parte sotto), più alcune richieste IN VALIDAZIONE per popolare la coda admin; marcate con colonna `note_seed` per cancellarle pulitamente (`delete from mantenimenti where note_seed is true;`)
+- **Sotto soglia nelle selezioni**: in TUTTE le tendine (Programmazione e Attivazione manuale) chi ha **meno di 36 ore** di mantenimenti approvati nell'anno: va **in fondo alla lista**, riga **evidenziata in rosso** (sfondo rosso chiaro) con **⚠️ MAN.** nell'etichetta — decisione sempre dell'admin, solo informazione. L'ordinamento privilegia: 1) in regola coi mantenimenti, 2) poi i criteri esistenti (capi ⭐ nei ROS, meno recenti, ecc.)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)

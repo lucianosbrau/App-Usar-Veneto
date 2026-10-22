@@ -682,6 +682,19 @@ async function toggleFerie(data, turno, el, anno, mese) {
   await disegnaCalendario(el, anno, mese);
 }
 
+
+async function caricaOreMantenimenti() {
+  const anno = new Date().getFullYear();
+  const { data } = await supabase.from('mantenimenti')
+    .select('operatore_id, ore, data').eq('stato', 'approvato');
+  const ore = {};
+  (data || []).forEach(m => {
+    if (!String(m.data).startsWith(anno)) return;
+    ore[m.operatore_id] = (ore[m.operatore_id] || 0) + Number(m.ore);
+  });
+  return ore;
+}
+
 /* ============ PROGRAMMAZIONE MENSILE ============ */
 
 const MESI = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
@@ -799,14 +812,17 @@ async function apriProgramma(cont, programmi) {
   const meseInizio = progMese;
   const [y, mo] = progMese.split('-').map(Number);
   const meseFine = `${y}-${String(mo).padStart(2, '0')}-${String(new Date(y, mo, 0).getDate()).padStart(2, '0')}`;
-  const [pers, membri, storico, ferie] = await Promise.all([
+  const [pers, membri, storico, ferie, mantRes] = await Promise.all([
     supabase.from('profili').select('id, nome, cognome, patente, grado, comando, estensioni_patente, tpss, tas').order('cognome'),
     supabase.from('programmi_membri').select('*, profili(nome, cognome, patente, grado, estensioni_patente)').eq('programma_id', prog.id),
     supabase.from('programmi_membri').select('operatore_id, programmi_mensili!inner(mese)')
       .lt('programmi_mensili.mese', progMese).order('programmi_mensili.mese', { ascending: true }),
     supabase.from('disponibilita').select('operatore_id, data').eq('tipo', 'ferie')
-      .gte('data', meseInizio).lte('data', meseFine)
+      .gte('data', meseInizio).lte('data', meseFine),
+    caricaOreMantenimenti()
   ]);
+  const oreMan = mantRes || {};
+  const sottoSogliaMan = (opId) => (oreMan[opId] || 0) < 36;
   const feriePerOp = {};
   (ferie.data || []).forEach(f => {
     (feriePerOp[f.operatore_id] = feriePerOp[f.operatore_id] || []).push(f.data);
@@ -837,7 +853,6 @@ async function apriProgramma(cont, programmi) {
   const patenteSigla = (o) => {
     let s = '';
     if (o.patente) s += ' 🚚' + o.patente + (o.estensioni_patente?.length ? '+' + o.estensioni_patente.map(e => e === 'Autoscala' ? 'AS' : e === 'Autogru' ? 'AG' : e === 'Anfibio' ? 'AN' : e).join('') : '');
-    if (o.tpss) s += ' 🎒';
     if (o.tas) s += ' 📍' + o.tas;
     return s;
   };
@@ -862,7 +877,8 @@ async function apriProgramma(cont, programmi) {
   const candidato = (o) => ({
     ...o,
     giorniFerie: (feriePerOp[o.id] || []).length,
-    etichetta: `${o.cognome} ${o.nome}`.trim() + iconeSpec(o.id) + patenteSigla(o) + (o.grado ? ` [${o.grado}]` : '') + ((feriePerOp[o.id] || []).length ? ` 🏖 ${(feriePerOp[o.id] || []).length} gg ferie` : ''),
+    sottoMan: sottoSogliaMan(o.id),
+    etichetta: `${o.cognome} ${o.nome}`.trim() + iconeSpec(o.id) + patenteSigla(o) + (o.grado ? ` [${o.grado}]` : '') + ((feriePerOp[o.id] || []).length ? ` 🏖 ${(feriePerOp[o.id] || []).length} gg ferie` : '') + (sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''),
     gruppo: gruppoDi(o.id)
   });
 
@@ -947,8 +963,8 @@ async function apriProgramma(cont, programmi) {
       const scelti = giaSceltiLive();
       const idonei = (window.__idoneiPosto[n] || []).filter(o => !scelti.has(o.id));
       const filtrati = idonei.filter(o => !q || o.etichetta.toLowerCase().includes(q));
-      if (ros) filtrati.sort((a, b) => (idCapi.has(b.id) - idCapi.has(a.id)) || (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
-      else filtrati.sort((a, b) => (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
+      if (ros) filtrati.sort((a, b) => (a.sottoMan - b.sottoMan) || (idCapi.has(b.id) - idCapi.has(a.id)) || (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
+      else filtrati.sort((a, b) => (a.sottoMan - b.sottoMan) || (b.gruppo.n - a.gruppo.n) || a.etichetta.localeCompare(b.etichetta));
       let html = '';
       let ultimoG = null;
       filtrati.forEach(o => {
@@ -958,7 +974,7 @@ async function apriProgramma(cont, programmi) {
           ultimoG = o.gruppo.t;
         }
         const pref = ros && idCapi.has(o.id) ? '⭐ ' : '';
-        html += `<div data-scelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9;">${pref}${esc(o.etichetta)}</div>`;
+        html += `<div data-scelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9; ${o.sottoMan ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${pref}${esc(o.etichetta)}</div>`;
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
       lista.querySelectorAll('[data-scelta]').forEach(d => {
@@ -1476,13 +1492,16 @@ async function compilazioneAutomaticaAttivazione(att, dopo) {
 
 async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRispondentiSi) {
   const manifestId = await assicuraManifesto(att.id, att.team);
-  const [pers, membri, risposte] = await Promise.all([
+  const [pers, membri, risposte, mantRes] = await Promise.all([
     supabase.from('profili').select('id, nome, cognome, patente, grado').order('cognome'),
     supabase.from('manifesti_membri').select('*, profili(nome, cognome, patente, grado)').eq('manifesto_id', manifestId),
     soloRispondentiSi
       ? supabase.from('risposte_attivazione').select('operatore_id').eq('attivazione_id', att.id).eq('risposta', 'si')
-      : Promise.resolve({ data: null })
+      : Promise.resolve({ data: null }),
+    caricaOreMantenimenti()
   ]);
+  const oreMan = mantRes || {};
+  const sottoSogliaMan = (opId) => (oreMan[opId] || 0) < 36;
   const idSi = new Set((risposte.data || []).map(r => r.operatore_id));
   const tutti = (pers.data || []).filter(o => !soloRispondentiSi || idSi.has(o.id) || (membri.data || []).some(m => m.operatore_id === o.id));
   const perPosto = {};
@@ -1561,7 +1580,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
       });
       if (ros) idonei = idonei.concat(tutti.filter(o => idCapi.has(o.id) && !giaScelti.has(o.id) && !idonei.includes(o)));
       const filtrati = idonei.filter(o => !q || `${o.cognome} ${o.nome}`.toLowerCase().includes(q));
-      filtrati.sort((a, b) => (ros ? (idCapi.has(b.id) - idCapi.has(a.id)) : 0) || a.cognome.localeCompare(b.cognome));
+      filtrati.sort((a, b) => (sottoSogliaMan(a.id) - sottoSogliaMan(b.id)) || (ros ? (idCapi.has(b.id) - idCapi.has(a.id)) : 0) || a.cognome.localeCompare(b.cognome));
       let html = '';
       let ultimoCapo = null;
       filtrati.forEach(o => {
@@ -1571,7 +1590,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
           ultimoCapo = capo;
         }
         const pat = o.patente ? ' 🚚' + esc(o.patente) : '';
-        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9;">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o.id)}${pat}</div>`;
+        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9; ${sottoSogliaMan(o.id) ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o.id)}${pat}${sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''}</div>`;
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
       lista.style.display = 'block';
