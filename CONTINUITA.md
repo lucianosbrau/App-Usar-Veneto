@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 22/10/2026 13:10
+Ultimo aggiornamento: 22/10/2026 13:15
 
 ---
 
@@ -486,7 +486,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Card operatore**: "Venezia · Chioggia · turno C (salto C2)" → se c'è il salto turno mostra solo lui ("turno C2"), altrimenti la lettera del turno
 - **Riepilogo Programmazione**: simbolo vigile del grado (16px) accanto ai nominativi già inseriti (con la ✖), oltre alle icone specializzazioni
 - **PDF manifesto**: tolti i simboli dei gradi (si sfalsavano/sfondo nero) — il manifesto resta pulito con solo i nomi, come da segnalazione utente
-- **Seed gradi**: `db/seed-gradi-d-vd-ia.sql` (**da eseguire**) — 8 operatori di prova: 3×D, 3×VD, 2×IA distribuiti su tutti i comandi e turni diversi; password Prova2026! come gli altri seed; pulibile rieseguendo (cancella e ricrea gli stessi nominativi)
+- **Seed gradi**: `db/seed-gradi-d-vd-ia.sql` (eseguito) — 8 operatori di prova: 3×D, 3×VD, 2×IA distribuiti su tutti i comandi e turni diversi; password Prova2026! come gli altri seed; pulibile rieseguendo (cancella e ricrea gli stessi nominativi)
 
 ### Mantenimenti da Telegram + ritocchi (22/10/2026)
 - **Mantenimenti da Telegram**: pulsante 🎓 "Mantenimento" in tutte le tastiere del bot — procedura guidata passo passo (data gg/mm/aaaa → ore → tipo con pulsanti per le 7 causali → argomento → riepilogo con Conferma/Annulla/Riparti); validazione di ogni campo con messaggi d'errore chiari; salvataggio come in_validazione (l'admin approva dalla PWA). Sessioni per chat: durante l'inserimento i messaggi testuali vanno alla procedura, non ai comandi
@@ -502,8 +502,8 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Card operatori cliccabili** → aprono la **scheda dedicata**: foto/avatar grande, nome+simbolo grado, e tutti i dati: email, cellulare, comando, sede, turno/salto, grado, patente+estensioni, TPSS, TAS, **gruppo sanguigno, indirizzo, medico curante, contatto ICE (nome+relazione+telefono)**, specializzazioni, Telegram collegato, ore mantenimenti anno (in linea/sotto soglia), ultimi 6 inserimenti in squadra
 - **Pulsante ⭐ RENDI AMMINISTRATORE** (o ➖ REVOCA ADMIN per chi lo è già): con conferma esplicita; bloccato dal trigger anti-escalation (errore chiaro se tentato da non-admin); non puoi revocare te stesso
 - **REGOLA FISSATA (utente)**: l'admin NON modifica i dati degli operatori dalla scheda (operazione vietata) — solo promozione/revoca; i dati li modifica l'operatore dal proprio Profilo
-- Migrazione: `db/migrazione-anagrafica-estesa.sql` (**da eseguire**): nuovi campi cellulare, indirizzo, contatto_ice_nome/telefono/relazione, medico_curante, gruppo_sanguigno — pronti per l'import dal Google Sheet reale
-- Seed: `db/seed-anagrafica-estesa.sql` (**da eseguire dopo la migrazione**): valori casuali per gli operatori di prova (sostituibili coi dati veri)
+- Migrazione: `db/migrazione-anagrafica-estesa.sql` (eseguita): nuovi campi cellulare, indirizzo, contatto_ice_nome/telefono/relazione, medico_curante, gruppo_sanguigno — pronti per l'import dal Google Sheet reale
+- Seed: `db/seed-anagrafica-estesa.sql` (eseguito): valori casuali per gli operatori di prova (sostituibili coi dati veri)
 
 ### Bot: allerte di attivazione + risposte SÌ/NO (22/10/2026)
 - Il bot ora **invia l'allerta** quando l'admin lancia ALPHA/BRAVO/PERSONALIZZATA dalla PWA: messaggio 🚨 a tutti gli operatori con Telegram collegato, con **pulsanti ✅ SONO DISPONIBILE / ❌ NON SONO DISPONIBILE**
@@ -526,6 +526,9 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **FIX /idgruppo (22/10/2026)**: la gestione dei messaggi nei gruppi non era mai stata applicata (un replace precedente era fallito in silenzio) — il bot rispondeva col benvenuto nel gruppo. Ora: i messaggi nei gruppi sono gestiti PRIMA dei dialoghi privati (solo /idgruppo, che risponde con l'ID in formato copiabile; log di aggiunta al gruppo); gli altri comandi sono disattivati nel gruppo
 - **FIX ALERT_GROUP not defined (22/10/2026)**: la dichiarazione `let ALERT_GROUP = process.env...` era stata persa da un replace fallito in silenzio — l'invio al gruppo crashava ("Errore attivazioni"). **Gruppo confermato dai log: ID = -1004443017442** (titolo "Allerta USAR VENETO"); la variabile ALERT_GROUP_CHAT_ID su Render era GIÀ configurata correttamente dall'utente — il mancato funzionamento era SOLO la dichiarazione mancante nel codice (fixato)
 - **LEZIONE (per la AI)**: dopo ogni replace fallito con assert, RICONTROLLARE che i blocchi collegati siano coerenti — due replace silenziosi hanno causato due bug consecutivi (gestione gruppi mancante, ALERT_GROUP non dichiarata)
+
+### Database completamente in pari (22/10/2026, ore 13:15)
+- **Confermato dall'utente**: TUTTE le migrazioni e i seed sono stati eseguiti (anagrafica estesa + seed, realtime, gradi D/VD/IA). Nessun SQL in sospeso: lo stato del DB corrisponde esattamente all'ultimo schema del repo
 
 ### Bozze vs Squadre pubblicate (22/10/2026, ore 13:10)
 - **REGOLA FISSATA (utente)**: quando un programma viene pubblicato su SQUADRE, NON è più una bozza — sparisce dall'elenco "Programmi esistenti" della Programmazione (resta raggiungibile per correzioni dal pulsante ✏️ MODIFICA nella pagina Squadre, che riapre il programma)
@@ -553,7 +556,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 
 ### Fix Operatori (handler dispersi) + migrazione Realtime (22/10/2026, ore 11:20)
 - **CAUSA TROVATA (Operatori: schede non si aprivano, filtro muto)**: quando è stato aggiunto il filtro, la funzione pagOperatori si è chiusa PRIMA degli handler, che sono finiti appesi a pagMantenimenti — mai eseguiti sulla pagina Operatori. Fix: handler (fil-tutti, fil-sottosoglia, click card) spostati DENTRO pagOperatori; verificato con controllo posizionale
-- **CAUSA TROVATA (Attivazione non si aggiornava in tempo reale)**: mancava l'abilitazione Realtime delle tabelle nel DB. Creata `db/migrazione-realtime.sql` (**da eseguire**): alter publication supabase_realtime add table (attivazioni, risposte_attivazione, programmi_membri, mantenimenti, disponibilita)
+- **CAUSA TROVATA (Attivazione non si aggiornava in tempo reale)**: mancava l'abilitazione Realtime delle tabelle nel DB. `db/migrazione-realtime.sql` (eseguita — da qui il realtime funziona): alter publication supabase_realtime add table (attivazioni, risposte_attivazione, programmi_membri, mantenimenti, disponibilita)
 - NB utente: la query di test del realtime da SQL Editor fallisce con "Failed to check user auth status" — normale in SQL Editor (non è un client autenticato): eseguire SOLO le alter publication, non testare il realtime da lì
 - FK operatori_specializzazioni verificate: profili + specializzazioni (non ambigue, ok)
 - **FIX PGRST100 (scheda operatore)**: order su colonna di tabella relazionata (programmi_mensili.mese) non supportato dalla sintassi dell'API — rimosso l'order lato server, ordinamento ora lato client (ultimi 6 per mese)
