@@ -294,43 +294,205 @@ function renderPagina() {
     case 'calendario': return pagCalendario(c);
     case 'profilo': return pagProfilo(c);
     case 'resoconti': return pagResoconti(c);
+    case 'squadre': return pagSquadre(c);
     default: {
-      const TITOLI = { squadre: 'Squadre', internazionale: 'Internazionale', report: 'Report e Statistiche' };
+      const TITOLI = { internazionale: 'Internazionale', report: 'Report e Statistiche' };
       c.innerHTML = `<div class="pagina-titolo">${TITOLI[pagina] || esc(pagina)}</div><div class="pagina-sotto">Pagina in costruzione</div>
         <div class="card">Questa sezione sarà sviluppata nei prossimi passi.</div>`;
     }
   }
 }
 
-function pagDashboard(el) {
+async function pagDashboard(el) {
   el.innerHTML = `
     <div class="pagina-titolo">Dashboard</div>
     <div class="pagina-sotto">Panoramica operativa — ${new Date().toLocaleDateString('it-IT')}</div>
-    <div class="card">Benvenuto, ${esc(utente.nome || '')} ${esc(utente.cognome || '')}. Le card dei team Alpha/Bravo e l'attivazione rapida saranno sviluppate nei prossimi passi.</div>`;
+    <div id="dash-cont">Caricamento…</div>`;
+  const cont = document.getElementById('dash-cont');
+  const anno = new Date().getFullYear();
+  const [prof, mant] = await Promise.all([
+    supabase.from('profili').select('id, cognome, nome, comando, turno, ruolo, tpss, tas, patente').order('cognome'),
+    supabase.from('mantenimenti').select('operatore_id, stato, ore, data').eq('stato', 'approvato')
+  ]);
+  const tutti = prof.data || [];
+  const approvati = mant.data || [];
+  const orePerOp = {};
+  approvati.forEach(m => {
+    if (!String(m.data).startsWith(anno)) return;
+    orePerOp[m.operatore_id] = (orePerOp[m.operatore_id] || 0) + Number(m.ore);
+  });
+  const soglia = 36;
+  const inLinea = tutti.filter(o => (orePerOp[o.id] || 0) >= soglia).length;
+  const sottoSoglia = tutti.filter(o => (orePerOp[o.id] || 0) < soglia).length;
+
+  // grafici a torta
+  const perComando = {};
+  tutti.forEach(o => { const c = o.comando || 'Non impostato'; perComando[c] = (perComando[c] || 0) + 1; });
+  const perTurno = {};
+  tutti.forEach(o => { const t = (o.turno || '?')[0] || '?'; perTurno[t] = (perTurno[t] || 0) + 1; });
+  const PALETTE = ['#B22222', '#2563EB', '#059669', '#F59E0B', '#7C3AED', '#0D9488', '#94A3B8', '#EA580C'];
+  const torta = (dati, id) => {
+    const tot = Object.values(dati).reduce((s, v) => s + v, 0) || 1;
+    let angolo = -90;
+    const fette = Object.entries(dati).map(([k, v], i) => {
+      const perc = v / tot;
+      const a1 = angolo, a2 = angolo + perc * 360;
+      angolo = a2;
+      return { k, v, col: PALETTE[i % PALETTE.length], a1, a2, perc };
+    });
+    return `
+    <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:center;">
+      <svg id="${id}" width="190" height="190" viewBox="0 0 42 42" style="flex-shrink:0;">
+        ${fette.map(f => {
+          const x1 = 21 + 15.9 * Math.cos((f.a1 - 90) * Math.PI / 180 * 1); 
+          const large = (f.a2 - f.a1) > 180 ? 1 : 0;
+          return `<circle r="15.9" cx="21" cy="21" fill="transparent" stroke="${f.col}" stroke-width="7" stroke-dasharray="${f.perc * 99.9} ${99.9 - f.perc * 99.9}" stroke-dashoffset="${25 - (f.a1 + 90) / 360 * 99.9}"></circle>`;
+        }).join('')}
+      </svg>
+      <div style="font-size:13px;">
+        ${fette.map(f => `<div style="display:flex; align-items:center; gap:8px; padding:3px 0;">
+          <span style="width:12px; height:12px; border-radius:3px; background:${f.col}; display:inline-block;"></span>
+          <span style="flex:1;">${esc(f.k)}</span><b>${f.v}</b> <span style="color:var(--grigio);">(${Math.round(f.perc * 100)}%)</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  };
+
+  cont.innerHTML = `
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:20px;">
+      <div class="card" style="border-left:4px solid var(--verde);">
+        <div style="font-size:32px; font-weight:800; color:var(--verde);">${inLinea}</div>
+        <div style="font-size:13px; color:var(--grigio);">✅ In linea (≥ ${soglia} h)</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--rosso);">
+        <div style="font-size:32px; font-weight:800; color:var(--rosso);">${sottoSoglia}</div>
+        <div style="font-size:13px; color:var(--grigio);">⚠️ Sotto soglia mantenimenti</div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--royal);">
+        <div style="font-size:32px; font-weight:800; color:var(--royal);">${tutti.length}</div>
+        <div style="font-size:13px; color:var(--grigio);">👥 Operatori totali</div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:16px;">
+      <div class="card">
+        <div style="font-weight:700; margin-bottom:14px;">🏛️ Personale per Comando</div>
+        ${torta(perComando, 'torta-comandi')}
+      </div>
+      <div class="card">
+        <div style="font-weight:700; margin-bottom:14px;">🔄 Personale per turno</div>
+        ${torta(perTurno, 'torta-turni')}
+      </div>
+    </div>`;
 }
 
 async function pagOperatori(el) {
-  el.innerHTML = `<div class="pagina-titolo">👥 Gestione Operatori</div><div class="pagina-sotto">Caricamento…</div>`;
-  const { data: operatori, error } = await supabase.from('profili').select('*').order('cognome');
-  if (error) {
-    el.innerHTML += `<div class="card">Errore: ${esc(error.message)}</div>`;
-    return;
-  }
-  el.innerHTML += `
-    <div class="grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px;">
+  el.innerHTML = `<div class="pagina-titolo">👥 Gestione Operatori</div><div class="pagina-sotto">Specializzazioni e abilitazioni</div><div id="op-cont">Caricamento…</div>`;
+  const cont = document.getElementById('op-cont');
+  const [opRes, specRes] = await Promise.all([
+    supabase.from('profili').select('*').order('cognome'),
+    supabase.from('operatori_specializzazioni').select('operatore_id, specializzazione_id, specializzazioni(nome)')
+  ]);
+  const operatori = opRes.data || [];
+  const specPerOp = {};
+  (specRes.data || []).forEach(s => {
+    (specPerOp[s.operatore_id] = specPerOp[s.operatore_id] || []).push(s.specializzazioni?.nome);
+  });
+
+  const iconeSpec = (o) => {
+    const nomi = specPerOp[o.id] || [];
+    let icone = '';
+    if (nomi.includes('Strutturista')) icone += ' <span title="Strutturista">🏗️</span>';
+    if (nomi.includes('NBCR 3° livello')) icone += ' <span title="NBCR 3° livello">☣️</span>';
+    if (nomi.includes('Unità cinofila K9')) icone += ' <span title="Unità cinofila K9">🐕</span>';
+    if (nomi.includes('SAF 2A (corda)')) icone += ' <span title="SAF 2A">🧗</span>';
+    if (nomi.includes('Caposquadra/Caporeparto')) icone += ' <span title="Caposquadra/Caporeparto">⭐</span>';
+    nomi.forEach(n => {
+      if (!['Strutturista', 'NBCR 3° livello', 'Unità cinofila K9', 'SAF 2A (corda)', 'Caposquadra/Caporeparto'].includes(n)) {
+        icone += ` <span title="${esc(n)}" class="pill" style="font-size:10px; background:#F1F5F9; color:var(--grigio);">${esc(n)}</span>`;
+      }
+    });
+    return icone;
+  };
+  const iconeAbilitazioni = (o) => {
+    let icone = '';
+    if (o.patente) icone += ` <span title="Patente ${esc(o.patente)}">🚚${esc(o.patente)}</span>`;
+    if (o.tpss) icone += ' <span title="TPSS — Soccorso sanitario">🎒</span>';
+    if (o.tas) icone += ` <span title="TAS livello ${o.tas}">📍${o.tas}</span>`;
+    return icone;
+  };
+
+  cont.innerHTML = `
+    <div class="grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px;">
       ${operatori.map(o => `
-        <div class="card" style="border-left:4px solid var(--royal);">
+        <div class="card" style="border-left:4px solid ${o.ruolo === 'admin' ? 'var(--rosso)' : 'var(--royal)'};">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <div class="avatar" style="width:56px;height:56px;font-size:18px;">${esc(iniziali(o.nome, o.cognome))}</div>
             <span class="pill ${o.ruolo === 'admin' ? 'rosso' : 'verde'}">${o.ruolo === 'admin' ? '⭐ Admin' : '🟢 Attivo'}</span>
           </div>
           <div style="font-size:18px; font-weight:700;">${esc(o.cognome)} ${esc(o.nome)}</div>
-          <div style="font-size:14px; color:var(--grigio);">${esc(o.ruolo)}</div>
+          <div style="font-size:13px; color:var(--grigio); margin:4px 0 8px;">${esc(o.comando || '')}${o.sede ? ' · ' + esc(o.sede) : ''}${o.turno ? ' · turno ' + esc(o.turno) : ''}${o.salto_turno ? ' (salto ' + esc(o.salto_turno) + ')' : ''}</div>
+          <div style="font-size:15px; line-height:2;">
+            <span style="font-size:11px; font-weight:700; color:var(--grigio); text-transform:uppercase;">Specializzazioni:</span> ${iconeSpec(o) || '<span style="color:var(--grigio); font-size:13px;">—</span>'}
+          </div>
+          <div style="font-size:15px; line-height:2; margin-top:4px;">
+            <span style="font-size:11px; font-weight:700; color:var(--grigio); text-transform:uppercase;">Abilitazioni:</span> ${iconeAbilitazioni(o) || '<span style="color:var(--grigio); font-size:13px;">—</span>'}
+          </div>
         </div>`).join('')}
     </div>`;
 }
 
 
+
+
+/* ============ SQUADRE ============ */
+
+async function pagSquadre(el) {
+  el.innerHTML = `
+    <div class="pagina-titolo">⚔️ Squadre</div>
+    <div class="pagina-sotto">Composizione pubblicata dei team Alpha e Bravo</div>
+    <div id="sq-cont">Caricamento…</div>`;
+  const cont = document.getElementById('sq-cont');
+  const { data: programmi } = await supabase.from('programmi_mensili')
+    .select('*, programmi_membri(*, profili(nome, cognome, patente))')
+    .eq('pubblicato_su_squadre', true).order('mese', { ascending: false });
+  const progs = programmi || [];
+  if (!progs.length) {
+    cont.innerHTML = '<div class="card">Nessuna squadra pubblicata. Compila un programma in Programmazione e premi PUBBLICA SU SQUADRE.</div>';
+    return;
+  }
+  // per ogni mese mostra Alpha e Bravo
+  const perMese = {};
+  progs.forEach(p => { (perMese[p.mese] = perMese[p.mese] || []).push(p); });
+  cont.innerHTML = Object.entries(perMese).map(([mese, lista]) => `
+    <div style="margin-bottom:30px;">
+      <div style="font-weight:800; font-size:16px; margin-bottom:12px;">📅 ${meseIt(mese)}</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:16px;">
+        ${lista.map(p => `
+        <div class="card" style="border-left:4px solid ${p.team === 'alpha' ? 'var(--royal)' : 'var(--verde)'};">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-weight:800;">TEAM ${p.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</div>
+            <span class="pill giallo">${p.programmi_membri.length}/38</span>
+          </div>
+          ${p.programmi_membri.length ? SEZIONI_MODULO.map(s => {
+            const membriSez = s.posti.map(pp => p.programmi_membri.find(m => m.posto === pp.n)).filter(Boolean);
+            if (!membriSez.length) return '';
+            return `<div style="margin-bottom:8px;">
+              <div style="font-size:11px; font-weight:700; color:var(--grigio); text-transform:uppercase;">${s.t}</div>
+              ${membriSez.map(m => `<div style="font-size:14px; padding:2px 0; display:flex; gap:6px;">
+                <span style="color:var(--rosso); font-weight:700; width:24px;">${m.posto}</span>
+                <span style="font-weight:600;">${esc(m.profili?.cognome)} ${esc(m.profili?.nome)}</span>
+              </div>`).join('')}
+            </div>`;
+          }).join('') : '<div style="color:var(--grigio); font-size:14px;">Nessun nominativo.</div>'}
+          ${utente.ruolo === 'admin' ? `<button class="btn-primary" data-modifica="${p.id}" style="height:38px; font-size:13px; margin-top:10px;">✏️ Modifica</button>` : ''}
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+  cont.querySelectorAll('[data-modifica]').forEach(b => b.onclick = () => {
+    const p = progs.find(x => x.id === Number(b.dataset.modifica));
+    progMese = p.mese; progTeam = p.team; pagina = 'programmazione'; render();
+  });
+}
 
 /* ============ RESOCONTI ============ */
 
@@ -340,27 +502,38 @@ async function pagResoconti(el) {
     <div class="pagina-sotto">Sintesi operativa</div>
     <div id="res-cont">Caricamento…</div>`;
   const cont = document.getElementById('res-cont');
-  const now = new Date();
-  const inizioMese = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
-  const fineMese = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()).padStart(2, '0')}`;
-  const { data: ferie } = await supabase.from('disponibilita').select('operatore_id, data, turno_ferie, profili(cognome, nome)')
-    .eq('tipo', 'ferie').gte('data', inizioMese).lte('data', fineMese);
+  const salvato = localStorage.getItem('res-mese');
+  let [y, m] = (salvato || '').split('-').map(Number);
+  if (!y || !m) { const now = new Date(); y = now.getFullYear(); m = now.getMonth() + 1; }
 
-  const perOp = {};
-  (ferie || []).forEach(f => {
-    const nome = `${f.profili?.cognome} ${f.profili?.nome}`;
-    perOp[nome] = perOp[nome] || { g: 0, n: 0 };
-    if (f.turno_ferie === 'notte') perOp[nome].n++;
-    else perOp[nome].g++;  // giorno o intera giornata
-  });
-  const totaleG = Object.values(perOp).reduce((s, v) => s + v.g, 0);
-  const totaleN = Object.values(perOp).reduce((s, v) => s + v.n, 0);
-  const nomi = Object.keys(perOp).sort();
+  const disegna = async () => {
+    const inizioMese = `${y}-${String(m).padStart(2, '0')}-01`;
+    const fineMese = `${y}-${String(m).padStart(2, '0')}-${String(new Date(y, m, 0).getDate()).padStart(2, '0')}`;
+    const { data: ferie } = await supabase.from('disponibilita').select('operatore_id, data, turno_ferie, profili(cognome, nome)')
+      .eq('tipo', 'ferie').gte('data', inizioMese).lte('data', fineMese);
 
-  cont.innerHTML = `
+    const perOp = {};
+    (ferie || []).forEach(f => {
+      const nome = `${f.profili?.cognome} ${f.profili?.nome}`;
+      perOp[nome] = perOp[nome] || { g: 0, n: 0 };
+      if (f.turno_ferie === 'notte') perOp[nome].n++;
+      else perOp[nome].g++;
+    });
+    const totaleG = Object.values(perOp).reduce((s, v) => s + v.g, 0);
+    const totaleN = Object.values(perOp).reduce((s, v) => s + v.n, 0);
+    const nomi = Object.keys(perOp).sort();
+    const nomiMesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+
+    cont.innerHTML = `
     <div class="card" style="margin-bottom:20px;">
-      <div style="font-weight:700; margin-bottom:10px;">🏖 Ferie di ${['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'][now.getMonth()]} ${now.getFullYear()}</div>
-      <div style="display:flex; gap:20px; margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <div style="font-weight:700;">🏖 Ferie di ${nomiMesi[m - 1]} ${y}</div>
+        <div style="display:flex; gap:8px;">
+          <button class="pill" id="res-indietro" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">◀ Mese prima</button>
+          <button class="pill" id="res-avanti" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">Mese dopo ▶</button>
+        </div>
+      </div>
+      <div style="display:flex; gap:20px; margin-bottom:14px; flex-wrap:wrap;">
         <div><div style="font-size:32px; font-weight:800; color:var(--royal);">${totaleG}</div>☀️ Giorni ferie diurne</div>
         <div><div style="font-size:32px; font-weight:800; color:var(--royal);">${totaleN}</div>🌙 Notti ferie</div>
         <div><div style="font-size:32px; font-weight:800;">${nomi.length}</div>👥 Operatori coinvolti</div>
@@ -369,9 +542,13 @@ async function pagResoconti(el) {
       <table style="width:100%; border-collapse:collapse; font-size:14px;">
         <tr style="text-align:left; color:var(--grigio); font-size:12px;"><th style="padding:6px 0;">Operatore</th><th>☀️ Giorno</th><th>🌙 Notte</th></tr>
         ${nomi.map(n => `<tr style="border-top:1px solid var(--bordo);"><td style="padding:7px 0;">${esc(n)}</td><td>${perOp[n].g}</td><td>${perOp[n].n}</td></tr>`).join('')}
-      </table>` : '<div style="color:var(--grigio);">Nessuna ferie registrata questo mese.</div>'}
+      </table>` : '<div style="color:var(--grigio);">Nessuna ferie registrata in questo mese.</div>'}
     </div>
-    <div class="card"><div style="font-weight:700; margin-bottom:8px;">📋 Resoconti attivazioni</div><div style="color:var(--grigio); font-size:14px;">Saranno disponibili con lo sviluppo delle attivazioni di emergenza.</div></div>`;
+    <div class="card"><div style="font-weight:700; margin-bottom:8px;">📋 Resoconti attivazioni</div><div style="color:var(--grigio); font-size:14px;">Saranno popolati con le prime attivazioni reali.</div></div>`;
+    document.getElementById('res-indietro').onclick = () => { m--; if (m < 1) { m = 12; y--; } localStorage.setItem('res-mese', `${y}-${m}`); disegna(); };
+    document.getElementById('res-avanti').onclick = () => { m++; if (m > 12) { m = 1; y++; } localStorage.setItem('res-mese', `${y}-${m}`); disegna(); };
+  };
+  await disegna();
 }
 
 /* ============ CALENDARIO TURNI ============ */
@@ -469,7 +646,8 @@ async function disegnaCalendario(el, anno, mese) {
           const cellaG = miaG ? 'background:#DBEAFE; color:#1E40AF; font-weight:800; cursor:pointer; border-radius:6px;' : 'cursor:pointer;';
           const cellaN = miaN ? 'background:#DBEAFE; color:#1E40AF; font-weight:800; cursor:pointer; border-radius:6px;' : 'cursor:pointer;';
           return `<tr style="border-top:1px solid var(--bordo); text-align:center; ${sfondo}">
-            <td style="text-align:left; padding:8px 4px;"><b>${gg}</b> <span style="color:var(--grigio); font-size:12px;">${settCompleto}</span> ${inFerie.length ? `<span class="pill giallo" style="font-size:10px;">🏖 ${inFerie.length}</span>` : ''}${dettaglio}</td>
+            <td style="text-align:left; padding:8px 4px; white-space:nowrap;"><b>${gg}</b> <span style="color:var(--grigio); font-size:12px;">${settCompleto}</span></td>
+            <td style="text-align:left; padding:8px 8px; min-width:220px;">${colFerie}</td>
             <td data-ferie-g="${dataIso}" style="padding:8px 4px; ${clsG} ${cellaG}" title="Ferie diurna: clicca per toglierla / metterla">${cp.giorno}</td>
             <td data-ferie-n="${dataIso}" style="padding:8px 4px; ${clsN} ${cellaN}" title="Ferie notturna: clicca per toglierla / metterla">${cp.notte}</td>
           </tr>`;
@@ -622,7 +800,7 @@ async function apriProgramma(cont, programmi) {
   const [y, mo] = progMese.split('-').map(Number);
   const meseFine = `${y}-${String(mo).padStart(2, '0')}-${String(new Date(y, mo, 0).getDate()).padStart(2, '0')}`;
   const [pers, membri, storico, ferie] = await Promise.all([
-    supabase.from('profili').select('id, nome, cognome, patente, grado, comando, estensioni_patente').order('cognome'),
+    supabase.from('profili').select('id, nome, cognome, patente, grado, comando, estensioni_patente, tpss, tas').order('cognome'),
     supabase.from('programmi_membri').select('*, profili(nome, cognome, patente, grado, estensioni_patente)').eq('programma_id', prog.id),
     supabase.from('programmi_membri').select('operatore_id, programmi_mensili!inner(mese)')
       .lt('programmi_mensili.mese', progMese).order('programmi_mensili.mese', { ascending: true }),
@@ -657,8 +835,11 @@ async function apriProgramma(cont, programmi) {
   const idSpec = (s) => new Set(SPEC_IDS[SPEC_DB[s]] || []);
 
   const patenteSigla = (o) => {
-    if (!o.patente) return '';
-    return ' 🚚' + o.patente + (o.estensioni_patente?.length ? '+' + o.estensioni_patente.map(e => e === 'Autoscala' ? 'AS' : e === 'Autogru' ? 'AG' : e === 'Anfibio' ? 'AN' : e).join('') : '');
+    let s = '';
+    if (o.patente) s += ' 🚚' + o.patente + (o.estensioni_patente?.length ? '+' + o.estensioni_patente.map(e => e === 'Autoscala' ? 'AS' : e === 'Autogru' ? 'AG' : e === 'Anfibio' ? 'AN' : e).join('') : '');
+    if (o.tpss) s += ' 🎒';
+    if (o.tas) s += ' 📍' + o.tas;
+    return s;
   };
   const iconeSpecPdf = (opId) => {
     let icone = '';
@@ -706,6 +887,7 @@ async function apriProgramma(cont, programmi) {
           <button class="btn-primary" id="prog-elimina" style="height:44px; background:var(--rosso);">🗑 ELIMINA COMPILAZIONE</button>
           <button class="btn-primary" id="prog-genera-pdf" style="height:44px;">📄 GENERA PDF</button>
           <button class="btn-primary" id="prog-pubblica" style="max-width:210px; height:44px; background:${prog.pubblicato ? 'var(--verde)' : 'var(--rosso)'};">${prog.pubblicato ? 'RIPUBBLICA' : 'PUBBLICA'} SU TELEGRAM</button>
+          <button class="btn-primary" id="prog-squadre" style="max-width:210px; height:44px; background:${prog.pubblicato_su_squadre ? 'var(--verde)' : 'var(--royal)'};">${prog.pubblicato_su_squadre ? 'AGGIORNA' : 'PUBBLICA'} SU SQUADRE</button>
         </div>
       </div>
       <div class="barra" style="margin-top:12px;"><div style="width:${compilati / 38 * 100}%;"></div></div>
@@ -878,6 +1060,12 @@ async function apriProgramma(cont, programmi) {
   document.getElementById('prog-pubblica').onclick = async () => {
     await supabase.from('programmi_mensili').update({ pubblicato: true }).eq('id', prog.id);
     alert('Programma pubblicato (invio Telegram con il bot).');
+    renderPagina();
+  };
+  document.getElementById('prog-squadre').onclick = async () => {
+    const { error } = await supabase.from('programmi_mensili').update({ pubblicato_su_squadre: true }).eq('id', prog.id);
+    if (error) { alert('Errore: ' + error.message); return; }
+    alert('Squadra pubblicata nella pagina SQUADRE.');
     renderPagina();
   };
   document.getElementById('prog-genera-pdf').onclick = () => generaPdfManifesto(prog, membri.data || []).catch(err => {
@@ -1440,7 +1628,7 @@ async function pagMantenimenti(el) {
   cont.innerHTML = `
     ${utente.ruolo === 'admin' ? `
       <div class="card" style="margin-bottom:24px; border-left:4px solid var(--ambra);">
-        <div style="font-weight:700; margin-bottom:12px;">⏳ Coda di validazione (${coda.length})</div>
+        <div style="font-weight:700; margin-bottom:12px;">🟡 CODA DI VALIDAZIONE — richieste in attesa (${coda.length})</div>
         ${coda.length === 0 ? '<div style="color:var(--grigio); font-size:14px;">Nessun mantenimento da validare.</div>' : `
           <div id="coda-lista">${coda.map(m => rigaCoda(m)).join('')}</div>`}
       </div>` : ''}
@@ -1489,12 +1677,13 @@ async function pagMantenimenti(el) {
 
       ${inVal.length ? `
       <div class="card" style="margin-bottom:24px; border-left:4px solid var(--ambra);">
-        <div style="font-weight:700; margin-bottom:12px;">⏳ In validazione (${inVal.length})</div>
+        <div style="font-weight:700; margin-bottom:12px;">🟡 IN ATTESA DI APPROVAZIONE (${inVal.length})</div>
         ${inVal.map(m => `
           <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--bordo);">
             <div>
-              <div style="font-weight:600;">${esc(m.tipo)} — ${Number(m.ore)} h</div>
+              <div style="font-weight:600;">🟡 ${esc(m.tipo)} — ${Number(m.ore)} h</div>
               <div style="font-size:13px; color:var(--grigio);">${fmtData(m.data)} · ${esc(m.argomento)}</div>
+              <div style="font-size:12px; color:var(--ambra-tx); font-weight:600;">In attesa di approvazione dell'admin</div>
             </div>
             <button class="pill rosso" data-del="${m.id}" style="border:none;">🗑 Elimina</button>
           </div>`).join('')}
@@ -1516,7 +1705,7 @@ async function pagMantenimenti(el) {
         ${storico.length === 0 ? '<div style="color:var(--grigio); font-size:14px;">Nessun mantenimento approvato.</div>' : `
           <table style="width:100%; border-collapse:collapse; font-size:14px;">
             <tr style="text-align:left; color:var(--grigio); font-size:12px;">
-              <th style="padding:8px 0;">Data</th><th>Tipo</th><th>Argomento</th><th style="text-align:right;">Ore</th>
+              <th style="padding:8px 0;">Data</th><th>Tipo</th><th>Argomento</th><th style="text-align:right;">Ore</th><th style="text-align:right;">Stato</th>
             </tr>
             ${storico.map(m => `
               <tr style="border-top:1px solid var(--bordo);">
@@ -1524,6 +1713,7 @@ async function pagMantenimenti(el) {
                 <td>${esc(m.tipo)}</td>
                 <td>${esc(m.argomento)}</td>
                 <td style="text-align:right; font-weight:700;">${Number(m.ore)}</td>
+                <td style="text-align:right;">🟢</td>
               </tr>`).join('')}
           </table>`}
       </div>`;

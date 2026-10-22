@@ -13,6 +13,9 @@ Sistema per la gestione operativa del nucleo:
 - **Attivazioni di emergenza** con risposta SÌ/NO (doppio canale PWA + Telegram) — pagina completa: allerta ALPHA/BRAVO/**personalizzata** (modulo compila a mano tra chi risponde SÌ), risposte in tempo reale, copertura requisiti, compilazione automatica (dal programma del mese) o manuale del manifesto, PDF
 - **Report/statistiche** con export Excel/CSV e **PDF** del Manifesto
 - **Internazionale**: abilitazioni missioni e vaccinazioni — da sviluppare
+- **Dashboard**: contatori mantenimenti (in linea / sotto soglia) e grafici a torta per Comando e Turno
+- **Operatori** (admin): schede con icone specializzazioni (🏗️☣️🐕🧗⭐) e abilitazioni (🚚 patente, 🎒 TPSS, 📍 TAS livello)
+- **Squadre**: composizioni pubblicate (da Programmazione → PUBBLICA SU SQUADRE), modifica rapida per admin
 - **Bot Telegram** (`bot/telegram-bot.mjs`): collegamento account con codice, comando /ferie (giorno/notte, continuative; max 31 giorni per comando)
 
 ## Sicurezza

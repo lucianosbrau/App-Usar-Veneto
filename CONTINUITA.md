@@ -408,6 +408,17 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Seed di prova**: da eliminare PRIMA del caricamento dati veri (già documentato in README/CONTINUITA): `delete from profili where email like 'prova.%'; delete from auth.users where email like 'prova.%';`
 - **Service worker**: verificato network-first con fallback cache — in emergenza con rete si ha sempre l'ultima versione; offline si vede l'ultima cache scaricata (comportamento voluto). Nessuna modifica
 
+### Revisione guidata dall'utente su dati fittizi (22/10/2026)
+- **Dashboard completa**: contatori (unità in linea con ≥36h mantenimenti approvati nell'anno, sotto soglia, totale operatori) + **2 grafici a torta** SVG nativi: Personale per Comando e per Turno (A-D), palette varia — come da decisioni vecchie; mostrata a admin E operatori
+- **Operatori**: card con comando/sede/turno/salto + righe **Specializzazioni** (icone 🏗️☣️🐕🧗⭐ + badge per le altre) e **Abilitazioni** (🚚patente, 🎒TPSS soccorso sanitario, 📍TAS livello 1/2)
+- **TPSS/TAS chiariti dall'utente**: TPSS = soccorso sanitario, icona **🎒 zaino sanitari**; TAS = icona **📍 GPS con numero livello 1 o 2**. Aggiunti anche nelle etichette delle tendine Programmazione/Attivazione
+- **Squadre sviluppata**: pagina con i programmi pubblicati su squadre (per mese, Alpha+Bravo affiancati, nomi per sezione); in Programmazione nuovo tasto **PUBBLICA SU SQUADRE** (salva senza Telegram, flag `pubblicato_su_squadre`); per admin pulsante ✏️ Modifica che riporta alla Programmazione del programma scelto. Visibile a tutti, modifica solo admin
+- **Calendario**: colonna **Ferie** in mezzo tra Data e Giorno/Notte (nomi per turno ☀️/🌙 nella colonna, non più sotto la data) — evita righe altissime con molti nomi
+- **Attivazione — fix errore RLS** ("new row violates row-level security policy"): mancava la policy **SELECT** su `attivazioni` (c'era solo INSERT) — l'insert con select() di ritorno falliva. Migrazione `db/migrazione-policy-attivazioni.sql` (**da eseguire**): select attivazioni per tutti, update (chiudi) per admin, colonna `pubblicato_su_squadre`
+- **Mantenimenti**: stato ben visibile — sezione **🟡 IN ATTESA DI APPROVAZIONE** per le proprie richieste (giallo, anche per admin), **🟡 CODA DI VALIDAZIONE** admin, storico approvati con **🟢** per riga; NB: admin vede le proprie richieste tra i "miei" e le altrui in coda — comportamento corretto
+- **Resoconti**: aggiunta navigazione **mese prima/dopo** (la pagina mostrava solo il mese corrente — ecco perché i contatori potevano apparire vuoti se le ferie erano in un altro mese)
+- Mobile: nessuna modifica mirata necessaria (layout già responsive: grid auto-fit, tabelle scrollabili); da verificare sul telefono
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
