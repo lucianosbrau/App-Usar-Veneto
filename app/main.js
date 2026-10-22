@@ -1685,7 +1685,7 @@ async function pagMantenimenti(el) {
   const anno = new Date().getFullYear();
   const [impo, tutti] = await Promise.all([
     supabase.from('impostazioni').select('valore').eq('chiave', 'soglia_ore_mantenimenti').limit(1).maybeSingle(),
-    supabase.from('mantenimenti').select('*, profili(nome, cognome)').order('data', { ascending: false })
+    supabase.from('mantenimenti').select('*, profili!mantenimenti_operatore_id_fkey(nome, cognome)').order('data', { ascending: false })
   ]);
   const soglia = Number(impo?.data?.valore) || 36;
   const cont = document.getElementById('man-cont');
