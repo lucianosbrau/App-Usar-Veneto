@@ -503,10 +503,13 @@ async function pagOperatori(el) {
           </div>
         </div>`).join('')}
     </div>`;
+  document.getElementById('fil-tutti').onclick = () => { localStorage.setItem('op-filtro', 'tutti'); pagOperatori(el); };
+  document.getElementById('fil-sottosoglia').onclick = () => { localStorage.setItem('op-filtro', 'sottosoglia'); pagOperatori(el); };
+  cont.querySelectorAll('[data-op]').forEach(c => c.onclick = () => {
+    const o = operatori.find(x => x.id === c.dataset.op);
+    if (o) schedaOperatore(el, o, oreMan);
+  });
 }
-
-
-
 
 /* ============ SQUADRE ============ */
 
@@ -1912,12 +1915,6 @@ function rigaCoda(m) {
         </div>
       </div>
     </div>`;
-  document.getElementById('fil-tutti').onclick = () => { localStorage.setItem('op-filtro', 'tutti'); pagOperatori(el); };
-  document.getElementById('fil-sottosoglia').onclick = () => { localStorage.setItem('op-filtro', 'sottosoglia'); pagOperatori(el); };
-  cont.querySelectorAll('[data-op]').forEach(c => c.onclick = () => {
-    const o = operatori.find(x => x.id === c.dataset.op);
-    if (o) schedaOperatore(el, o, oreMan);
-  });
 }
 
 async function schedaOperatore(el, o, oreMan) {

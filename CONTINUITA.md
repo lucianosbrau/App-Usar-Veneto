@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 22/10/2026 11:03
+Ultimo aggiornamento: 22/10/2026 11:20
 
 ---
 
@@ -526,6 +526,12 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **FIX /idgruppo (22/10/2026)**: la gestione dei messaggi nei gruppi non era mai stata applicata (un replace precedente era fallito in silenzio) — il bot rispondeva col benvenuto nel gruppo. Ora: i messaggi nei gruppi sono gestiti PRIMA dei dialoghi privati (solo /idgruppo, che risponde con l'ID in formato copiabile; log di aggiunta al gruppo); gli altri comandi sono disattivati nel gruppo
 - **FIX ALERT_GROUP not defined (22/10/2026)**: la dichiarazione `let ALERT_GROUP = process.env...` era stata persa da un replace fallito in silenzio — l'invio al gruppo crashava ("Errore attivazioni"). **Gruppo confermato dai log: ID = -1004443017442** (titolo "Allerta USAR VENETO"); la variabile ALERT_GROUP_CHAT_ID su Render era GIÀ configurata correttamente dall'utente — il mancato funzionamento era SOLO la dichiarazione mancante nel codice (fixato)
 - **LEZIONE (per la AI)**: dopo ogni replace fallito con assert, RICONTROLLARE che i blocchi collegati siano coerenti — due replace silenziosi hanno causato due bug consecutivi (gestione gruppi mancante, ALERT_GROUP non dichiarata)
+
+### Fix Operatori (handler dispersi) + migrazione Realtime (22/10/2026, ore 11:20)
+- **CAUSA TROVATA (Operatori: schede non si aprivano, filtro muto)**: quando è stato aggiunto il filtro, la funzione pagOperatori si è chiusa PRIMA degli handler, che sono finiti appesi a pagMantenimenti — mai eseguiti sulla pagina Operatori. Fix: handler (fil-tutti, fil-sottosoglia, click card) spostati DENTRO pagOperatori; verificato con controllo posizionale
+- **CAUSA TROVATA (Attivazione non si aggiornava in tempo reale)**: mancava l'abilitazione Realtime delle tabelle nel DB. Creata `db/migrazione-realtime.sql` (**da eseguire**): alter publication supabase_realtime add table (attivazioni, risposte_attivazione, programmi_membri, mantenimenti, disponibilita)
+- NB utente: la query di test del realtime da SQL Editor fallisce con "Failed to check user auth status" — normale in SQL Editor (non è un client autenticato): eseguire SOLO le alter publication, non testare il realtime da lì
+- FK operatori_specializzazioni verificate: profili + specializzazioni (non ambigue, ok)
 
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
