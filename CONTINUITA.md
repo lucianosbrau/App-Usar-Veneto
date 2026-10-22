@@ -433,6 +433,18 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Creati `MIGRAZIONE-ACCOUNT.md` (guida dettagliata: principi, scelta Gmail nucleo vs @dipvvf.it, 6 fasi GitHub/Supabase/Render/Telegram/PWA/dati, checklist, costi, rischi) e `infografica-migrazione.html` (stile progetto: rosso #B22222, tricolore, entrambi i loghi come nel modello manifesto)
 - Punti chiave: transfer del repo GitHub (mantiene redirect), transfer progetto Supabase o dump SQL (opz. A/B), Render con email nucleo, bot Telegram invariato, redirect PWA automatico; raccomandato Gmail del nucleo per gli account tecnici (posta VVF filtra terze parti)
 
+### Conteggio giorni (non turni) nelle ferie (22/10/2026, richiesta utente)
+- **Bot /ferie**: prima contava le righe del DB (con "continuative" 01/11→05/11 diceva "10 giorni"); ora conta i **giorni distinti del range** (5 giorni) — il dettaglio turno resta tra parentesi ("continuative: giorno e notte")
+- **Resoconti**: totali ora in **giorni con ferie** (date distinte del mese, non somme di turni); in tabella per operatore: colonna **Giorni** (date distinte, in evidenza) + colonne informative Turni giorno/Turni notte
+- **Calendario**: nessun conteggio esposto (solo nominativi per turno) — nessuna modifica necessaria
+- Rimosse dalla risposta del bot le diciture "Massimo 31 giorni per comando" (il limite tecnico resta attivo, il messaggio dedicato esce solo quando serve)
+- **Regola fissata (NON reinventare)**: all'utente interessa sempre il conteggio in **GIORNI**, i turni sono dettaglio secondario da mostrare separato, mai sommato ai giorni
+
+### Bot Telegram collaudato end-to-end (22/10/2026)
+- Collegamento account ✅ (codice 6 cifre es. 482-193, 15 min, monouso), pulsanti **inline sempre visibili** nei messaggi (Inserisci ferie / Come funziona), aiuto con date precompilate (+7/+14 gg)
+- Fix durante il collaudo: `.single()`→`.maybeSingle()` su codici multipli; server HTTP minimo per Render (il Web Service esige una porta); causa radice del "codice non trovato": SUPABASE_URL con `/rest/v1/` in coda su Render (forma corretta: solo `https://lwdcrjtbsmqammwpvrhy.supabase.co`)
+- Prossima cosa concordata: infografica istruzioni collegamento bot (stile progetto; screenshots reali Telegram servono? — in fase di valutazione)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)

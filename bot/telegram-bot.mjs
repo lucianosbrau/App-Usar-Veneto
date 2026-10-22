@@ -70,7 +70,8 @@ async function inserisciFerie(chatId, testo) {
   }
   const { error } = await sb.from('disponibilita').insert(righe);
   if (error) return 'Errore salvataggio: ' + error.message;
-  return `🏖 Ferie registrate: ${match[1]}/${match[2]}/${match[3]}${match[4] ? ` → ${match[4]}/${match[5]}/${match[6]}` : ''} — ${righe.length} giorni${continuative ? ' (continuative: giorno e notte)' : ' (solo turno diurno)'}.`;
+  const nGiorni = Math.round((Date.parse(d2) - Date.parse(d1)) / 86400000) + 1;
+  return `🏖 Ferie registrate: ${match[1]}/${match[2]}/${match[3]}${match[4] ? ` → ${match[4]}/${match[5]}/${match[6]}` : ''} — ${nGiorni} giorni${continuative ? ' (continuative: giorno e notte)' : ' (solo turno diurno)'}.`;
 }
 
 let offset = 0;

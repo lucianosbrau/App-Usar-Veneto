@@ -540,8 +540,8 @@ async function pagResoconti(el) {
       </div>
       ${nomi.length ? `
       <table style="width:100%; border-collapse:collapse; font-size:14px;">
-        <tr style="text-align:left; color:var(--grigio); font-size:12px;"><th style="padding:6px 0;">Operatore</th><th>☀️ Giorno</th><th>🌙 Notte</th></tr>
-        ${nomi.map(n => `<tr style="border-top:1px solid var(--bordo);"><td style="padding:7px 0;">${esc(n)}</td><td>${perOp[n].g}</td><td>${perOp[n].n}</td></tr>`).join('')}
+        <tr style="text-align:left; color:var(--grigio); font-size:12px;"><th style="padding:6px 0;">Operatore</th><th>📅 Giorni</th><th>☀️ Turni giorno</th><th>🌙 Turni notte</th></tr>
+        ${nomi.map(n => `<tr style="border-top:1px solid var(--bordo);"><td style="padding:7px 0;">${esc(n)}</td><td><b>${perOp[n].giorni.size}</b></td><td>${perOp[n].g}</td><td>${perOp[n].n}</td></tr>`).join('')}
       </table>` : '<div style="color:var(--grigio);">Nessuna ferie registrata in questo mese.</div>'}
     </div>
     <div class="card"><div style="font-weight:700; margin-bottom:8px;">📋 Resoconti attivazioni</div><div style="color:var(--grigio); font-size:14px;">Saranno popolati con le prime attivazioni reali.</div></div>`;
@@ -634,10 +634,6 @@ async function disegnaCalendario(el, anno, mese) {
           const dataIso = `${anno}-${String(mese + 1).padStart(2, '0')}-${String(gg).padStart(2, '0')}`;
           const inFerie = ferieGiorno[dataIso] || [];
           const mieFerie = inFerie.some(n => n.startsWith(`${utente.cognome || ''} ${utente.nome || ''}`.trim()));
-          const elencoGiorno = inFerie.filter(n => n.includes('☀️') || (!n.includes('☀️') && !n.includes('🌙'))).map(n => n.replace(' (☀️)','').replace(' (🌙)',''));
-          const dettaglio = inFerie.length
-            ? `<div style="font-size:11px; color:var(--giallo-tx); text-align:left; padding:4px 0 0 28px;">GIORNO: ${elencoGiorno.join(', ') || '—'}<br>NOTTE: ${inFerie.filter(n => n.includes('🌙')).map(n => n.replace(' (🌙)','')).join(', ') || '—'}</div>`
-            : '';
           const dicituraFerie = mieFerie ? '<span class="pill" style="font-size:10px; background:#DBEAFE; color:#1E40AF; margin-left:6px;">Ferie</span>' : '';
           const sfondo = mieFerie ? 'background:#DBEAFE;' : '';
           const settCompleto = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'][new Date(anno, mese, giorno).getDay()];

@@ -16,7 +16,7 @@ Sistema per la gestione operativa del nucleo:
 - **Dashboard**: contatori mantenimenti (in linea / sotto soglia) e grafici a torta per Comando e Turno
 - **Operatori** (admin): schede con icone specializzazioni (🏗️☣️🐕🧗⭐) e abilitazioni (🚚 patente, 🎒 TPSS, 📍 TAS livello)
 - **Squadre**: composizioni pubblicate (da Programmazione → PUBBLICA SU SQUADRE), modifica rapida per admin
-- **Bot Telegram** (`bot/telegram-bot.mjs`): collegamento account con codice, comando /ferie (giorno/notte, continuative; max 31 giorni per comando)
+- **Bot Telegram** (`bot/telegram-bot.mjs`, @Usar_veneto_bot su Render): collegamento account con codice a 6 cifre, pulsanti inline, comando /ferie (giorno/notte, continuative; risposta in giorni distinti)
 
 ## Sicurezza
 - **Ruolo admin protetto**: trigger DB che impedisce l'auto-promozione (solo un admin esistente può promuovere/revocare)
