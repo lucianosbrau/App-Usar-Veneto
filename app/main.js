@@ -285,7 +285,7 @@ function render() {
     { id: 'operatori', ic: '👥', t: 'Operatori', admin: true },
     { id: 'squadre', ic: '⚔️', t: 'Squadre' },
     { id: 'calendario', ic: '📅', t: 'Calendario' },
-    { id: 'attivazione', ic: '🚨', t: 'Attivazione', admin: true },
+    { id: 'attivazione', ic: '🚨', t: 'Attivazione' },
     { id: 'programmazione', ic: '🗓️', t: 'Programmazione', admin: true },
     { id: 'mantenimenti', ic: '🎓', t: 'Mantenimenti' },
     { id: 'internazionale', ic: '🌍', t: 'Internazionale' },
@@ -315,7 +315,7 @@ function render() {
     <div class="mobile-nav" id="mobile-nav">
       ${(utente.ruolo === 'admin'
         ? [['dashboard','🏠','Dashboard'], ['squadre','⚔️','Squadre'], ['programmazione','🗓️','Programmazione'], ['attivazione','🚨','Attivazione']]
-        : [['calendario','📅','Calendario'], ['squadre','⚔️','Squadre'], ['mantenimenti','🎓','Mantenimenti']]
+        : [['attivazione','🚨','Attivazione'], ['calendario','📅','Calendario'], ['squadre','⚔️','Squadre'], ['mantenimenti','🎓','Mantenimenti']]
       ).map(([id, ic, t]) => `<button data-p="${id}" class="${pagina === id ? 'attiva' : ''}"><span class="ic">${ic}</span>${t}</button>`).join('')}
       <button id="menu-btn"><span class="ic">☰</span>Menù</button>
     </div>
