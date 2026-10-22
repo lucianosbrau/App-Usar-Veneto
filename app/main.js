@@ -28,6 +28,25 @@ const TIPI_MAN = ['Mantenimento', 'Manovra', 'Intervento', 'Lavorazione', 'Tutor
 function esc(t) {
   return String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+
+const GRADI_VIGILE = {
+  D: 'grigio', VD: 'grigio', IA: 'grigio',
+  CRE: 'rosso', CR: 'rosso', CSE: 'rosso', CS: 'rosso',
+  VC: 'nero', VE: 'nero', VF: 'nero'
+};
+function simboloVigile(o, px) {
+  const tipo = GRADI_VIGILE[o?.grado];
+  if (!tipo) return '';
+  const titoli = { grigio: 'Vigile (D, VD, IA)', rosso: 'Capo (CRE, CR, CSE, CS)', nero: 'Vigile scelto (VC, VE, VF)' };
+  return `<img src="assets/vigile-${tipo}.png" alt="${esc(o.grado)}" title="${esc(o.grado)} — ${titoli[tipo]}" style="width:${px}px; height:${px}px; vertical-align:middle;">`;
+}
+
+window.addEventListener('popstate', () => {
+  const h = location.hash.replace(/^#\/?/, '');
+  if (h && h !== pagina) { pagina = h; render(); }
+  else if (!h && pagina !== 'dashboard') { pagina = 'dashboard'; render(); }
+});
+
 function iniziali(nome, cognome) {
   return ((nome?.[0] || '') + (cognome?.[0] || '')).toUpperCase() || '?';
 }
@@ -58,6 +77,9 @@ async function init() {
   if (session) {
     await caricaUtente(session.user);
     await caricaSpecializzazioni();
+    const h = location.hash.replace(/^#\/?/, '');
+    if (h) pagina = h;
+    history.replaceState({ pagina }, '', '#/' + pagina);
     render();
   } else {
     renderLogin();
@@ -204,7 +226,18 @@ async function esci() {
   renderLogin();
 }
 
+function pushStato() {
+  const h = '#/' + pagina;
+  if (location.hash !== h) history.pushState({ pagina }, '', h);
+}
+
+function sincronizzaDaHash() {
+  const h = location.hash.replace(/^#\/?/, '');
+  if (h && h !== pagina) { pagina = h; render(); }
+}
+
 function render() {
+  pushStato();
   const menu = [
     { id: 'dashboard', ic: '🏠', t: 'Dashboard' },
     { id: 'operatori', ic: '👥', t: 'Operatori', admin: true },
@@ -427,17 +460,7 @@ async function pagOperatori(el) {
     });
     return icone;
   };
-  const GRADI_VIGILE = {
-    D: 'grigio', VD: 'grigio', IA: 'grigio',
-    CRE: 'rosso', CR: 'rosso', CSE: 'rosso', CS: 'rosso',
-    VC: 'nero', VE: 'nero', VF: 'nero'
-  };
-  const simboloVigile = (o) => {
-    const tipo = GRADI_VIGILE[o.grado];
-    if (!tipo) return '';
-    const titoli = { grigio: 'Vigile (D, VD, IA)', rosso: 'Capo (CRE, CR, CSE, CS)', nero: 'Vigile scelto (VC, VE, VF)' };
-    return ` <img src="assets/vigile-${tipo}.png" alt="${o.grado}" title="${o.grado} — ${titoli[tipo]}" style="width:20px; height:20px; vertical-align:middle;">`;
-  };
+  const simboloVigileImg = (o) => simboloVigile(o, 20);
   const iconeAbilitazioni = (o) => {
     let icone = '';
     if (o.patente) icone += ` <span title="Patente ${esc(o.patente)}">🚚${esc(o.patente)}</span>`;
@@ -905,7 +928,7 @@ async function apriProgramma(cont, programmi) {
     ...o,
     giorniFerie: (feriePerOp[o.id] || []).length,
     sottoMan: sottoSogliaMan(o.id),
-    etichetta: `${o.cognome} ${o.nome}`.trim() + iconeSpec(o.id) + patenteSigla(o) + (o.grado ? ` [${o.grado}]` : '') + ((feriePerOp[o.id] || []).length ? ` 🏖 ${(feriePerOp[o.id] || []).length} gg ferie` : '') + (sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''),
+    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.grado ? ` [${o.grado}]` : '') + iconeSpec(o.id) + patenteSigla(o) + ((feriePerOp[o.id] || []).length ? ` 🏖 ${(feriePerOp[o.id] || []).length} gg ferie` : '') + (sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''),
     gruppo: gruppoDi(o.id)
   });
 
@@ -961,7 +984,7 @@ async function apriProgramma(cont, programmi) {
             ${occ
               ? `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpec(occ.operatore_id)}${occ.profili?.patente ? ` <span class="pill giallo" style="font-size:10px;">🚚 ${esc(occ.profili.patente)}</span>` : ''}</span>
                  <button class="pill rosso" data-vuota="${occ.id}" style="border:none; cursor:pointer;">✕</button>`
-              : `<div style="display:flex; gap:6px; align-items:center; max-width:300px;">
+              : `<div style="display:flex; gap:6px; align-items:center; max-width:400px;">
                    <div style="position:relative; flex:1;">
                      <input id="cerca-${p.n}" placeholder="Cerca nome…" autocomplete="off"
                        style="width:100%; height:40px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; font-size:13px;">
@@ -1001,7 +1024,7 @@ async function apriProgramma(cont, programmi) {
           ultimoG = o.gruppo.t;
         }
         const pref = ros && idCapi.has(o.id) ? '⭐ ' : '';
-        html += `<div data-scelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9; ${o.sottoMan ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${pref}${esc(o.etichetta)}</div>`;
+        html += `<div data-scelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9; ${o.sottoMan ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${pref}${esc(o.etichetta)} ${simboloVigile(o, 16)}</div>`;
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
       lista.querySelectorAll('[data-scelta]').forEach(d => {
@@ -1136,7 +1159,10 @@ async function generaPdfManifesto(prog, membri) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const perPosto = {};
   membri.forEach(m => {
-    perPosto[m.posto] = `${(m.profili?.cognome || '').toUpperCase()} ${(m.profili?.nome || '').toUpperCase()}`.trim();
+    perPosto[m.posto] = {
+      nome: `${(m.profili?.cognome || '').toUpperCase()} ${(m.profili?.nome || '').toUpperCase()}`.trim(),
+      grado: m.profili?.grado || null
+    };
   });
   const team = prog.team === 'alpha' ? 'TEAM ALPHA' : prog.team === 'bravo' ? 'TEAM BRAVO' : 'ATTIVAZIONE PERSONALIZZATA';
 
@@ -1151,7 +1177,7 @@ async function generaPdfManifesto(prog, membri) {
   const GRIGIO_TX = [71,85,105];
   const ANTRACITE = [30,41,59];
 
-  function box(x, y, w, h, n, ruolo, nome, sfondo, stile) {
+  function box(x, y, w, h, n, ruolo, nome, sfondo, stile, grado) {
     doc.setFillColor(...sfondo);
     doc.setDrawColor(0,0,0);
     doc.setLineWidth(0.3);
@@ -1168,7 +1194,16 @@ async function generaPdfManifesto(prog, membri) {
     if (scuro || lum) { doc.setTextColor(255,255,255); }
     else if (nome) { doc.setTextColor(...ANTRACITE); }
     else { doc.setTextColor(150,150,150); }
-    if (nome) doc.text(nome, cx, y + 9.5, { align: 'center' });
+    if (nome) {
+      const tipo = GRADI_VIGILE[grado];
+      const img = tipo ? imgVigile[tipo] : null;
+      if (img) {
+        const sw = 4.2;
+        const tw = doc.getTextWidth(nome);
+        doc.addImage(img, 'PNG', cx - tw / 2 - sw - 0.8, y + 9.5 - sw / 2 - 0.9, sw, sw);
+      }
+      doc.text(nome, cx, y + 9.5, { align: 'center' });
+    }
   }
 
   function sezioneBg(y1, y2, colore) {
@@ -1192,6 +1227,15 @@ async function generaPdfManifesto(prog, membri) {
   } catch (e) {
     console.warn('Logo non caricati nel PDF:', e);
   }
+  let imgVigile = { grigio: null, rosso: null, nero: null };
+  try {
+    const [ig, ir, inr] = await Promise.all([
+      caricaImmaginePdf('/App-Usar-Veneto/assets/vigile-grigio.png').catch(() => null),
+      caricaImmaginePdf('/App-Usar-Veneto/assets/vigile-rosso.png').catch(() => null),
+      caricaImmaginePdf('/App-Usar-Veneto/assets/vigile-nero.png').catch(() => null)
+    ]);
+    imgVigile = { grigio: ig, rosso: ir, nero: inr };
+  } catch (e) { console.warn('Simboli vigile non caricati nel PDF:', e); }
   if (logoVvf) doc.addImage(logoVvf, 'JPEG', 12, 8, 15, 15);
   if (logoUsar) doc.addImage(logoUsar, 'JPEG', 183, 8, 15, 15);
   doc.setFont('helvetica', 'bold'); doc.setFontSize(20); doc.setTextColor(...ANTRACITE);
@@ -1215,12 +1259,12 @@ async function generaPdfManifesto(prog, membri) {
   const yD3 = yD2 + STEP;
   sezioneBg(y0, yD3 + H + 2.5, BLU_CHIARO);
   titoloSezione(y0 + 4, 'DIREZIONE E COMANDO');
-  box(75, yD, 60, H, 1, 'Team Leader', perPosto[1], BLU_TL, 'capo');
-  box(15, yD2, 88, H, 2, 'Vice Team Leader', perPosto[2], BLU_CHIARO, null);
-  box(107, yD2, 88, H, 3, 'Ufficiale di Collegamento', perPosto[3], BLU_CHIARO, null);
-  box(15, yD3, 58, H, 4, 'Staff Comando', perPosto[4], BLU_CHIARO, null);
-  box(76, yD3, 58, H, 5, 'Staff', perPosto[5], BLU_CHIARO, null);
-  box(137, yD3, 58, H, 6, 'Staff', perPosto[6], BLU_CHIARO, null);
+  box(75, yD, 60, H, 1, 'Team Leader', perPosto[1]?.nome, BLU_TL, 'capo', perPosto[1]?.grado);
+  box(15, yD2, 88, H, 2, 'Vice Team Leader', perPosto[2]?.nome, BLU_CHIARO, null, perPosto[2]?.grado);
+  box(107, yD2, 88, H, 3, 'Ufficiale di Collegamento', perPosto[3]?.nome, BLU_CHIARO, null, perPosto[3]?.grado);
+  box(15, yD3, 58, H, 4, 'Staff Comando', perPosto[4]?.nome, BLU_CHIARO, null, perPosto[4]?.grado);
+  box(76, yD3, 58, H, 5, 'Staff', perPosto[5]?.nome, BLU_CHIARO, null, perPosto[5]?.grado);
+  box(137, yD3, 58, H, 6, 'Staff', perPosto[6]?.nome, BLU_CHIARO, null, perPosto[6]?.grado);
   y = yD3 + H + 4.5;
 
   // ===== VALUTAZIONE E SICUREZZA (sfondo giallo) =====
@@ -1230,7 +1274,7 @@ async function generaPdfManifesto(prog, membri) {
   sezioneBg(y0, yV + H + 2.5, BIANCO_SEZ);
   titoloSezione(y0 + 4, 'VALUTAZIONE E SICUREZZA');
   [[7,'Strutturista'],[8,'NBCR'],[9,'Strutturista'],[10,'NBCR']].forEach(([n, r], i) => {
-    box(15.5 + i * (wV + 1.6), yV, wV, H, n, r, perPosto[n], SENAPE, null);
+    box(15.5 + i * (wV + 1.6), yV, wV, H, n, r, perPosto[n]?.nome, SENAPE, null, perPosto[n]?.grado);
   });
   y = yV + H + 4.5;
 
@@ -1245,13 +1289,13 @@ async function generaPdfManifesto(prog, membri) {
   sottoTitolo(yO + 3, 'RICERCA');
   const colR1 = [[11,'Unit\u00e0 Cinofila'],[12,'Unit\u00e0 Cinofila'],[13,'Tecnico Strumentista']];
   const colR2 = [[14,'Unit\u00e0 Cinofila'],[15,'Unit\u00e0 Cinofila'],[16,'Tecnico Strumentista']];
-  colR1.forEach(([n, r], i) => box(15, yR + i * STEPS, 88, HS, n, r, perPosto[n], ROSSO_CH, null));
-  colR2.forEach(([n, r], i) => box(107, yR + i * STEPS, 88, HS, n, r, perPosto[n], ROSSO_CH, null));
+  colR1.forEach(([n, r], i) => box(15, yR + i * STEPS, 88, HS, n, r, perPosto[n]?.nome, ROSSO_CH, null, perPosto[n]?.grado));
+  colR2.forEach(([n, r], i) => box(107, yR + i * STEPS, 88, HS, n, r, perPosto[n]?.nome, ROSSO_CH, null, perPosto[n]?.grado));
   sottoTitolo(yS - 1.5, 'SOCCORSO');
   const colS1 = [[17,'ROS'],[18,'Soccorritore Tecnico'],[19,'Soccorritore Tecnico'],[20,'Soccorritore Tecnico'],[21,'Soccorritore Tecnico'],[22,'SAF'],[23,'Addetto Sicurezza'],[24,'Sentinella']];
   const colS2 = [[25,'ROS'],[26,'Soccorritore Tecnico'],[27,'Soccorritore Tecnico'],[28,'Soccorritore Tecnico'],[29,'Soccorritore Tecnico'],[30,'SAF'],[31,'Addetto Sicurezza'],[32,'Sentinella']];
-  colS1.forEach(([n, r], i) => box(15, yS + i * STEPS, 88, HS, n, r, perPosto[n], ROSSO_CH, null));
-  colS2.forEach(([n, r], i) => box(107, yS + i * STEPS, 88, HS, n, r, perPosto[n], ROSSO_CH, null));
+  colS1.forEach(([n, r], i) => box(15, yS + i * STEPS, 88, HS, n, r, perPosto[n]?.nome, ROSSO_CH, null, perPosto[n]?.grado));
+  colS2.forEach(([n, r], i) => box(107, yS + i * STEPS, 88, HS, n, r, perPosto[n]?.nome, ROSSO_CH, null, perPosto[n]?.grado));
   y = yEndO + 2;
 
   // ===== LOGISTICA (sfondo giallo): 2 righe da 3 =====
@@ -1260,12 +1304,12 @@ async function generaPdfManifesto(prog, membri) {
   const yL2 = yL + STEPS;
   sezioneBg(y0, yL2 + HS + 2.5, BIANCO_SEZ);
   titoloSezione(y0 + 4, 'LOGISTICA');
-  box(15, yL, 58, HS, 33, 'Responsabile Logistica', perPosto[33], GIALLO, null);
-  box(76, yL, 58, HS, 34, 'Vice Responsabile Logistica', perPosto[34], GIALLO, null);
-  box(137, yL, 58, HS, 35, 'Logista', perPosto[35], GIALLO, null);
-  box(15, yL2, 58, HS, 36, 'Logista', perPosto[36], GIALLO, null);
-  box(76, yL2, 58, HS, 37, 'Logista', perPosto[37], GIALLO, null);
-  box(137, yL2, 58, HS, 38, 'Logista', perPosto[38], GIALLO, null);
+  box(15, yL, 58, HS, 33, 'Responsabile Logistica', perPosto[33]?.nome, GIALLO, null, perPosto[33]?.grado);
+  box(76, yL, 58, HS, 34, 'Vice Responsabile Logistica', perPosto[34]?.nome, GIALLO, null, perPosto[34]?.grado);
+  box(137, yL, 58, HS, 35, 'Logista', perPosto[35]?.nome, GIALLO, null, perPosto[35]?.grado);
+  box(15, yL2, 58, HS, 36, 'Logista', perPosto[36]?.nome, GIALLO, null, perPosto[36]?.grado);
+  box(76, yL2, 58, HS, 37, 'Logista', perPosto[37]?.nome, GIALLO, null, perPosto[37]?.grado);
+  box(137, yL2, 58, HS, 38, 'Logista', perPosto[38]?.nome, GIALLO, null, perPosto[38]?.grado);
   y = yL2 + HS + 4.5;
 
   doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184);
@@ -1553,7 +1597,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
       cella = `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpecAtt(occ.operatore_id)}</span>
         <button class="pill rosso" data-mvuota="${occ.id}" style="border:none; cursor:pointer;">✖</button>`;
     } else {
-      cella = `<div style="position:relative; width:min(300px, 55%);">
+      cella = `<div style="position:relative; width:min(420px, 62%);">
           <input id="mcerca-${p.n}" placeholder="Cerca nome…" autocomplete="off"
             style="width:100%; height:38px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; font-size:13px;">
           <div id="mlista-${p.n}" style="display:none; position:absolute; top:40px; left:0; right:0; background:#fff; border:1px solid var(--bordo); border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.15); z-index:40; max-height:240px; overflow-y:auto;"></div>
@@ -1617,7 +1661,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
           ultimoCapo = capo;
         }
         const pat = o.patente ? ' 🚚' + esc(o.patente) : '';
-        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9; ${sottoSogliaMan(o.id) ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o.id)}${pat}${sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''}</div>`;
+        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9; ${sottoSogliaMan(o.id) ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o.id)}${pat}${sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''} ${simboloVigile(o, 16)}</div>`;
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
       lista.style.display = 'block';
