@@ -204,12 +204,12 @@ async function loop() {
           const { data: op } = await sb.from('profili').select('id, nome, cognome').eq('telegram_chat_id', cb.from.id).limit(1).maybeSingle();
           if (!op) {
             await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Prima collega il tuo account (app \u2192 Profilo \u2192 Collega Telegram).' });
-            return;
+            continue;
           }
           const { data: att } = await sb.from('attivazioni').select('id, chiusa').eq('id', Number(attId)).limit(1).maybeSingle();
           if (!att || att.chiusa) {
             await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Attivazione gi\u00e0 chiusa.' });
-            return;
+            continue;
           }
           const { error: errIns } = await sb.from('risposte_attivazione').upsert(
             { attivazione_id: att.id, operatore_id: op.id, risposta: risposta },
@@ -217,7 +217,7 @@ async function loop() {
           );
           if (errIns) {
             await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Errore: ' + errIns.message });
-            return;
+            continue;
           }
           await tg('answerCallbackQuery', { callback_query_id: cb.id, text: risposta === 'si' ? '✅ Registrato: DISPONIBILE' : '❌ Registrato: NON disponibile' });
           await tg('sendMessage', { chat_id: cb.message.chat.id, text: risposta === 'si'
