@@ -547,32 +547,65 @@ async function pagSquadre(el) {
   // per ogni mese mostra Alpha e Bravo
   const perMese = {};
   progs.forEach(p => { (perMese[p.mese] = perMese[p.mese] || []).push(p); });
+  const dettaglioSquadra = (p) => p.programmi_membri.length ? SEZIONI_MODULO.map(s => {
+    const membriSez = s.posti.map(pp => p.programmi_membri.find(m => m.posto === pp.n)).filter(Boolean);
+    if (!membriSez.length) return '';
+    return `<div style="margin-bottom:8px;">
+      <div style="font-size:11px; font-weight:700; color:var(--grigio); text-transform:uppercase;">${s.t}</div>
+      ${membriSez.map(m => `<div style="font-size:14px; padding:2px 0; display:flex; gap:6px;">
+        <span style="color:var(--rosso); font-weight:700; width:24px;">${m.posto}</span>
+        <span style="font-weight:600;">${esc(m.profili?.cognome)} ${esc(m.profili?.nome)}</span>
+      </div>`).join('')}
+    </div>`;
+  }).join('') : '<div style="color:var(--grigio); font-size:14px;">Nessun nominativo.</div>';
+
   cont.innerHTML = Object.entries(perMese).map(([mese, lista]) => `
-    <div style="margin-bottom:30px;">
+    <div style="margin-bottom:24px;">
       <div style="font-weight:800; font-size:16px; margin-bottom:12px;">📅 ${meseIt(mese)}</div>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:16px;">
-        ${lista.map(p => `
-        <div class="card" style="border-left:4px solid ${p.team === 'alpha' ? 'var(--royal)' : 'var(--verde)'};">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <div style="font-weight:800;">TEAM ${p.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</div>
-            <span class="pill giallo">${p.programmi_membri.length}/38</span>
+      ${lista.map(p => `
+        <div class="card" data-squadra="${p.id}" style="border-left:4px solid ${p.team === 'alpha' ? 'var(--royal)' : 'var(--verde)'}; margin-bottom:10px; cursor:pointer;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:16px; font-weight:800; color:${p.team === 'alpha' ? 'var(--royal)' : 'var(--verde)'};">TEAM ${p.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</span>
+              <span class="pill giallo">${p.programmi_membri.length}/38</span>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              ${utente.ruolo === 'admin' ? `<button class="btn-primary" data-attiva-sq="${p.team}" style="height:38px; font-size:13px; background:var(--rosso);">🚨 ATTIVA</button>` : ''}
+              <button class="btn-primary" data-visualizza="${p.id}" style="height:38px; font-size:13px;">👁️ VISUALIZZA</button>
+              ${utente.ruolo === 'admin' ? `<button class="btn-primary" data-modifica="${p.id}" style="height:38px; font-size:13px; background:var(--grigio-ch);">✏️ MODIFICA</button>` : ''}
+            </div>
           </div>
-          ${p.programmi_membri.length ? SEZIONI_MODULO.map(s => {
-            const membriSez = s.posti.map(pp => p.programmi_membri.find(m => m.posto === pp.n)).filter(Boolean);
-            if (!membriSez.length) return '';
-            return `<div style="margin-bottom:8px;">
-              <div style="font-size:11px; font-weight:700; color:var(--grigio); text-transform:uppercase;">${s.t}</div>
-              ${membriSez.map(m => `<div style="font-size:14px; padding:2px 0; display:flex; gap:6px;">
-                <span style="color:var(--rosso); font-weight:700; width:24px;">${m.posto}</span>
-                <span style="font-weight:600;">${esc(m.profili?.cognome)} ${esc(m.profili?.nome)}</span>
-              </div>`).join('')}
-            </div>`;
-          }).join('') : '<div style="color:var(--grigio); font-size:14px;">Nessun nominativo.</div>'}
-          ${utente.ruolo === 'admin' ? `<button class="btn-primary" data-modifica="${p.id}" style="height:38px; font-size:13px; margin-top:10px;">✏️ Modifica</button>` : ''}
+          <div class="dettaglio-sq" style="display:none; margin-top:12px; border-top:1px solid var(--bordo); padding-top:12px;">
+            ${dettaglioSquadra(p)}
+          </div>
         </div>`).join('')}
-      </div>
     </div>`).join('');
-  cont.querySelectorAll('[data-modifica]').forEach(b => b.onclick = () => {
+
+  // toggle dettaglio al click sulla card (ma non sui pulsanti)
+  cont.querySelectorAll('[data-squadra]').forEach(card => {
+    card.onclick = (e) => {
+      if (e.target.closest('button')) return;
+      const d = card.querySelector('.dettaglio-sq');
+      d.style.display = d.style.display === 'none' ? 'block' : 'none';
+    };
+  });
+  // VISUALIZZA: apre il dettaglio (come il click)
+  cont.querySelectorAll('[data-visualizza]').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    const card = b.closest('[data-squadra]');
+    const d = card.querySelector('.dettaglio-sq');
+    d.style.display = 'block';
+  });
+  // ATTIVA: porta alla pagina Attivazione con la squadra preselezionata
+  cont.querySelectorAll('[data-attiva-sq]').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    localStorage.setItem('att-preferita', b.dataset.attivaSq);
+    pagina = 'attivazione';
+    render();
+  });
+  // MODIFICA: alla programmazione
+  cont.querySelectorAll('[data-modifica]').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
     const p = progs.find(x => x.id === Number(b.dataset.modifica));
     progMese = p.mese; progTeam = p.team; pagina = 'programmazione'; render();
   });
@@ -1473,13 +1506,21 @@ async function pagAttivazioneAdmin(el) {
       let teamScelto = null;
       const MSG_DEFAULT = (t) => `🚨 ATTIVAZIONE ${t} — Emergenza USAR. Ritrovo: Centrale VVF Mestre. Confermare la propria disponibilità.`;
       const msgBox = document.getElementById('att-msg');
-      cont.querySelectorAll('[data-avvia]').forEach(b => b.onclick = () => {
+      const seleziona = (team) => {
         cont.querySelectorAll('[data-avvia]').forEach(x => x.style.outline = '');
-        b.style.outline = '4px solid #059669';
-        teamScelto = b.dataset.avvia;
-        const nome = teamScelto === 'alpha' ? 'TEAM ALPHA' : teamScelto === 'bravo' ? 'TEAM BRAVO' : 'ATTIVAZIONE PERSONALIZZATA';
+        const btn = cont.querySelector(`[data-avvia="${team}"]`);
+        if (!btn) return;
+        btn.style.outline = '4px solid #059669';
+        teamScelto = team;
+        const nome = team === 'alpha' ? 'TEAM ALPHA' : team === 'bravo' ? 'TEAM BRAVO' : 'ATTIVAZIONE PERSONALIZZATA';
         msgBox.value = MSG_DEFAULT(nome);
-      });
+      };
+      cont.querySelectorAll('[data-avvia]').forEach(b => b.onclick = () => seleziona(b.dataset.avvia));
+      const preferita = localStorage.getItem('att-preferita');
+      if (preferita) {
+        localStorage.removeItem('att-preferita');
+        seleziona(preferita);
+      }
       document.getElementById('att-invia').onclick = async () => {
         if (!teamScelto) { alert('Seleziona prima ATTIVA ALPHA, ATTIVA BRAVO o ATTIVAZIONE PERSONALIZZATA.'); return; }
         const messaggio = msgBox.value.trim();
