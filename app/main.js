@@ -1447,21 +1447,24 @@ async function pagAttivazioneAdmin(el) {
           <button class="btn-primary" id="att-invia" style="margin-top:12px;">📡 INVIA ALLERTA</button>
         </div>`;
       let teamScelto = null;
+      const MSG_DEFAULT = (t) => `🚨 ATTIVAZIONE ${t} — Emergenza USAR. Ritrovo: Centrale VVF Mestre. Confermare la propria disponibilità.`;
+      const msgBox = document.getElementById('att-msg');
       cont.querySelectorAll('[data-avvia]').forEach(b => b.onclick = () => {
         cont.querySelectorAll('[data-avvia]').forEach(x => x.style.outline = '');
-        b.style.outline = '4px solid #ffffff';
+        b.style.outline = '4px solid #059669';
         teamScelto = b.dataset.avvia;
+        const nome = teamScelto === 'alpha' ? 'TEAM ALPHA' : teamScelto === 'bravo' ? 'TEAM BRAVO' : 'ATTIVAZIONE PERSONALIZZATA';
+        msgBox.value = MSG_DEFAULT(nome);
       });
       document.getElementById('att-invia').onclick = async () => {
         if (!teamScelto) { alert('Seleziona prima ATTIVA ALPHA, ATTIVA BRAVO o ATTIVAZIONE PERSONALIZZATA.'); return; }
-        const messaggio = document.getElementById('att-msg').value.trim();
+        const messaggio = msgBox.value.trim();
         if (!messaggio) { alert('Scrivi il messaggio di emergenza.'); return; }
         const { data: nuova, error } = await supabase.from('attivazioni')
           .insert({ team: teamScelto, messaggio, creata_da: utente.id }).select().single();
         if (error) { alert('Errore: ' + error.message); return; }
         attivazioneId = nuova.id;
         attivazioneTeam = nuova.team;
-        alert('🚨 Allerta lanciata! (Invio Telegram ai colleghi appena il bot è online — le risposte arrivano comunque qui in tempo reale)');
         disegna();
       };
       return;

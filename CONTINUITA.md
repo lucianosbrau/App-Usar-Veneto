@@ -512,6 +512,13 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - NB: su Render serve **Manual Deploy → Deploy latest commit** per attivare questa versione
 - **PRIMA PROVA DI ATTIVAZIONE END-TO-END** (proposta all'utente): admin lancia ALPHA dalla PWA → tutti i collegati ricevono l'allerta su Telegram → rispondono coi pulsanti → l'admin vede contatori e copertura aggiornarsi in tempo reale → chiude l'attivazione
 
+### Gruppo ALLERTA USAR VENETO + flusso attivazione completo (22/10/2026, decisione utente)
+- **Gruppo Telegram "ALLERTA USAR VENETO"** (da creare: gruppo, non canale — scrittura riservata agli admin, bot come amministratore): il bot manda lì le allerte CONTESTUALMENTE alle chat private dei collegati (doppio canale); le risposte coi pulsanti dal gruppo identificano l'operatore via `cb.from.id` (chat privata) — fix applicato
+- **Configurazione gruppo**: variabile d'ambiente `ALERT_GROUP_CHAT_ID` su Render (numero negativo per i gruppi); per scoprirla: aggiungere il bot al gruppo come ADMIN e scrivere `/idgruppo` nel gruppo (il bot risponde con l'ID, che finisce anche nei log)
+- **PWA Attivazione**: cornice di selezione **VERDE** (#059669); il messaggio si **precompila dinamicamente** col nome della squadra scelta ("🚨 ATTIVAZIONE TEAM ALPHA — ..."); invio senza alert di conferma → passa subito alla pagina realtime
+- **Flusso operativo completo deciso**: INVIA ALLERTA → allerta nel gruppo + private → la pagina Attivazione dell'admin è GIA la schermata realtime (risposte SÌ/NO live, copertura requisiti, compilazione automatica e manuale, GENERA PDF) → il PDF scaricato si inoltra manualmente nel gruppo
+- Il PDF NON viene pubblicato su GitHub Pages (nominativi), né generato dal bot per ora (futuro: PDF lato server)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)

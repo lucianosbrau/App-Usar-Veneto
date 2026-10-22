@@ -153,20 +153,25 @@ async function controllaAttivazioni() {
   const { data: collegati } = await sb.from('profili')
     .select('telegram_chat_id').not('telegram_chat_id', 'is', null);
   const teamTxt = aperta.team === 'alpha' ? 'TEAM ALPHA' : aperta.team === 'bravo' ? 'TEAM BRAVO' : 'ATTIVAZIONE PERSONALIZZATA';
-  for (const p of (collegati || [])) {
-    await tg('sendMessage', {
-      chat_id: p.telegram_chat_id,
-      text: `🚨🚨🚨 ATTIVAZIONE 🚨🚨🚨
+  const testoAllerta = `🚨🚨🚨 ATTIVAZIONE 🚨🚨🚨
 
 ${teamTxt}
 
 ${aperta.messaggio}
 
-Rispondi con i pulsanti qui sotto ⭇`,
-      reply_markup: { inline_keyboard: [[
-        { text: '✅ SONO DISPONIBILE', callback_data: 'att:si:' + aperta.id },
-        { text: '❌ NON SONO DISPONIBILE', callback_data: 'att:no:' + aperta.id }
-      ]] }
+Rispondi con i pulsanti qui sotto ⭇`;
+  const tastieraAllerta = { inline_keyboard: [[
+    { text: '✅ SONO DISPONIBILE', callback_data: 'att:si:' + aperta.id },
+    { text: '❌ NON SONO DISPONIBILE', callback_data: 'att:no:' + aperta.id }
+  ]] };
+  if (ALERT_GROUP) {
+    await tg('sendMessage', { chat_id: ALERT_GROUP, text: testoAllerta, reply_markup: tastieraAllerta }).catch(e => console.error('Invio gruppo fallito:', e.message));
+  }
+  for (const p of (collegati || [])) {
+    await tg('sendMessage', {
+      chat_id: p.telegram_chat_id,
+      text: testoAllerta,
+      reply_markup: tastieraAllerta
     }).catch(() => {});
   }
 }
@@ -196,7 +201,7 @@ async function loop() {
         await tg('answerCallbackQuery', { callback_query_id: cb.id });
         if (cb.data.startsWith('att:')) {
           const [ , risposta, attId ] = cb.data.split(':');
-          const { data: op } = await sb.from('profili').select('id, nome, cognome').eq('telegram_chat_id', cb.message.chat.id).limit(1).maybeSingle();
+          const { data: op } = await sb.from('profili').select('id, nome, cognome').eq('telegram_chat_id', cb.from.id).limit(1).maybeSingle();
           if (!op) {
             await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Prima collega il tuo account (app \u2192 Profilo \u2192 Collega Telegram).' });
             return;
