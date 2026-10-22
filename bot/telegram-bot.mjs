@@ -132,7 +132,7 @@ async function loop() {
         });
       } else if (testo.startsWith('/ferie')) {
         await tg('sendMessage', { chat_id: chatId, text: await inserisciFerie(chatId, testo) });
-      } else if (/^\d{2}-\d{2}$/.test(testo.trim())) {
+      } else if (/^\d{2,3}-\d{3}$/.test(testo.trim())) {
         const c = await collega(chatId, testo.trim());
         await tg('sendMessage', { chat_id: chatId, text: c.msg, reply_markup: c.ok ? tastieraPrincipale : undefined });
       } else {
