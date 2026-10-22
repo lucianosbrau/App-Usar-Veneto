@@ -10,7 +10,7 @@ Sistema per la gestione operativa del nucleo:
 - **Programmazione mensile** dei manifesti Alpha e Bravo (38 unità su modello USAR Medium, rotazione del personale, ricerca nominativi, ferie, contatori, **PDF nativo del manifesto scaricabile da mobile** — jsPDF; layout a sezioni: Direzione blu, Valutazione oro #FFD700, Operazioni rosso #FF0000, Logistica giallo)
 - **Calendario turni** ciclico (salti turno giorno/notte, vista personale, ferie con inserimento a click, range 2024-2028)
 - **Mantenimenti**: registro ore con validazione admin, soglia annua (36 h) configurabile
-- **Attivazioni di emergenza** con risposta SÌ/NO (doppio canale PWA + Telegram) — pagina completa: allerta ALPHA/BRAVO/**personalizzata** (modulo compila a mano tra chi risponde SÌ), risposte in tempo reale, copertura requisiti, compilazione automatica (dal programma del mese) o manuale del manifesto, PDF
+- **Attivazioni di emergenza** ✅ collaudate end-to-end: allerta ALPHA/BRAVO/**personalizzata** → gruppo Telegram "Allerta USAR VENETO" + chat private → risposte ✅/❌ dai pulsanti → **tempo reale** nella pagina admin (contatori, copertura requisiti, nomi), compilazione automatica/manuale del manifesto, PDF
 - **Report/statistiche** con export Excel/CSV e **PDF** del Manifesto
 - **Internazionale**: abilitazioni missioni e vaccinazioni — da sviluppare
 - **Dashboard**: contatori mantenimenti (in linea / sotto soglia) e grafici a torta per Comando e Turno
@@ -39,7 +39,7 @@ Sistema per la gestione operativa del nucleo:
 ```
 app/                 codice dell'app (main.js, style.css, supabase.js)
 db/schema.sql        schema completo del database (primo setup)
-db/migrazione-*.sql  migrazioni successive (TUTTE GIÀ ESEGUITE sul progetto attuale)
+db/migrazione-*.sql  migrazioni successive (TUTTE GIÀ ESEGUITE sul progetto attuale, incluse realtime, anagrafica estesa, policy attivazioni)
 db/seed-prova.sql    50 operatori fittizi per test (email prova.*, cancellabili)
 bot/telegram-bot.mjs bot Telegram (collegamento account, /ferie)
 public/              file statici pubblicati (logo, manifest PWA, service worker)
