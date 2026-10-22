@@ -1921,7 +1921,7 @@ async function schedaOperatore(el, o, oreMan) {
   const [specRes, mantRes, progRes] = await Promise.all([
     supabase.from('operatori_specializzazioni').select('specializzazioni(nome)').eq('operatore_id', o.id),
     supabase.from('mantenimenti').select('ore, data, stato').eq('operatore_id', o.id).eq('stato', 'approvato'),
-    supabase.from('programmi_membri').select('posto, programmi_mensili(mese, team)').eq('operatore_id', o.id).order('programmi_mensili.mese', { ascending: false }).limit(6)
+    supabase.from('programmi_membri').select('posto, programmi_mensili(mese, team)').eq('operatore_id', o.id).limit(50)
   ]);
   if (specRes.error || mantRes.error || progRes.error) {
     const err = specRes.error || mantRes.error || progRes.error;
@@ -1973,7 +1973,7 @@ async function schedaOperatore(el, o, oreMan) {
       ${(progRes.data || []).length ? `
       <div style="margin-top:18px;">
         <div style="font-weight:700; margin-bottom:8px;">🗓️ Ultimi inserimenti in squadra</div>
-        ${(progRes.data || []).map(m => `<div style="font-size:13px; padding:4px 0; border-top:1px solid var(--bordo);">${meseIt(m.programmi_mensili?.mese)} — <b>${m.programmi_mensili?.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</b> · posto ${m.posto}</div>`).join('')}
+        ${(progRes.data || []).sort((a, b) => String(b.programmi_mensili?.mese || '').localeCompare(String(a.programmi_mensili?.mese || ''))).slice(0, 6).map(m => `<div style="font-size:13px; padding:4px 0; border-top:1px solid var(--bordo);">${meseIt(m.programmi_mensili?.mese)} — <b>${m.programmi_mensili?.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</b> · posto ${m.posto}</div>`).join('')}
       </div>` : ''}
     </div>`;
 

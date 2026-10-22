@@ -2,7 +2,7 @@
 
 > **Scopo di questo documento**: consentire a chiunque (persona o AI) di riprendere il lavoro esattamente da dove siamo arrivati, anche in caso di crash di una sessione di lavoro. Aggiornarlo a ogni nuova decisione importante.
 
-Ultimo aggiornamento: 22/10/2026 11:20
+Ultimo aggiornamento: 22/10/2026 11:35
 
 ---
 
@@ -532,6 +532,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **CAUSA TROVATA (Attivazione non si aggiornava in tempo reale)**: mancava l'abilitazione Realtime delle tabelle nel DB. Creata `db/migrazione-realtime.sql` (**da eseguire**): alter publication supabase_realtime add table (attivazioni, risposte_attivazione, programmi_membri, mantenimenti, disponibilita)
 - NB utente: la query di test del realtime da SQL Editor fallisce con "Failed to check user auth status" — normale in SQL Editor (non è un client autenticato): eseguire SOLO le alter publication, non testare il realtime da lì
 - FK operatori_specializzazioni verificate: profili + specializzazioni (non ambigue, ok)
+- **FIX PGRST100 (scheda operatore)**: order su colonna di tabella relazionata (programmi_mensili.mese) non supportato dalla sintassi dell'API — rimosso l'order lato server, ordinamento ora lato client (ultimi 6 per mese)
 
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
