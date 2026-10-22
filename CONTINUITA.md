@@ -519,6 +519,11 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Flusso operativo completo deciso**: INVIA ALLERTA → allerta nel gruppo + private → la pagina Attivazione dell'admin è GIA la schermata realtime (risposte SÌ/NO live, copertura requisiti, compilazione automatica e manuale, GENERA PDF) → il PDF scaricato si inoltra manualmente nel gruppo
 - Il PDF NON viene pubblicato su GitHub Pages (nominativi), né generato dal bot per ora (futuro: PDF lato server)
 
+### Notifiche in silenzioso + configurazione gruppo (22/10/2026)
+- **Limite tecnico spiegato all'utente**: nessun bot/app può far suonare una notifica col telefono in silenzioso (restrizione iOS/Android). Rimedi possibili: impostazioni Telegram per il gruppo (notifiche attive, suono "Avviso", popup/priorità alta su Android), eccezione Telegram nel "Non disturbare", notifiche sbloccate sulla chat privata del bot; in futuro valutabile la CHIAMATA VoIP (unica che suona in silenzioso su Android se consentito)
+- **REQUISITO INFOGRAFICA collegamento Telegram** (da costruire, con screenshots reali o disegnati): includere la sezione "ricevere le allerte anche in silenzioso" con le impostazioni consigliate per Android e iPhone (campanella gruppo → notifiche attive + suono Avviso; popup/priorità; eccezione Non disturbare)
+- **Configurazione ALERT_GROUP_CHAT_ID** (istruzioni date all'utente): bot aggiunto al gruppo come ADMIN → `/idgruppo` nel gruppo → il numero (negativo) risposto va in Render → Settings → Environment → ALERT_GROUP_CHAT_ID → save (riavvio automatico)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)
