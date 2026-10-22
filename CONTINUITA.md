@@ -498,6 +498,13 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **Frecce navigazione mesi** spostate subito sotto il titolo della sezione, a sinistra, più grandi e visibili
 - **Nuova sezione "Le mie ferie" (solo admin)** in Resoconti: conteggio dei turni di ferie effettivi PROPI (stessa regola del riepilogo generale: solo turni che avresti lavorato, escluso il proprio salto turno) + giorni coinvolti; se il turno non è impostato nel profilo mostra l'avviso; naviga coi mesi insieme al resto della pagina
 
+### Scheda dettaglio operatore + promozione admin (22/10/2026, richiesta utente)
+- **Card operatori cliccabili** → aprono la **scheda dedicata**: foto/avatar grande, nome+simbolo grado, e tutti i dati: email, cellulare, comando, sede, turno/salto, grado, patente+estensioni, TPSS, TAS, **gruppo sanguigno, indirizzo, medico curante, contatto ICE (nome+relazione+telefono)**, specializzazioni, Telegram collegato, ore mantenimenti anno (in linea/sotto soglia), ultimi 6 inserimenti in squadra
+- **Pulsante ⭐ RENDI AMMINISTRATORE** (o ➖ REVOCA ADMIN per chi lo è già): con conferma esplicita; bloccato dal trigger anti-escalation (errore chiaro se tentato da non-admin); non puoi revocare te stesso
+- **REGOLA FISSATA (utente)**: l'admin NON modifica i dati degli operatori dalla scheda (operazione vietata) — solo promozione/revoca; i dati li modifica l'operatore dal proprio Profilo
+- Migrazione: `db/migrazione-anagrafica-estesa.sql` (**da eseguire**): nuovi campi cellulare, indirizzo, contatto_ice_nome/telefono/relazione, medico_curante, gruppo_sanguigno — pronti per l'import dal Google Sheet reale
+- Seed: `db/seed-anagrafica-estesa.sql` (**da eseguire dopo la migrazione**): valori casuali per gli operatori di prova (sostituibili coi dati veri)
+
 ### Prossimi passi (in ordine proposto)
 1. Primo utilizzo reale della Programmazione (Novembre — Alpha o Bravo) con verifica tendine e ferie
 2. **Bot Telegram online** (utente: BotFather + hosting; poi testare collegamento e /ferie end-to-end)

@@ -483,7 +483,8 @@ async function pagOperatori(el) {
     </div>
     <div class="grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px;">
       ${daMostrare.map(o => `
-        <div class="card" style="border-left:4px solid ${o.ruolo === 'admin' ? 'var(--rosso)' : 'var(--royal)'};">
+        <div class="card" data-op="${o.id}" style="border-left:4px solid ${o.ruolo === 'admin' ? 'var(--rosso)' : 'var(--royal)'}; cursor:pointer; position:relative;">
+          <div style="position:absolute; top:10px; right:12px; font-size:11px; color:var(--grigio);">➤</div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <div class="avatar" style="width:56px;height:56px;font-size:18px;">${esc(iniziali(o.nome, o.cognome))}</div>
             <span class="pill ${o.ruolo === 'admin' ? 'rosso' : 'verde'}">${o.ruolo === 'admin' ? '⭐ Admin' : '🟢 Attivo'}</span>
@@ -1906,6 +1907,85 @@ function rigaCoda(m) {
     </div>`;
   document.getElementById('fil-tutti').onclick = () => { localStorage.setItem('op-filtro', 'tutti'); pagOperatori(el); };
   document.getElementById('fil-sottosoglia').onclick = () => { localStorage.setItem('op-filtro', 'sottosoglia'); pagOperatori(el); };
+  cont.querySelectorAll('[data-op]').forEach(c => c.onclick = () => {
+    const o = operatori.find(x => x.id === c.dataset.op);
+    if (o) schedaOperatore(el, o, oreMan);
+  });
+}
+
+async function schedaOperatore(el, o, oreMan) {
+  const [specRes, mantRes, progRes] = await Promise.all([
+    supabase.from('operatori_specializzazioni').select('specializzazioni(nome)').eq('operatore_id', o.id),
+    supabase.from('mantenimenti').select('ore, data, stato').eq('operatore_id', o.id).eq('stato', 'approvato'),
+    supabase.from('programmi_membri').select('posto, programmi_mensili(mese, team)').eq('operatore_id', o.id).order('programmi_mensili.mese', { ascending: false }).limit(6)
+  ]);
+  const anno = new Date().getFullYear();
+  const oreAnno = (mantRes.data || []).filter(m => String(m.data).startsWith(anno)).reduce((s, m) => s + Number(m.ore), 0);
+  const specNomi = (specRes.data || []).map(s => s.specializzazioni?.nome).filter(Boolean);
+  const inValore = specNomi.filter(n => ['Strutturista', 'NBCR 3° livello', 'Unità cinofila K9', 'SAF 2A (corda)', 'Caposquadra/Caporeparto'].includes(n));
+  const altreSpec = specNomi.filter(n => !inValore.includes(n));
+
+  const riga = (label, valore) => valore ? `<tr><td style="padding:7px 10px; color:var(--grigio); font-size:13px; white-space:nowrap; border-top:1px solid var(--bordo);">${label}</td><td style="padding:7px 10px; border-top:1px solid var(--bordo); font-weight:600;">${esc(valore)}</td></tr>` : '';
+
+  el.innerHTML = `
+    <div class="pagina-titolo">👥 Gestione Operatori</div>
+    <button class="link" id="op-indietro" style="padding:0; margin:6px 0 16px; font-size:14px;">← Torna all'elenco</button>
+    <div class="card" style="max-width:680px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div class="avatar" style="width:72px;height:72px;font-size:24px;">${esc(iniziali(o.nome, o.cognome))}</div>
+          <div>
+            <div style="font-size:24px; font-weight:800;">${esc(o.cognome)} ${esc(o.nome)} ${simboloVigile(o, 24)}</div>
+            <div style="color:var(--grigio); font-size:13px;">${o.grado ? esc(o.grado) + ' · ' : ''}${o.ruolo === 'admin' ? '⭐ Amministratore' : 'Operatore'}</div>
+          </div>
+        </div>
+        ${o.ruolo !== 'admin' ? `<button class="btn-primary" id="op-promuovi" style="background:var(--rosso); height:44px;">⭐ RENDI AMMINISTRATORE</button>` : `<button class="btn-primary" id="op-revoca" style="background:var(--grigio-ch); height:44px;">➖ REVOCA ADMIN</button>`}
+      </div>
+
+      <table style="width:100%; border-collapse:collapse;">
+        ${riga('Email', o.email)}
+        ${riga('Cellulare', o.cellulare)}
+        ${riga('Comando', o.comando)}
+        ${riga('Sede di servizio', o.sede)}
+        ${riga('Turno / salto', o.salto_turno || o.turno)}
+        ${riga('Grado', o.grado)}
+        ${riga('Patente', o.patente ? o.patente + (o.estensioni_patente?.length ? ' + ' + o.estensioni_patente.join(', ') : '') : '')}
+        ${riga('TPSS (soccorso sanitario)', o.tpss ? 'Sì' : '')}
+        ${riga('TAS', o.tas ? 'Livello ' + o.tas : '')}
+        ${riga('Gruppo sanguigno', o.gruppo_sanguigno)}
+        ${riga('Indirizzo', o.indirizzo)}
+        ${riga('Medico curante', o.medico_curante)}
+        ${riga('Contatto ICE', o.contatto_ice_nome ? `${o.contatto_ice_nome} (${esc(o.contatto_ice_relazione || '')}) · ${o.contatto_ice_telefono || ''}` : '')}
+        ${riga('Specializzazioni', inValore.concat(altreSpec).join(', '))}
+        ${riga('Telegram', o.telegram_chat_id ? '✅ Collegato' : '')}
+        ${riga('Mantenimenti ' + anno, oreAnno ? oreAnno + ' ore approvate' + ((oreMan[o.id] || 0) < 36 ? ' ⚠️ sotto soglia' : ' ✅ in linea') : '')}
+      </table>
+
+      ${(progRes.data || []).length ? `
+      <div style="margin-top:18px;">
+        <div style="font-weight:700; margin-bottom:8px;">🗓️ Ultimi inserimenti in squadra</div>
+        ${(progRes.data || []).map(m => `<div style="font-size:13px; padding:4px 0; border-top:1px solid var(--bordo);">${meseIt(m.programmi_mensili?.mese)} — <b>${m.programmi_mensili?.team === 'alpha' ? 'ALPHA' : 'BRAVO'}</b> · posto ${m.posto}</div>`).join('')}
+      </div>` : ''}
+    </div>`;
+
+  document.getElementById('op-indietro').onclick = () => pagOperatori(el);
+  const btnP = document.getElementById('op-promuovi');
+  if (btnP) btnP.onclick = async () => {
+    if (!confirm(`Promuovere ${o.cognome} ${o.nome} ad AMMINISTRATORE? Potrà gestire squadre, validare mantenimenti e lanciare allerte.`)) return;
+    const { error } = await supabase.from('profili').update({ ruolo: 'admin' }).eq('id', o.id);
+    if (error) { alert('Errore: ' + error.message + (error.code === '42501' ? ' — la promozione è bloccata dal sistema di sicurezza. Contatta l\'assistenza.' : '')); return; }
+    alert('⭐ ' + o.cognome + ' ' + o.nome + ' è ora amministratore.');
+    pagOperatori(el);
+  };
+  const btnR = document.getElementById('op-revoca');
+  if (btnR) btnR.onclick = async () => {
+    if (o.id === utente.id) { alert('Non puoi revocare te stesso: sarebbe un problema se restasse fuori.'); return; }
+    if (!confirm(`Revocare i privilegi di amministratore a ${o.cognome} ${o.nome}?`)) return;
+    const { error } = await supabase.from('profili').update({ ruolo: 'operatore' }).eq('id', o.id);
+    if (error) { alert('Errore: ' + error.message); return; }
+    alert(o.cognome + ' ' + o.nome + ' è ora operatore.');
+    pagOperatori(el);
+  };
 }
 
 async function salvaMantenimento() {
