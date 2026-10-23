@@ -642,3 +642,8 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Aggiunta sezione «IL GRUPPO "ALLERTA USAR VENETO"» in HTML e PDF: allerte nel gruppo + private, PDF del manifesto girati dagli admin visibili a tutti, solo admin scrivono
 - **REGOLA (utente)**: l'inserimento nel gruppo avviene SOLO da parte di un admin (Telegram non permette l'aggiunta da parte di membri normali e il bot non può farlo) — l'operatore deve CHIEDERE AL PROPRIO AMMINISTRATORE di essere aggiunto (evidenziato in un riquadro blu)
 - **Ricerca Operatori**: pulsante ✕ dentro la barra (visibile solo quando c'è testo) che cancella tutto e mostra di nuovo tutte le schede
+
+### Infografica piano di migrazione in 2 fasi (23/10/2026)
+- File: `index-extra/infografica-migrazione-2fasi.html` — riassume per i non-tecnici le due migrazioni future: FASE 1 (rosso) da account personali a Gmail del nucleo (GitHub transfer, Supabase transfer/dump, Render nuovo, verifica + collaudo; bot invariato, redirect automatico PWA, 0 €) e FASE 2 (blu) dai servizi esterni ai server CNVVF (requisiti server + firewall Telegram, dump/import PostgreSQL, sostituzione solo dello strato dati, realtime WebSocket, bot spostato, SSO Corpo, chiusura servizi esterni)
+- Fonti: MIGRAZIONE-ACCOUNT.md e MIGRAZIONE-SERVER-CORPO.md (i dettagli operativi restano lì); l'infografica è la vista d'insieme per la presentazione
+- Distinta dalla vecchia infografica-migrazione.html (solo fase 1) che resta pubblicata
