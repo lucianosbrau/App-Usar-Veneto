@@ -632,3 +632,8 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - **SOLUZIONE STRUTTURALE**: le pagine informative ora vivono in `index-extra/` e `vite.config.js` le copia in `dist` a fine build (plugin closeBundle). Gli screenshot condivisi vanno in `public/assets/` (copiati automaticamente). **REGOLA: ogni nuovo file HTML o immagine da pubblicare va in `index-extra/` o `public/`, NON nella radice del repo**
 - **Foto nel tondo di PROFILO**: ora si vede subito la propria foto dopo l'upload (pagProfilo async + avatarHtml)
 - **Ricerca in OPERATORI**: barra "🔍 Cerca per nome o cognome…" sopra l'elenco — filtra le card mentre si scrive (nome e cognome, anche parziale), testo salvato e ritrovato al rientro, combinabile col filtro sotto-soglia
+
+### PDF infografica Telegram (23/10/2026)
+- Creato `index-extra/infografica-telegram.pdf` (A4, 2-3 pagine): stesse 6 fasi con gli screenshot reali, sezione silenzioso Android/iPhone, niente emoji (font DejaVu, simboli testuali SÌ/NO)
+- Pubblicato su GitHub Pages insieme all'HTML — link diretto: /infografica-telegram.pdf
+- Generato offline con fpdf2 (script non committato); se l'infografica cambia, rigenerare il PDF a mano
