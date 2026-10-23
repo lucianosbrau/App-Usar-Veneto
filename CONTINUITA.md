@@ -182,3 +182,10 @@ Skill persistente (v4) collegata all'account utente: struttura del modulo USAR M
 - FIX: `.then(() => {}, () => {})` al posto di `.catch(() => {})` su rpc e storage.remove (l'altro punto con la stessa forma fragile)
 - VERIFICA: test automatico jsdom con supabase simulato REALISTICO (rpc senza .catch, esattamente come la libreria vera) → click card → scheda APERTA. Il test simula ora anche le forme di risposta della libreria: utile come riferimento per i test futuri
 - LEZIONE (4ª): le query supabase sono thenable ma NON Promise complete — MAI concatenare .catch; usare .then(ok, ko) oppure await con try/catch
+
+### Piano import dati reali (23/10/2026, in definizione)
+- Scenario: l'utente ha un elenco di nominativi con nome, cognome e tutte le informazioni (specializzazioni, turno, ecc.) da importare in Supabase
+- **COLLEGAMENTO ACCOUNT ← SCHEDA: via EMAIL** (deciso): l'elenco importato conterrà anche l'email di ogni persona; chi si registra con quell'email "raccatta" automaticamente la propria scheda già piena (dati, specializzazioni, turno) — nessuno reinserisce nulla, nessun collegamento manuale admin
+- Utente dice che le email probabilmente ci sono già nell'elenco (da confermare alla consegna del file)
+- **DA DECIDERE (domande aperte all'utente)**: (1) chi si registra con email NON presente nell'elenco: bloccato / registrato con validazione admin / libero come oggi; (2) ok a cancellare i 50 operatori di prova prima dell'import vero
+- Da costruire quando arriva l'elenco: script di import da CSV → righe profili con email + marker "in attesa di registrazione"; collegamento email→profilo alla registrazione
