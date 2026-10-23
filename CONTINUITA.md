@@ -175,3 +175,10 @@ Skill persistente (v4) collegata all'account utente: struttura del modulo USAR M
 - FIX (public/sw.js v4): la pagina principale arriva SEMPRE dal server (solo offline usa la cache); gli asset con nome-impronta (index-XXXX.js) restano in cache (immutabili); foto/logo cache con aggiornamento in sottofondo. skipWaiting + clients.claim già presenti → al primo reload dopo il deploy la nuova versione prende il comando
 - **ISTRUZIONI per chi ha il problema adesso**: fare F5/ricarica UNA volta (il service worker nuovo si installa e prende il comando), poi una SECONDA ricarica per vedere la versione nuova. In alternativa: DevTools (F12) → Application → Service Workers → Unregister, poi ricarica
 - LEZIONE: qualunque modifica al comportamento di aggiornamento dell'app va fatta nel service worker tenendo presente che la sua cache è SEPARATA da quella del browser
+
+### FIX VERO: schede non si aprivano da PC (23/10/2026, console utente)
+- CONSOLE utente: "Uncaught TypeError: Ee.rpc(...).catch is not a function" — la riga del log consultazioni (`supabase.rpc('registra_consultazione').catch(()=>{})`) bloccava TUTTA la scheda: le query della libreria supabase sono "thenable" SENZA .catch concatenabile — il .catch non esiste e l'eccezione ammazzava la funzione prima del rendering
+- Il telefono funzionava perché aveva una versione anteriore a quella riga (quindi anche la ✕ della ricerca mancava: era la versione di ieri)
+- FIX: `.then(() => {}, () => {})` al posto di `.catch(() => {})` su rpc e storage.remove (l'altro punto con la stessa forma fragile)
+- VERIFICA: test automatico jsdom con supabase simulato REALISTICO (rpc senza .catch, esattamente come la libreria vera) → click card → scheda APERTA. Il test simula ora anche le forme di risposta della libreria: utile come riferimento per i test futuri
+- LEZIONE (4ª): le query supabase sono thenable ma NON Promise complete — MAI concatenare .catch; usare .then(ok, ko) oppure await con try/catch

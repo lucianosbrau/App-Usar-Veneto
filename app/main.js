@@ -2066,7 +2066,7 @@ function rigaCoda(m) {
 
 async function schedaOperatore(el, o, oreMan) {
   if (utente.ruolo === 'admin' && o.id !== utente.id) {
-    supabase.rpc('registra_consultazione', { target: o.id }).catch(() => {});
+    supabase.rpc('registra_consultazione', { target: o.id }).then(() => {}, () => {});
   }
   const [specRes, mantRes, progRes] = await Promise.all([
     supabase.from('operatori_specializzazioni').select('specializzazioni(nome)').eq('operatore_id', o.id),
@@ -2182,7 +2182,7 @@ async function schedaOperatore(el, o, oreMan) {
     if (errA || !data?.session) { alert('Password errata: eliminazione annullata.'); return; }
     const { error: errDel } = await supabase.rpc('elimina_operatore', { target: o.id });
     if (errDel) { alert('Eliminazione fallita: ' + errDel.message); return; }
-    if (o.foto_path) supabase.storage.from('foto-profili').remove([o.foto_path]).catch(() => {});
+    if (o.foto_path) supabase.storage.from('foto-profili').remove([o.foto_path]).then(() => {}, () => {});
     alert('Account eliminato.');
     pagOperatori(el);
   };
