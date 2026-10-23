@@ -168,3 +168,10 @@ Skill persistente (v4) collegata all'account utente: struttura del modulo USAR M
 - Riprodotta l'apertura scheda con test automatico (jsdom + DB simulato): il codice CORRENTE funziona — click → hash #/operatori/<id> → scheda renderizzata con tutti i dati
 - Se l'utente vede l'hash cambiare ma la scheda non aprirsi: quasi certamente CACHE del telefono con versione precedente. Istruzioni: chiudere l'app, riaprire e ricaricare; se persiste, svuotare la cache del browser o reinstallare la PWA
 - Test eseguito con jsdom: script temporaneo non committato
+
+### FIX SERVICE WORKER: PC bloccato su versione vecchia (23/10/2026, segnalazione utente)
+- SINTOMO: da PC le schede operatori non si aprivano (cambiava solo l'indirizzo) nemmeno dopo svuotare la cache del browser; da MOBILE funzionava MA mancava la ✕ della ricerca → il PC e il telefono erano entrambi su una versione vecchia, ma il PC non si aggiornava MAI
+- CAUSA RADICE: il service worker metteva in CACHE anche la pagina principale dell'app (index.html) e la serviva dalla memoria senza mai ricontrollare il server — svuotare la cache del browser NON basta perché il service worker ha una MEMORIA PROPRIA separata
+- FIX (public/sw.js v4): la pagina principale arriva SEMPRE dal server (solo offline usa la cache); gli asset con nome-impronta (index-XXXX.js) restano in cache (immutabili); foto/logo cache con aggiornamento in sottofondo. skipWaiting + clients.claim già presenti → al primo reload dopo il deploy la nuova versione prende il comando
+- **ISTRUZIONI per chi ha il problema adesso**: fare F5/ricarica UNA volta (il service worker nuovo si installa e prende il comando), poi una SECONDA ricarica per vedere la versione nuova. In alternativa: DevTools (F12) → Application → Service Workers → Unregister, poi ricarica
+- LEZIONE: qualunque modifica al comportamento di aggiornamento dell'app va fatta nel service worker tenendo presente che la sua cache è SEPARATA da quella del browser
