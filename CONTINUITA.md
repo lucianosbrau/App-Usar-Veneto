@@ -232,3 +232,10 @@ Skill persistente (v4) collegata all'account utente: struttura del modulo USAR M
 - VACCINAZIONI CANI: ID_VACCINICANE, ID_CANE, NOME, MICROCHIP, TIPO VACCINO (RABBIA, POLIVALENTE, LESHMANIOSI, LEPTOSPIROSI), DATA SOMMINISTRAZIONE, SCADENZA → tabella cani_vaccini legata al cane
 - RILEVAZIONE TAGLIE: taglia TUTA, ELMO (NORMALE/FUORI MISURA), INTIMO TERMICO (S-XXL), SCARPONI (numero), GUANTI (numero) → card "TAGLIE DPI" in Profilo e scheda Operatore; vita propria, solo informativa
 - SPECIALIZZAZIONI (colonne del foglio): FUNZIONARIO, STAFF, LOGISTA, NBCR (Liv. 2/Liv. 3/NR/LPG/LNG), SPECIALIZZAZIONE NBCR, CINOFILO (SI), SAF (1B - BASICO / 2A - AVANZATO / combinati), TAS (2), SAPR, MEDICO, INFERMIERE → in attesa delle regole di gestione dall'utente
+
+### ⚠️ INCIDENTE GRAVE: app schermata bianca (23/10/2026 — RISOLTO)
+- SINTOMO: app offline per chiunque, pagina bianca, console "Cannot read properties of undefined (reading 'auth')"
+- CAUSA: il file di test test-app.mjs sovrascriveva app/supabase.js con la versione FINTA del database e il file è stato committato così (commit c84b417) → pubblicato → nessuna connessione al DB
+- FIX: supabase.js ripristinato dalla versione originale (d3be1c0); test ora blindato: lavora su una COPIA del progetto in cartella temporanea DENTRO il repo (vede node_modules), MAI sul file vero; .gitignore per .test-run-*
+- **REGOLA PERMANENTE (5ª lezione)**: i test NON devono MAI modificare file del progetto: copiare tutto in una cartella temporanea e testare lì; VERIFICARE SEMPRE `git status` prima di ogni commit e guardare se file core come supabase.js risultano modificati
+- Il test ha comunque 20/20 check verdi sul codice corretto

@@ -5,7 +5,7 @@
 // alla libreria Supabase (query "thenable" SENZA .catch: la forma
 // che ha causato il bug delle schede non si può più scrivere per sbaglio).
 
-import { readFileSync, writeFileSync, rmSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { JSDOM } from 'jsdom';
 
 let passati = 0, falliti = 0;
@@ -58,12 +58,21 @@ globalThis.__SB = {
   channel: () => ({ on: () => ({ on: () => ({ subscribe: () => {} }) }) }),
 };
 
+const origdir = process.cwd();
 const origine = readFileSync('./app/supabase.js', 'utf8');
+// MAI sovrascrivere il file vero: si testa su una COPIA in una cartella temporanea
+import { mkdtempSync, cpSync } from 'fs';
+import { rmSync } from 'fs';
+import { join } from 'path';
+const dirTest = mkdtempSync(join(origdir, '.test-run-'));  // DENTRO il progetto: vede node_modules
+cpSync('./app', join(dirTest, 'app'), { recursive: true });
+cpSync('./index.html', join(dirTest, 'index.html'));
+process.chdir(dirTest);
 writeFileSync('./app/supabase.js', `export const supabase = globalThis.__SB; export const isConfigured = true;`);
 const attesa = (ms) => new Promise(r => setTimeout(r, ms));
 
 try {
-  await import('./app/main.js');
+  await import(new URL('./app/main.js', `file://${process.cwd()}/`).href);
   await attesa(600);
 
   console.log('\n[1] Avvio e rendering');
@@ -131,7 +140,8 @@ try {
   console.log('  ❌ ERRORE RUNTIME nei test:', e.message);
   console.log(e.stack?.split('\n').slice(0, 5).join('\n'));
 } finally {
-  writeFileSync('./app/supabase.js', origine);
+  process.chdir(origdir);
+  rmSync(dirTest, { recursive: true, force: true });
 }
 
 console.log(`\n========== RISULTATO: ${passati} passati, ${falliti} falliti ==========`);
