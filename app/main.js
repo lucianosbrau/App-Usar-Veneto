@@ -2281,6 +2281,11 @@ async function pagProfilo(el) {
       <div class="successo" id="p-ok" style="margin-top:14px;">Dati salvati.</div>
       <button class="btn-primary" id="p-salva" style="max-width:200px; height:46px; margin-top:14px;">SALVA</button>
     </div>
+    <div class="card" style="max-width:600px; margin-bottom:20px;">
+      <div style="font-weight:700; margin-bottom:10px;">👀 Chi ha consultato la tua scheda</div>
+      <div id="p-consultazioni" style="font-size:13px; color:var(--grigio);">Caricamento…</div>
+      <div style="font-size:11px; color:var(--grigio); margin-top:8px;">Ogni volta che un amministratore apre la tua scheda, la consultazione viene registrata. È la tua garanzia di trasparenza prevista dall'informativa privacy.</div>
+    </div>
     <div class="card" style="max-width:600px;">
       <div style="font-weight:700; margin-bottom:10px;">🤖 Collega Telegram</div>
       <p style="font-size:14px; color:var(--grigio);">Apri il bot su Telegram, premi AVVIA e invia il codice che compare qui sotto.</p>
@@ -2315,7 +2320,7 @@ async function pagProfilo(el) {
   const btnRf = document.getElementById('p-foto-rimuovi');
   if (btnRf) btnRf.onclick = async () => {
     if (!confirm('Rimuovere la foto profilo?')) return;
-    await supabase.storage.from('foto-profili').remove([utente.foto_path]).catch(() => {});
+    supabase.storage.from('foto-profili').remove([utente.foto_path]).then(() => {}, () => {});
     const { error } = await supabase.from('profili').update({ foto_path: null }).eq('id', utente.id);
     if (error) { mostraFotoMsg('Errore: ' + error.message, true); return; }
     utente.foto_path = null;
@@ -2341,6 +2346,7 @@ async function pagProfilo(el) {
     const { data } = await supabase.from('log_consultazioni')
       .select('creato_il, profili!log_cons_admin_fkey(cognome, nome)')
       .eq('operatore_id', utente.id).order('creato_il', { ascending: false }).limit(10);
+    if (!box) return;
     box.innerHTML = (data || []).length
       ? `<ul style="margin-left:18px; line-height:1.9;">${data.map(c => `<li><b>${esc((c.profili?.cognome || '') + ' ' + (c.profili?.nome || ''))}</b> — ${new Date(c.creato_il).toLocaleString('it-IT')}</li>`).join('')}</ul>`
       : 'Nessun amministratore ha consultato la tua scheda finora.';
