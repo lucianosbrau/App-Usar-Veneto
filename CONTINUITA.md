@@ -73,7 +73,7 @@ Account (personali di Luciano Di Lorenzo): GitHub `lucianosbrau`, Supabase, Rend
 - **Turno G (Giornaliero)**: nel Profilo (A-D-G); **G NON ha salto** (campo disattivato al salvataggio); i G non entrano nel calendario, solo ferie. Nel foglio: M→G, "Giornaliero"→G; chi non ha turno lo imposta da sé
 
 ### Mantenimenti
-- **Soglia 24 ore** su `ore_conteggiate` (import: prestate→ore, reali→ore_conteggiate; causale "Manutenzione e magazzino" conteggia 50% via trigger)
+- **Soglia 24 ore** su `ore_conteggiate` (import: prestate→ore, reali→ore_conteggiate; causale "Manutenzione e magazzino" conteggia 50% via trigger). Scheda operatore: la riga mantenimenti mostra le **ore conteggiate** (base soglia) e, se diverse, le ore approvate piene tra parentesi — stesso criterio ovunque, niente più "41 ore approvate ⚠️ sotto soglia" apparentemente contraddittorio
 - Flusso: in_validazione → admin approva/rifiuta (note); sotto soglia: in fondo alle tendine ⚠️ MAN.
 - 8 causali: Mantenimento, Manovra, Intervento, Lavorazione, Manutenzione e magazzino, Tutor Mantenimento, Tutor Corso, Altra formazione
 
