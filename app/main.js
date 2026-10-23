@@ -585,7 +585,8 @@ async function pagOperatori(el) {
 
   cont.innerHTML = `
     <div style="position:relative; width:100%; max-width:420px; margin-bottom:12px;">
-      <input id="op-cerca" placeholder="🔍 Cerca per nome o cognome…" autocomplete="off"
+      <div id="diag-ore" style="display:none; max-width:100%; margin-bottom:12px; padding:10px 14px; background:#FEF2F2; color:#991B1B; border:1px solid #FECACA; border-radius:10px; font-size:13px;"></div>
+    <input id="op-cerca" placeholder="🔍 Cerca per nome o cognome…" autocomplete="off"
         style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 38px 0 14px; font-size:14px;">
       <button id="op-cerca-x" title="Cancella la ricerca" style="position:absolute; right:4px; top:50%; transform:translateY(-50%); border:none; background:#F1F5F9; color:#64748B; width:28px; height:28px; border-radius:50%; font-size:15px; font-weight:700; cursor:pointer; display:none; line-height:1;">✕</button>
     </div>
@@ -982,8 +983,18 @@ async function toggleFerie(data, turno, el, anno, mese) {
 
 async function caricaOreMantenimenti() {
   const anno = new Date().getFullYear();
-  const { data } = await supabase.from('mantenimenti')
+  const { data, error } = await supabase.from('mantenimenti')
     .select('operatore_id, ore, ore_conteggiate, data').eq('stato', 'approvato');
+  if (error) {
+    // MAI silenzioso: se la query fallisce (es. cache schema PostgREST) si vede subito
+    console.error('ERRORE caricamento ore mantenimenti:', error.message, error.code);
+    const avviso = document.getElementById('diag-ore');
+    if (avviso) {
+      avviso.style.display = 'block';
+      avviso.textContent = '⚠️ Conteggio ore non caricato (' + error.code + ' ' + error.message + ') — probabilmente la cache dello schema: eseguire in Supabase SQL Editor: NOTIFY pgrst, \'reload schema\';';
+    }
+    return {};
+  }
   const ore = {};
   (data || []).forEach(m => {
     if (!String(m.data).startsWith(anno)) return;
