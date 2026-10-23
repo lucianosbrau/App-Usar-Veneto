@@ -43,6 +43,7 @@ db/migrazione-*.sql  migrazioni successive (TUTTE GIÀ ESEGUITE sul progetto att
 db/seed-prova.sql    50 operatori fittizi per test (email prova.*, cancellabili)
 bot/telegram-bot.mjs bot Telegram (collegamento account, /ferie)
 public/              file statici pubblicati (logo, manifest PWA, service worker)
+index-extra/         pagine informative HTML (infografiche, presentazione) — copiate nel build
 .github/workflows/   deploy automatico su GitHub Pages
 CONTINUITA.md        documento di continuità (leggere PRIMA di riprendere il lavoro)
 ```
@@ -62,9 +63,7 @@ CONTINUITA.md        documento di continuità (leggere PRIMA di riprendere il la
 ## Documentazione
 
 - `CONTINUITA.md` — decisioni, regole di business, stato del lavoro (documento operativo principale)
-- `presentazione.html` — panoramica del progetto
-- `anteprima-schermate.html` — mockup delle schermate
-- `infografica-flusso.html` — infografica del flusso operativo
+- Le pagine informative (`index-extra/`: presentazione, anteprima schermate, infografiche) vengono copiate nel build e pubblicate su Pages
 - `MIGRAZIONE-SERVER-CORPO.md` — guida futura migrazione sui server del Corpo
 - `MIGRAZIONE-ACCOUNT.md` — guida passo-passo per passare dagli account personali a quelli del nucleo (GitHub/Supabase/Render)
 - `infografica-migrazione.html` — infografica della migrazione account

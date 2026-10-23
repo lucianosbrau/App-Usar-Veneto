@@ -528,11 +528,18 @@ async function pagOperatori(el) {
   };
 
   const soloSottoSoglia = localStorage.getItem('op-filtro') === 'sottosoglia';
-  const daMostrare = soloSottoSoglia
-    ? operatori.filter(o => (oreMan[o.id] || 0) < 36)
-    : operatori;
+  let testoCerca = localStorage.getItem('op-cerca') || '';
+  const filtraPer = () => {
+    let lista = soloSottoSoglia ? operatori.filter(o => (oreMan[o.id] || 0) < 36) : operatori;
+    const q = testoCerca.trim().toLowerCase();
+    if (q) lista = lista.filter(o => `${o.cognome} ${o.nome}`.toLowerCase().includes(q));
+    return lista;
+  };
+  const daMostrare = filtraPer();
 
   cont.innerHTML = `
+    <input id="op-cerca" placeholder="🔍 Cerca per nome o cognome…" autocomplete="off"
+      style="width:100%; max-width:420px; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 14px; font-size:14px; margin-bottom:12px;">
     <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
       <button class="pill ${!soloSottoSoglia ? 'verde' : ''}" id="fil-tutti" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">👥 Tutti (${operatori.length})</button>
       <button class="pill ${soloSottoSoglia ? 'rosso' : ''}" id="fil-sottosoglia" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">⚠️ Sotto soglia mantenimenti (${operatori.filter(o => (oreMan[o.id] || 0) < 36).length})</button>
@@ -559,6 +566,16 @@ async function pagOperatori(el) {
           </div>
         </div>`))).join('')}
     </div>`;
+  const cercaInput = document.getElementById('op-cerca');
+  cercaInput.value = testoCerca;
+  cercaInput.oninput = () => {
+    testoCerca = cercaInput.value;
+    localStorage.setItem('op-cerca', testoCerca);
+    const lista = filtraPer();
+    cont.querySelectorAll('[data-op]').forEach(c => {
+      c.style.display = lista.some(o => o.id === c.dataset.op) ? '' : 'none';
+    });
+  };
   document.getElementById('fil-tutti').onclick = () => { localStorage.setItem('op-filtro', 'tutti'); pagOperatori(el); };
   document.getElementById('fil-sottosoglia').onclick = () => { localStorage.setItem('op-filtro', 'sottosoglia'); pagOperatori(el); };
   cont.querySelectorAll('[data-op]').forEach(c => c.onclick = () => {
@@ -2179,16 +2196,17 @@ async function salvaMantenimento() {
   pagMantenimenti(document.getElementById('contenuto'));
 }
 
-function pagProfilo(el) {
+async function pagProfilo(el) {
   const TURNI = ['A', 'B', 'C', 'D'];
   const SALTI = [];
   for (const t of TURNI) for (let n = 1; n <= 8; n++) SALTI.push(t + n);
+  const mioAvatar = await avatarHtml(utente, 72, 24);
   el.innerHTML = `
     <div class="pagina-titolo">👤 Profilo</div>
     <div class="pagina-sotto">${esc(utente.email)} — ruolo: ${esc(utente.ruolo)}</div>
     <div class="card" style="max-width:600px; margin-bottom:20px;">
       <div style="display:flex; align-items:center; gap:16px; margin-bottom:14px;">
-        <div class="avatar" style="width:72px;height:72px;font-size:24px;">${esc(iniziali(utente.nome, utente.cognome))}</div>
+        ${mioAvatar}
         <div>
           <div style="font-weight:700; margin-bottom:6px;">📷 Foto profilo</div>
           <input type="file" id="p-foto" accept="image/*" style="display:none;">

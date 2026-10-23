@@ -626,3 +626,9 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - SOLUZIONE: bucket `foto-profili` reso PRIVATO + lettura per autenticati + policy delete propria cartella; l'app ora genera **URL firmati (1 ora, in cache)** con createSignedUrl per mostrare le foto. Migrazione: `db/fix-bucket-foto.sql` (**DA ESEGUIRE in SQL Editor**)
 - NOTA: la foto accanto ai nomi in pagina Attivazione era stata PERSA da un replace fallito (stessa lezione); ripristinata ora con avatarHtml async
 - LEZIONE RIPETUTA: verificare SEMPRE con grep dopo i replace su blocchi template multi-riga
+
+### FIX 404 infografiche + foto in Profilo + ricerca operatori (23/10/2026)
+- **CAUSA 404 infografica-telegram** (e di qualunque altro file non-app): il sito pubblica SOLO la cartella `dist` del build Vite, e i file HTML "informativi" (presentazione, anteprima, infografiche) non venivano copiati. Le vecchie si vedevano perché pubblicate quando il sito usava il metodo precedente
+- **SOLUZIONE STRUTTURALE**: le pagine informative ora vivono in `index-extra/` e `vite.config.js` le copia in `dist` a fine build (plugin closeBundle). Gli screenshot condivisi vanno in `public/assets/` (copiati automaticamente). **REGOLA: ogni nuovo file HTML o immagine da pubblicare va in `index-extra/` o `public/`, NON nella radice del repo**
+- **Foto nel tondo di PROFILO**: ora si vede subito la propria foto dopo l'upload (pagProfilo async + avatarHtml)
+- **Ricerca in OPERATORI**: barra "🔍 Cerca per nome o cognome…" sopra l'elenco — filtra le card mentre si scrive (nome e cognome, anche parziale), testo salvato e ritrovato al rientro, combinabile col filtro sotto-soglia
