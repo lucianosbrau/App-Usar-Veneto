@@ -212,3 +212,30 @@ Skill persistente (v4) sull'account utente: modulo USAR Medium, modello COMPOSIZ
 - TURNO G: selezionando G il campo SALTO si svuota e si DISATTIVA (G non ha salto); salvataggio: salto vuoto per G
 - MANTENIMENTI: confermato dall'utente che le ore importate si considerano TUTTE APPROVATE
 - La torta Dashboard e i filtri comando vanno aggiornati con i 12 comandi al prossimo giro (le tendine programmazione usano il campo comando del profilo, non fisse)
+
+## 15. FASE 1 IMPORT — RUNBOOK COMPLETO (stato: PREPARATA, non ancora eseguita)
+
+> Se la sessione crash: leggere questa sezione per sapere a che punto siamo.
+> Stato attuale: PREPARAZIONE COMPLETA. **Non è stato toccato NIENTE nel database online.**
+
+### Cosa è già pronto (verificato 24/10/2026)
+- ✅ Codice: tag git `backup-pre-fase1-24-10-2026` (backup completo del codice, pushato su GitHub)
+- ✅ Migrazione progettata: `db/FASE1-migrazione-specializzazioni.sql` (**DA NON ESEGUIRE ANCORA**) — aggiunge SOLO colonne/tabelle nuove accanto alle esistenti (sp_* su profili, anagrafici nuovo, cani, cani_vaccini, taglie_dpi, log_modifiche_spec, RPC admin_modifica_spec). Le colonne vecchie NON si toccano finché l'import non è verificato (TPSS rimossa solo a fine fase)
+- ✅ Verifiche fatte dall'utente: mantenimenti v2 ✅, sedi ✅, soglia 24 ✅, tendine sedi ✅
+- ✅ Tutte le regole decise: specializzazioni (sez. 6 + tabella definitiva), gradi, comandi/sedi (12 + lista), turni G, dedup livello-alto, eccezioni pulizia (admin + TENAN + CONTESSO + IPPOLITO), mantenimenti (ore=prestate, conteggiate=reali, tutti approvati)
+
+### Passi della FASE 1 (in ordine — spuntare man mano)
+- [ ] **1. BACKUP DATABASE (fa l'utente)**: Supabase → Database → Backups → scaricare l'ultimo backup (o Settings → General → Export). Senza questo NON si procede
+- [ ] 2. **Eseguire `db/FASE1-migrazione-specializzazioni.sql`** (fa l'utente in SQL Editor): aggiunge colonne e tabelle nuove senza toccare nulla di esistente
+- [ ] 3. **Script di import** (costruisce l'AI): legge il foglio Google (DATI ANAGRAFICI + SPECIALIZZAZIONI + MANTENIMENTI via gviz CSV), applica le regole (gradi FF.TT.→D, M→G, comando→i 12, sede→lista ufficiale, NBCR Liv.→numero, SAF normalizzato, TAS, dedup livello-alto) e genera SQL di import (INSERT ... ON CONFLICT DO UPDATE, email come chiave di collegamento)
+- [ ] 4. **SIMULAZIONE su 2-3 operatori campione** (es. ANAFI, BUBOLA, DI LORENZO): mostrare all'utente la riga trasformata (foglio → app) e farla VERIFICARE prima di importare tutto
+- [ ] 5. **Pulizia + import**: cancellare gli operatori di prova (TRANNE admin, TENAN, CONTESSO, IPPOLITO — via id esplicito), azzerare i mantenimenti di prova, eseguire l'import (anagrafici → specializzazioni → mantenimenti con ore=prestate/conteggiate=reali, tutti approvati)
+- [ ] 6. **Aggiornare l'app**: tendine/priorità/badge sulle nuove colonne sp_* (STAFF 📝 nei 4-6, LOGISTA nei 33-38, FUNZIONARIO 1-3, NBCR prima 3 poi 2, SAF solo 2A-AVANZATO, K9 11-15, strutturista 7-9, ROS omino rosso 17-25); Profilo con sezioni apribili; collegamento email→scheda alla registrazione; rimozione TPSS dall'interfaccia
+- [ ] 7. **Verifica finale con l'utente**: login con account reale, scheda piena, tendine con priorità, dashboard con numeri veri, mantenimenti importati
+- [ ] 8. **Fine FASE 1**: rimozione colonne vecchie non più usate (tpss, vecchio schema specializzazioni se non più referenziato) — SOLO dopo verifica, in una migrazione separata
+
+### Punti di attenzione
+- Il trigger `trg_blocca_modifiche_admin` vieta all'admin le modifiche ai profili: le specializzazioni admin passano dalla RPC `admin_modifica_spec` (che logga)
+- L'import usa email come chiave; righe senza email: caricare comunque la scheda (l'utente completerà la mail poi)
+- Il foglio ha ~150 righe con anomalie già mappate (vedi sez. 10); ogni anomalia non prevista → chiedere all'utente, non improvvisare
+- Dopo l'import: i 50 di prova spariscono; i seed non si rieseguono più
