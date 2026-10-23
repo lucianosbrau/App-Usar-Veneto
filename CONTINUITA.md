@@ -214,3 +214,12 @@ Skill persistente (v4) collegata all'account utente: struttura del modulo USAR M
 - MISSIONI INT. SI/NO presente — ottimo per la futura sezione Internazionale
 - REGOLA DECISA DALL'UTENTE: doppi = tenere il LIVELLO PIÙ ALTO (dedup durante l'import con unione dei dati, prevale il valore più alto per NBCR/SAF)
 - L'utente fornirà a breve l'elenco completo delle specializzazioni con le regole di gestione in un messaggio dedicato
+
+### Decisioni import (23/10/2026) + foglio MANTENIMENTI letto
+- GRADI: l'utente scriverà la tabella di corrispondenza (forniti ora i valori attuali dell'app: D, VD, IA, CRE, CR, CSE, CS, VC, VE, VF)
+- COMANDI: si aggiungono le province del FRIULI VENEZIA GIULIA a quelle venete (elenco a tendina; aggiornare la torta Dashboard che conta per comando) — SEDE = sede distaccata precisa, anche a tendina per evitare errori di scrittura
+- TURNI: G = GIORNALIERO (uniformare in menù a tendina: A, B, C, D, G/Giornaliero); per i G valgono SOLO le ferie che inseriscono, niente turno nel calendario; M → G; chi ha più turni (es. Contesso) → inserirne UNO solo, confermerà l'operatore; ALTRO → non importare nulla, conferma manuale dell'operatore
+- DOCUMENTI: nel PROFILO possibilità di caricare 2 FOTO DEL DOCUMENTO per operatore; visibili SOLO in Profilo e nella scheda OPERATORE sotto una card "DOCUMENTI" (bucket foto-profili, stessa infrastruttura, path <id>/doc1 e <id>/doc2)
+- CINOFILI: per chi è CINOFILO (dal foglio SPECIALIZZAZIONI): colonne DB aggiuntive per anagrafica del CANE + VACCINAZIONI; CARD dedicate in PROFILO e OPERATORI
+- MANTENIMENTI (foglio letto): PERFETTAMENTE integrabile — colonne: ID, ID_ANAGRAFICA, CODICE FISCALE, COGNOME, NOME, TIPO MANTENIMENTO (= le 7 causali dell'app, ma con varianti "TUTOR MANTENIMENTI" e "TUTOR CORSI" → normalizzare in "Tutor Mantenimento"/"Tutor Corso"), DATA (gg/mm/aaaa), ARGOMENTO, ORE PRESTATE, ORE REALI (→ usare ORE REALI come ore valide? CHIEDERE), APPROVATO SI (= approvato), MOTIVAZIONE (= note_rifiuto). Riferimento via CODICE FISCALE o ID_ANAGRAFICA
+- FOGLI DEL DATABASE EXCEL CONOSCIUTI: APP GENERALE (email per gruppi G1-G18), DATI ANAGRAFICI (anagrafica completa), SPECIALIZZAZIONI (abilitazioni/corsi), MANTENIMENTI (storico ore). Da leggere ancora: fogli cinofili (nome esatto da chiedere)
