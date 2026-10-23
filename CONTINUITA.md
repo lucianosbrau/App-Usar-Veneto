@@ -637,3 +637,7 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - Creato `index-extra/infografica-telegram.pdf` (A4, 2-3 pagine): stesse 6 fasi con gli screenshot reali, sezione silenzioso Android/iPhone, niente emoji (font DejaVu, simboli testuali SÌ/NO)
 - Pubblicato su GitHub Pages insieme all'HTML — link diretto: /infografica-telegram.pdf
 - Generato offline con fpdf2 (script non committato); se l'infografica cambia, rigenerare il PDF a mano
+
+### Infografica Telegram: sezione gruppo Allerta USAR VENETO (23/10/2026)
+- Aggiunta sezione «IL GRUPPO "ALLERTA USAR VENETO"» in HTML e PDF: allerte nel gruppo + private, PDF del manifesto girati dagli admin visibili a tutti, solo admin scrivono
+- **REGOLA (utente)**: l'inserimento nel gruppo avviene SOLO da parte di un admin (Telegram non permette l'aggiunta da parte di membri normali e il bot non può farlo) — l'operatore deve CHIEDERE AL PROPRIO AMMINISTRATORE di essere aggiunto (evidenziato in un riquadro blu)
