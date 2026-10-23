@@ -31,6 +31,8 @@ def normalizza_tel(x):
     t = pulisci(x).replace(' ', '').replace('.', '').replace('-', '').replace('(', '').replace(')', '')
     if t.startswith('+39'): t = t[3:]
     if t.startswith('0039'): t = t[4:]
+    # valori "spazzatura" nel foglio ('0', '......', '*') → vuoto
+    if t in ('0', '', '*') or set(t) <= {'.'}: return ''
     return t
 
 def data_iso(x):
@@ -116,8 +118,15 @@ def main():
         turno = TURNI.get(turno_raw)
         salto = up(16) if turno in ('A','B','C','D') else None
         sede = up(14)
-        if sede == 'CENTRALE':
-            sede = 'Centrale Direzione' if 'DIREZIONE' in comando_raw else ('Centrale Mestre' if comando_raw == 'VENEZIA' else 'Centrale ' + (COMANDI.get(comando_raw) or '').title())
+        # NORMALIZZAZIONE SEDI verso la lista ufficiale (l'operatore può correggere dal Profilo)
+        sl = sede.replace('-', ' ').replace('.', ' ').strip()
+        if 'DIREZIONE' in comando_raw and ('CENTRALE' in sl or 'DIREZIONE' in sl):
+            sede = 'Centrale Direzione'
+        elif 'MESTRE' in sl or 'VENEZIA MESTRE' in sl:
+            sede = 'Centrale Mestre' if 'CENTRALE' in sl or 'VENEZIA MESTRE' in sl else 'Mestre'
+        elif 'CENTRALE' in sl or sl in (COMANDI.get(comando_raw) or ''):
+            sede = 'Centrale ' + (COMANDI.get(comando_raw) or '').title()
+        # le sedi restanti restano come scritte (l'operatore verificherà dal Profilo)
         sp = spec.get(cf, {})
         saf_u = sp.get('saf_raw', '')
         saf = '2A - AVANZATO' if ('2A' in saf_u or 'AVANZATO' in saf_u) else ('1B - BASICO' if ('1B' in saf_u or 'BASICO' in saf_u) else ('1A' if '1A' in saf_u else None))
