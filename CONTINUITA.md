@@ -647,3 +647,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - File: `index-extra/infografica-migrazione-2fasi.html` — riassume per i non-tecnici le due migrazioni future: FASE 1 (rosso) da account personali a Gmail del nucleo (GitHub transfer, Supabase transfer/dump, Render nuovo, verifica + collaudo; bot invariato, redirect automatico PWA, 0 €) e FASE 2 (blu) dai servizi esterni ai server CNVVF (requisiti server + firewall Telegram, dump/import PostgreSQL, sostituzione solo dello strato dati, realtime WebSocket, bot spostato, SSO Corpo, chiusura servizi esterni)
 - Fonti: MIGRAZIONE-ACCOUNT.md e MIGRAZIONE-SERVER-CORPO.md (i dettagli operativi restano lì); l'infografica è la vista d'insieme per la presentazione
 - Distinta dalla vecchia infografica-migrazione.html (solo fase 1) che resta pubblicata
+
+### FIX registrazione: email di conferma riapparsa (23/10/2026)
+- SINTOMO: un nuovo utente registrato ha ricevuto l'email di conferma col link che apriva una pagina VUOTA (dovevamo avere accesso immediato senza conferma)
+- CAUSA: l'interruttore "Confirm email" su Supabase (Authentication → Sign In/Up → Email) era ATTIVO — non un problema di codice; il redirect URL corretto è già in config: https://lucianosbrau.github.io/App-Usar-Veneto/** (i due asterischi coprono tutte le sottopagine — non cambiarlo)
+- FIX (fatto dall'utente sul pannello): "Confirm email" SPENTO + Site URL = https://lucianosbrau.github.io/App-Usar-Veneto/
+- **REGOLA PERMANENTE**: ogni volta che si entra nel pannello Authentication di Supabase per qualunque motivo, RICONTROLLARE che "Confirm email" resti spento — la registrazione deve dare accesso immediato. Se un utente resta bloccato da una registrazione fatta con la conferma attiva, attivarlo con: update auth.users set email_confirmed_at = now() where email = '<email>';
+- Da verificare col nuovo utente che ora riesca ad accedere
