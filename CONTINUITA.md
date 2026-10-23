@@ -175,7 +175,7 @@ Skill persistente (v4) sull'account utente: modulo USAR Medium, modello COMPOSIZ
 - CINOFILO: SI/NO — nell'app il nome resta "Unità cinofila K9"; nel foglio è la colonna CINOFILO (mappa durante l'import)
 - SAF: 1A, 1B-BASICO, 2A-AVANZATO; simbolo 🧗; priorità SOLO 2A-AVANZATO
 - TAS: No, 1, 2; icona 🧭 SOLO livello 2
-- SAPR: SI/NO — simbolo DRONE
+- SAPR: SI/NO — SENZA simbolo (l'emoji drone era un UFO; deciso niente icona)
 - MEDICO / INFERMIERE: SI/NO — SENZA simbolo
 - ELIMINARE TPSS (sostituito da MEDICO/INFERMIERE)
 - Modifiche admin a specializzazioni/attributi: sempre con LOG di modifica
@@ -183,6 +183,11 @@ Skill persistente (v4) sull'account utente: modulo USAR Medium, modello COMPOSIZ
 ### Tendine più grandi + decisioni SAPR/K9 + strategia import (23/10/2026 sera)
 - TENDINE PROGRAMMAZIONE/ATTIVAZIONE: righe più alte (padding 10px 12px), testo 15px (era 13), simbolo vigile 20px (era 16), casella di ricerca leggermente più larga (min(460px,68%))
 - UNITÀ CINOFILE K9: già obbligatorie nei posti 11, 12, 14, 15 (tendina mostra solo idonei + "● OBBL.") — confermato dall'utente, nessuna modifica necessaria
-- SAPR: simbolo DRONE (non elicottero) — da usare nell'implementazione
-- **STRATEGIA IMPORT (proposta all'utente, in attesa di conferma)**: FASE 1 = sezioni con IMPATTO sulle funzioni (DATI ANAGRAFICI + SPECIALIZZAZIONI + MANTENIMENTI) — perché cambiano tendine, priorità, badge, conteggi; FASE 2 = sezioni di sola CONSULTAZIONE (DOCUMENTI, MEDICA, VACCINAZIONI, VACCINI, ANAGRAFICA CANI, VACCINAZIONI CANI, RILEVAZIONE TAGLIE) — nessun impatto su programmazione, si importano dopo con le card dedicate
+- SAPR: SENZA simbolo (decisione finale dell'utente)
+- **STRATEGIA IMPORT (CONFERMATA dall'utente)**: FASE 1 = sezioni con IMPATTO sulle funzioni (DATI ANAGRAFICI + SPECIALIZZAZIONI + MANTENIMENTI) — perché cambiano tendine, priorità, badge, conteggi; FASE 2 = sezioni di sola CONSULTAZIONE (DOCUMENTI, MEDICA, VACCINAZIONI, VACCINI, ANAGRAFICA CANI, VACCINAZIONI CANI, RILEVAZIONE TAGLIE) — nessun impatto su programmazione, si importano dopo con le card dedicate
 - NB: i fogli MEDICA e VACCINAZIONI (persone) non ancora letti — leggerli in fase 2
+
+### Inizio FASE 1 import (24/10/2026 — PROSSIMO LAVORO)
+- Piano CONFERMATO: FASE 1 = DATI ANAGRAFICI + SPECIALIZZAZIONI + MANTENIMENTI (impatto sulle funzioni). FASE 2 = schede consultazione (documenti, medica, vaccinazioni, vaccini, cani, taglie) con le card dedicate
+- Procedura: (1) BACKUP completo codice+DB; (2) migrazione schema nuove specializzazioni (livelli NBCR 0-3, SAF 1A/1B-BASICO/2A-AVANZATO, funzionario/staff/logista/sapr/medico/infermiere SI-NO, strutturista compilabile, TPSS eliminato, estensione NBCR informativa); (3) script di import dal foglio Google con dedup livello-più-alto; (4) simulazione su 2-3 operatori campione + verifica utente; (5) pulizia operatori di prova (tranne admin) + import vero; (6) aggiornamento tendine/priorità/badge in base alla tabella definitiva
+- **Da chiedere prima di importare i mantenimenti: ORE REALI o ORE PRESTATE come ore valide**
