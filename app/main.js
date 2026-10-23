@@ -1073,6 +1073,8 @@ async function apriProgramma(cont, programmi) {
   }
   progId = prog.id;
 
+  const [yS, mS] = progMese.split('-').map(Number);
+  const seiMesiFa = new Date(yS, mS - 1 - 6, 1).toISOString().slice(0, 7) + '-01';
   const meseInizio = progMese;
   const [y, mo] = progMese.split('-').map(Number);
   const meseFine = `${y}-${String(mo).padStart(2, '0')}-${String(new Date(y, mo, 0).getDate()).padStart(2, '0')}`;
@@ -1080,7 +1082,7 @@ async function apriProgramma(cont, programmi) {
     supabase.from('profili').select('id, nome, cognome, patente, grado, comando, estensioni_patente, tpss, tas').order('cognome'),
     supabase.from('programmi_membri').select('*, profili(nome, cognome, patente, grado, estensioni_patente)').eq('programma_id', prog.id),
     supabase.from('programmi_membri').select('operatore_id, programmi_mensili!inner(mese)')
-      .lt('programmi_mensili.mese', progMese).order('programmi_mensili.mese', { ascending: true }),
+      .lt('programmi_mensili.mese', progMese).gte('programmi_mensili.mese', seiMesiFa).order('programmi_mensili.mese', { ascending: true }),
     supabase.from('disponibilita').select('operatore_id, data').eq('tipo', 'ferie')
       .gte('data', meseInizio).lte('data', meseFine),
     caricaOreMantenimenti()
@@ -1090,6 +1092,11 @@ async function apriProgramma(cont, programmi) {
   const feriePerOp = {};
   (ferie.data || []).forEach(f => {
     (feriePerOp[f.operatore_id] = feriePerOp[f.operatore_id] || []).push(f.data);
+  });
+  // REGOLA: le ferie si contano in GIORNI (date distinte), non in turni
+  const giorniFeriePerOp = {};
+  Object.keys(feriePerOp).forEach(opId => {
+    giorniFeriePerOp[opId] = [...new Set(feriePerOp[opId])].length;
   });
   const tutti = pers.data || [];
   const occupati = new Set((membri.data || []).map(m => m.operatore_id));
@@ -1140,9 +1147,9 @@ async function apriProgramma(cont, programmi) {
   };
   const candidato = (o) => ({
     ...o,
-    giorniFerie: (feriePerOp[o.id] || []).length,
+    giorniFerie: giorniFeriePerOp[o.id] || 0,
     sottoMan: sottoSogliaMan(o.id),
-    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.grado ? ` [${o.grado}]` : '') + iconeSpec(o.id) + patenteSigla(o) + ((feriePerOp[o.id] || []).length ? ` 🏖 ${(feriePerOp[o.id] || []).length} gg ferie` : '') + (sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''),
+    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.grado ? ` [${o.grado}]` : '') + iconeSpec(o.id) + patenteSigla(o) + ((giorniFeriePerOp[o.id] || 0) ? ` 🏖 ${giorniFeriePerOp[o.id]} gg ferie` : '') + (sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''),
     gruppo: gruppoDi(o.id)
   });
 
