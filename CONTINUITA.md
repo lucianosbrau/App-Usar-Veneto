@@ -654,3 +654,9 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - FIX (fatto dall'utente sul pannello): "Confirm email" SPENTO + Site URL = https://lucianosbrau.github.io/App-Usar-Veneto/
 - **REGOLA PERMANENTE**: ogni volta che si entra nel pannello Authentication di Supabase per qualunque motivo, RICONTROLLARE che "Confirm email" resti spento — la registrazione deve dare accesso immediato. Se un utente resta bloccato da una registrazione fatta con la conferma attiva, attivarlo con: update auth.users set email_confirmed_at = now() where email = '<email>';
 - Da verificare col nuovo utente che ora riesca ad accedere
+
+### Privacy: analisi e bozza informativa (23/10/2026)
+- Analisi rischi GDPR fatta e condivisa con l'utente: cellulare/indirizzo = dati personali; ICE = dato di TERZI (il familiare non firma: va informato dall'operatore); gruppo sanguigno e vaccinazioni = DATI SANITARI (categoria speciale GDPR art. 9, base giuridica = sicurezza sul lavoro, non consenso pubblicitario); indirizzo+turni di 250 VVF = anche rischio sicurezza personale
+- DECISIONE utente: preparare la BOZZA di informativa → creata `INFORMATIVA-PRIVACY.md` (bozza v1, linguaggio semplice: cosa salviamo, chi vede cosa con tabella ruoli, dove stanno i dati UE, tempi conservazione, diritti, ICE facoltativo ma spiegato, sanitari facoltativi)
+- Da fare prossimi: (1) validazione testo dal responsabile privacy del Corpo; (2) mostrare l'informativa in app alla registrazione con spunta di accettazione; (3) valutare i livelli di accesso differenziati per i dati sanitari tra gli admin; (4) campo "consenso privacy" nel profilo quando attivata
+- La fase 2 (server CNVVF) riduce ulteriormente i rischi: dati sanitari in casa
