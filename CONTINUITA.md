@@ -660,3 +660,10 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - DECISIONE utente: preparare la BOZZA di informativa → creata `INFORMATIVA-PRIVACY.md` (bozza v1, linguaggio semplice: cosa salviamo, chi vede cosa con tabella ruoli, dove stanno i dati UE, tempi conservazione, diritti, ICE facoltativo ma spiegato, sanitari facoltativi)
 - Da fare prossimi: (1) validazione testo dal responsabile privacy del Corpo; (2) mostrare l'informativa in app alla registrazione con spunta di accettazione; (3) valutare i livelli di accesso differenziati per i dati sanitari tra gli admin; (4) campo "consenso privacy" nel profilo quando attivata
 - La fase 2 (server CNVVF) riduce ulteriormente i rischi: dati sanitari in casa
+
+### Privacy implementata + file dei link (23/10/2026)
+- DECISIONI utente sui punti privacy: (2) dati ICE/sanitari solo admin CON LOG DI CONSULTAZIONE e admin che NON può modificare; (3) consenso privacy registrato alla registrazione; (4-5) ok sui restanti
+- Implementato: migrazione `db/migrazione-privacy-consenso-log.sql` (**DA ESEGUIRE in SQL Editor**): colonna privacy_consenso_il, tabella log_consultazioni (append-only via RPC registra_consultazione, leggibile da admin e DALL'OPERATORE STESSO per trasparenza), trigger trg_blocca_modifiche_admin (l'admin NON modifica più i profili altrui: restano solo promozione/revoca ruolo, eliminazione account e il proprio profilo — rafforza la regola fissata in precedenza)
+- App: spunta obbligatoria di accettazione privacy alla registrazione (link a informativa-privacy.html) + registrazione della marca temporale del consenso; ogni apertura di scheda operatore da parte di admin chiama la RPC di log; NUOVA sezione in Profilo "👀 Chi ha consultato la tua scheda" (ultime 10, nome admin + data)
+- Informativa pubblicata anche come pagina web stile progetto: index-extra/informativa-privacy.html
+- Creato `Link del progetto.txt` (radice repo): l'utente lo chiede di mantenere aggiornato con TUTTI i link (app, repo, bot, documenti, infografiche, PDF, presentazioni)
