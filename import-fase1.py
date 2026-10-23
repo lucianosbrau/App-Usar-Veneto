@@ -19,6 +19,20 @@ def pulisci(x):
         return str(int(x))
     return ' '.join(str(x or '').split()).strip()
 
+def estrai_cf(x):
+    import re
+    t = pulisci(x).upper()
+    m = re.search(r'"([A-Z0-9]{16})"', t)
+    if m: return m.group(1)
+    m = re.match(r'^([A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z])$', t)
+    return m.group(1) if m else t
+
+def normalizza_tel(x):
+    t = pulisci(x).replace(' ', '').replace('.', '').replace('-', '').replace('(', '').replace(')', '')
+    if t.startswith('+39'): t = t[3:]
+    if t.startswith('0039'): t = t[4:]
+    return t
+
 def data_iso(x):
     import datetime
     if isinstance(x, datetime.datetime) or isinstance(x, datetime.date):
@@ -60,7 +74,7 @@ def main():
     # ---- SPECIALIZZAZIONI per codice fiscale (dedup livello più alto) ----
     spec = {}
     for header, v in righe_foglio(wb, 'SPECIALIZZAZIONI', 16, riga_dati=2):
-        cf = pulisci(v[2]).upper()  # col3 CF = indice 2
+        cf = estrai_cf(v[2])  # col3 CF = indice 2 (gestisce formule =UPPER)
         if not cf or len(cf) < 10: continue
         # POSIZIONI FISSE: col3 CF, col6 FUNZ, col7 STAFF, col8 LOGISTA, col9 NBCR,
         # col10 EST, col11 CINOFILO, col12 SAF, col13 TAS, col14 SAPR, col15 MEDICO, col16 INFERMIERE
@@ -91,7 +105,7 @@ def main():
     for header, v in anagrafica:
         pul = lambda i: pulisci(v[i - 1])
         up = lambda i: pul(i).upper()
-        cf = up(2)
+        cf = estrai_cf(v[1])
         cognome, nome = up(3), up(4)
         if simula and not any(s in cognome for s in simula): continue
         email = pul(10).lower()
@@ -113,12 +127,12 @@ def main():
         riga = {
             'cognome': cognome, 'nome': nome, 'email': email or None, 'email_servizio': email_servizio or None,
             'cf': cf or None, 'data_nascita': data_iso(v[4]), 'luogo_nascita': pul(6),
-            'cellulare': pul(7), 'tel_servizio': pul(8), 'tel_casa': pul(9),
+            'cellulare': normalizza_tel(v[6]), 'tel_servizio': normalizza_tel(v[7]), 'tel_casa': normalizza_tel(v[8]),
             'grado': GRADI.get(grado_raw), 'grado_raw': grado_raw,
             'comando': COMANDI.get(comando_raw), 'comando_raw': comando_raw, 'sede': sede,
             'turno': turno, 'salto_turno': salto,
             'corso_usar': data_iso(v[16]),
-            'ice_nome': pul(18), 'ice_tel': pul(19),
+            'ice_nome': pul(18), 'ice_tel': normalizza_tel(v[18]),
             'missioni_int': up(20) == 'SI',
             'spec': {
                 'funzionario': sp.get('funzionario', False), 'staff': sp.get('staff', False),
