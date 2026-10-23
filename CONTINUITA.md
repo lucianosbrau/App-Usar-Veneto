@@ -163,3 +163,17 @@ Skill persistente (v4) sull'account utente: modulo USAR Medium, modello COMPOSIZ
 - 23/10 (mattina): back telefono, foto profilo (bucket privato), elimina account, log admin, Attivazione a tutti, cambia risposta, ricerca Operatori, revisione codice, infografica Telegram (HTML+PDF), migrazione 2 fasi, fix registrazione
 - 23/10 (pomeriggio): privacy (informativa+consenso+log consultazioni+admin non modifica), test automatici 20 check, file link progetto, lettura esportazione database + decisioni import (gradi, comandi FVG, turni G, documenti, cani, taglie)
 - 23/10 (sera): **incidente app bianca (test aveva sovrascritto supabase.js) → risolto + sistema anti-disaster 3 livelli**; soglia 24h; PDF in Squadre; avviso ferie; keep-alive bot; ferie tendine in giorni; finestra storico 6 mesi; fix PDF UNDEFINED NAN; contatore nessuna-risposta reale; avviso ATTIVAZIONE CHIUSA dal bot
+
+### Specializzazioni foglio: regole di gestione date dall'utente (23/10/2026 — da implementare)
+- FUNZIONARIO: SI/NO (badge informativo)
+- STAFF: SI/NO (modificabile da admin) — simbolo 📝 carta e penna; PRIORITARI nelle tendine dei posti 4, 5, 6 (Direzione/Staff)
+- LOGISTA: SI/NO (modificabile da admin) — simbolo muletto/carrello elevatore; PRIORITARI nei posti 33-38 (Logistica)
+- NBCR: livelli 0, 1, 2, 3; priorità in tendina come già definito (livello più alto prima per il modulo)
+- ESTENSIONE NBCR (NR/LPG/LNG): NON compare nelle tendine (solo dati anagrafici)
+- SPECIALIZZAZIONE NBCR: valori NR/LPG/LNG (campo informativo)
+- CINOFILO: SI/NO, regole tendina come già definite
+- SAF: valori 1A, 1B-BASICO, 2A-AVANZATO; simbolo 🧗; priorità SOLO a chi ha 2A-AVANZATO
+- TAS: No, 1, 2; icona (🧭) SOLO per livello 2
+- SAPR / MEDICO / INFERMIERE: SI/NO
+- ELIMINARE TPSS (sostituito concettualmente da MEDICO/INFERMIERE)
+- **INCOGRUENZE DA CHIARIRE**: (1) nel foglio NON esistono le colonne STRUTTURISTA e CAPOSQUADRA/ROS che l'app usa per il modulo (posti 7,9 e 17,25): da dove vengono i strutturisti? ROS = dai gradi CRE/CR/CSE/CS (regola attuale)? (2) NBCR foglio ha Liv. 2/3, l'utente ora dice 0-3: il modulo conta solo livello 3? (3) FUNZIONARIO: solo badge o priorità nei posti 1-6?
