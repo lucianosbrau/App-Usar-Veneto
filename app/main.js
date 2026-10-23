@@ -2269,6 +2269,15 @@ async function salvaMantenimento() {
   pagMantenimenti(document.getElementById('contenuto'));
 }
 
+const COMANDI_ELENCO = ['DIREZIONE REGIONALE VENETO','VENEZIA','PADOVA','TREVISO','VERONA','VICENZA','BELLUNO','ROVIGO','UDINE','PORDENONE','TRIESTE','GORIZIA'];
+let SEDI_TUTTE = [];
+async function caricaSedi() {
+  if (SEDI_TUTTE.length) return SEDI_TUTTE;
+  const { data } = await supabase.from('sedi').select('comando, sede').order('sede');
+  SEDI_TUTTE = data || [];
+  return SEDI_TUTTE;
+}
+
 async function pagProfilo(el) {
   const TURNI = ['A', 'B', 'C', 'D', 'G'];
   const SALTI = [];
@@ -2313,12 +2322,15 @@ async function pagProfilo(el) {
           <label style="font-size:12px; font-weight:600; color:var(--grigio);">Comando</label>
           <select id="p-comando" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
             <option value="">—</option>
-            ${['Venezia','Verona','Padova','Vicenza','Treviso','Belluno','Rovigo'].map(c => `<option ${utente.comando === c ? 'selected' : ''}>${c}</option>`).join('')}
+            ${COMANDI_ELENCO.map(c => `<option ${utente.comando === c ? 'selected' : ''}>${c}</option>`).join('')}
           </select>
         </div>
         <div>
           <label style="font-size:12px; font-weight:600; color:var(--grigio);">Sede di servizio</label>
-          <input id="p-sede" value="${esc(utente.sede || '')}" placeholder="es. Mestre" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+          <select id="p-sede" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="">—</option>
+            <option ${utente.sede ? 'selected' : ''}>${esc(utente.sede || '')}</option>
+          </select>
         </div>
       </div>
       <div class="successo" id="p-ok" style="margin-top:14px;">Dati salvati.</div>
@@ -2337,6 +2349,34 @@ async function pagProfilo(el) {
       </div>
     </div>`;
   document.getElementById('p-ok').style.display = 'none';
+  // SEDI a cascata: scelgo il comando → vedo solo le sue sedi
+  const comandoSel = document.getElementById('p-comando');
+  const sedeSel = document.getElementById('p-sede');
+  const aggiornaSedi = () => {
+    const comando = comandoSel.value;
+    const attuale = utente.sede || '';
+    const delComando = SEDI_TUTTE.filter(x => x.comando === comando).map(x => x.sede);
+    sedeSel.innerHTML = `<option value="">—</option>` + delComando.map(sd =>
+      `<option ${attuale === sd ? 'selected' : ''}>${esc(sd)}</option>`).join('');
+  };
+  await caricaSedi();
+  aggiornaSedi();
+  comandoSel.onchange = () => { aggiornaSedi(); };
+  // TURNO G: niente salto — selezionando G il salto si svuota e si disattiva
+  const turnoSel = document.getElementById('p-turno');
+  const saltoSel = document.getElementById('p-salto');
+  const aggiornaSalto = () => {
+    if (turnoSel.value === 'G') {
+      saltoSel.value = '';
+      saltoSel.disabled = true;
+      saltoSel.style.background = '#F1F5F9';
+    } else {
+      saltoSel.disabled = false;
+      saltoSel.style.background = '#fff';
+    }
+  };
+  turnoSel.onchange = () => { aggiornaSalto(); };
+  aggiornaSalto();
   const fotoMsg = document.getElementById('p-foto-msg');
   const mostraFotoMsg = (testo, err) => {
     fotoMsg.textContent = testo;
@@ -2374,6 +2414,7 @@ async function pagProfilo(el) {
       turno: document.getElementById('p-turno').value,
       salto_turno: document.getElementById('p-salto').value,
       comando: document.getElementById('p-comando').value,
+      salto_turno: document.getElementById('p-turno').value === 'G' ? '' : document.getElementById('p-salto').value,
       sede: document.getElementById('p-sede').value.trim()
     }).eq('id', utente.id);
     if (error) { alert('Errore: ' + error.message); return; }

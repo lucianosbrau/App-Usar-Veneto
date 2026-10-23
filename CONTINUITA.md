@@ -205,3 +205,10 @@ Skill persistente (v4) sull'account utente: modulo USAR Medium, modello COMPOSIZ
 - Elenco comandi definitivo (12): DIREZIONE REGIONALE VENETO, VENEZIA, PADOVA, TREVISO, VERONA, VICENZA, BELLUNO, ROVIGO, UDINE, PORDENONE, TRIESTE, GORIZIA (i valori del foglio vanno mappati su questi; es. riga ALFANO con comando DIREZIONE VENETO → DIREZIONE REGIONALE VENETO, sede CENTRALE → Centrale Direzione)
 - Procedura: estrarre dal foglio le coppie comando→sede, normalizzarle secondo le regole, far verificare la lista dall'utente, poi caricare nel DB (tabella sedi) e tendina a cascata
 - Il turno G NON ha salto (G a tendina → campo salto disabilitato/svuotato)
+
+### SEDI a cascata + comandi 12 + G senza salto (24/10/2026 — FATTO)
+- Migrazione `db/migrazione-sedi.sql` (**DA ESEGUIRE in SQL Editor**): tabella `sedi` con la lista UFFICIALE confermata dall'utente (12 comandi: DIREZIONE REGIONALE VENETO + 7 venete + 4 FVG; ~55 sedi). Verona usa "Caldiero" (senza "Distaccamento")
+- PROFILO: Comando = tendina con i 12; SEDE = tendina A CASCATA (solo le sedi del comando scelto); l'utente vede la propria sede attuale anche se non in lista (pre-selezionata)
+- TURNO G: selezionando G il campo SALTO si svuota e si DISATTIVA (G non ha salto); salvataggio: salto vuoto per G
+- MANTENIMENTI: confermato dall'utente che le ore importate si considerano TUTTE APPROVATE
+- La torta Dashboard e i filtri comando vanno aggiornati con i 12 comandi al prossimo giro (le tendine programmazione usano il campo comando del profilo, non fisse)
