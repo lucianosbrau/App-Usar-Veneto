@@ -1,0 +1,17 @@
+BACKUP DATABASE USAR VENETO — 23/10/2026 (pre-FASE 1)
+
+Fonte: export SQL Editor (query di sola lettura) caricati dall'utente su Drive
+in "Esportazione database - backup supabase":
+- Query file 1 profili.csv (52KB — ~150 righe json: anagrafica completa operatori)
+- Query file 2 mantenimenti.csv (43KB — storico ore con ore_conteggiate)
+- Query file 3 ferie squadre.csv (6KB — programmi_membri; disponibilita vuota all'export)
+- Query file 4 specializzazioni impostazioni.csv (4KB — operatori_specializzazioni + impostazioni + sedi)
+- Supabase Snippet Untitled query.csv (schema tabelle completo)
+
+COPIE ORIGINALI: restano sul Drive dell'utente (cartella "Esportazione database - backup supabase").
+Le query per rigenerare l'export: db/BACKUP-export-letture.sql e i 4 frammenti in chat (24/10/2026).
+
+STATO AL BACKUP: 50+ operatori di prova (email prova.*), 4 account reali
+(admin DI LORENZO, CONTESSO, TENAN, IPPOLITO), mantenimenti v2 con ore_conteggiate,
+sedi caricate (12 comandi), soglia 24. Le password di login NON sono incluse
+(irraggiungibili da SQL Editor per sicurezza).
