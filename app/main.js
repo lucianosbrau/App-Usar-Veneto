@@ -1445,7 +1445,8 @@ async function generaPdfManifesto(prog, membri) {
   doc.setFont('helvetica', 'bold'); doc.setFontSize(20); doc.setTextColor(...ANTRACITE);
   doc.text(team, 105, 16, { align: 'center' });
   doc.setFontSize(12); doc.setTextColor(37,99,235);
-  doc.text(meseIt(progMese).toUpperCase(), 105, 22.5, { align: 'center' });
+  const mesePdf = prog.mese ? meseIt(prog.mese) : (progMese ? meseIt(progMese) : meseIt(new Date().toISOString().slice(0, 7) + '-01'));
+  doc.text(mesePdf.toUpperCase(), 105, 22.5, { align: 'center' });
 
   const H = 12, GAP = 1.6, STEP = H + GAP;
   const HS = 10.5, STEPS = HS + 1.4;
