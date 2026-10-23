@@ -1659,6 +1659,20 @@ async function pagAttivazioneAdmin(el) {
     const si = risp.filter(r => r.risposta === 'si');
     const no = risp.filter(r => r.risposta === 'no');
 
+    // NESSUNA RISPOSTA = allertati che non hanno ancora risposto.
+    // Allertati = chi ha Telegram collegato (il bot invia lì) + il personale del programma del team attivato
+    const { data: collegati } = await supabase.from('profili').select('id, nome, cognome').not('telegram_chat_id', 'is', null);
+    const meseCorrenteAllerta = new Date().toISOString().slice(0, 7) + '-01';
+    const { data: progAllerta } = await supabase.from('programmi_mensili')
+      .select('id, programmi_membri(operatore_id)')
+      .eq('mese', meseCorrenteAllerta).eq('team', aperta.team === 'personalizzata' ? 'alpha' : aperta.team).maybeSingle();
+    const allertati = new Set((collegati || []).map(c => c.id));
+    const nomiAllertati = {};
+    (collegati || []).forEach(c => { nomiAllertati[c.id] = `${c.cognome || ''} ${c.nome || ''}`.trim(); });
+    (progAllerta?.programmi_membri || []).forEach(m => allertati.add(m.operatore_id));
+    const risposto = new Set(risp.map(r => r.operatore_id));
+    const senzaRisposta = [...allertati].filter(id => !risposto.has(id));
+
     // copertura requisiti: conta tra i SÌ (prioritariamente chi è nel programma del mese)
     const meseCorrente = new Date().toISOString().slice(0, 7) + '-01';
     const { data: progMese } = await supabase.from('programmi_mensili')
@@ -1689,8 +1703,9 @@ async function pagAttivazioneAdmin(el) {
         <div style="display:flex; gap:14px; flex-wrap:wrap; font-size:14px; margin-bottom:12px;">
           <span class="pill verde">✅ SÌ: ${si.length}</span>
           <span class="pill rosso">✖️ NO: ${no.length}</span>
-          <span class="pill giallo">⏳ Nessuna risposta: —</span>
+          <span class="pill giallo">⏳ Nessuna risposta: ${senzaRisposta.length}</span>
         </div>
+        ${senzaRisposta.length ? `<div style="font-size:12px; color:var(--grigio); margin-bottom:12px;">⏳ In attesa: ${senzaRisposta.map(id => nomiAllertati[id] || '').filter(Boolean).join(', ')}</div>` : ''}
       </div>
 
       <div class="card" style="margin-top:14px;">

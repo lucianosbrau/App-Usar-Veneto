@@ -260,3 +260,7 @@ Skill persistente (v4) collegata all'account utente: struttura del modulo USAR M
 ### Fix PDF "UNDEFINED NAN" (23/10/2026, segnalazione utente)
 - Nel PDF del manifesto sotto TEAM ALPHA compariva "UNDEFINED NAN": generaPdfManifesto usava la variabile GLOBALE progMese per il mese, che esiste solo arrivando dalla Programmazione — dalla pagina SQUADRE (nuovo pulsante GENERA PDF) o da Attivazione era vuota → meseIt(undefined) → "undefined" + anno "NaN"
 - FIX: la funzione ora usa il mese del programma PASSATO (prog.mese); fallback: progMese se presente, altrimenti il mese corrente. Il PDF mostra sempre il mese giusto da qualunque pagina venga generato
+
+### Attivazione: contatore "Nessuna risposta" vero (23/10/2026, richiesta utente)
+- Prima il pill "⏳ Nessuna risposta: —" era fisso (non contava nulla)
+- Ora: NESSUNA RISPOSTA = allertati − chi ha risposto. Allertati = chi ha Telegram collegato (il bot manda lì) ∪ personale del programma del mese del team attivato (fallback alpha per personalizzata). Sotto i contatori: riga "⏳ In attesa: Cognome Nome, ..." con i nomi di chi non ha ancora risposto — aggiornata in tempo reale come il resto
