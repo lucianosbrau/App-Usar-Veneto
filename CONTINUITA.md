@@ -189,3 +189,9 @@ Skill persistente (v4) collegata all'account utente: struttura del modulo USAR M
 - Utente dice che le email probabilmente ci sono già nell'elenco (da confermare alla consegna del file)
 - **DA DECIDERE (domande aperte all'utente)**: (1) chi si registra con email NON presente nell'elenco: bloccato / registrato con validazione admin / libero come oggi; (2) ok a cancellare i 50 operatori di prova prima dell'import vero
 - Da costruire quando arriva l'elenco: script di import da CSV → righe profili con email + marker "in attesa di registrazione"; collegamento email→profilo alla registrazione
+
+### Import dati reali — decisioni chiuse (23/10/2026)
+- **Email di collegamento**: confermato il piano (email nell'elenco → chi si registra "raccatta" la propria scheda piena)
+- **Chi si registra con email NON in elenco**: COME OGGI — entra e l'app crea la scheda vuota che riempie da solo dal Profilo (nessun blocco, nessuna coda di validazione admin)
+- **Pulizia pre-import**: cancellare TUTTI i 50 operatori di prova TRANNE l'account admin DI LORENZO LUCIANO (lucianosbrau@gmail.com) — query di pulizia da preparare CON exclude per quell'account: NOTA: i seed attuali usano email 'prova.*' e l'account admin reale NON è un seed, quindi la pulizia `where email like 'prova.%'` lo tocca comunque NO — verificare con l'utente l'email esima: la cancellazione deve escludere esplicitamente l'id dell'admin
+- Prossimo passo: l'utente consegna l'elenco (colonne da definire insieme) → costruire lo script di import + il collegamento email→scheda alla registrazione
