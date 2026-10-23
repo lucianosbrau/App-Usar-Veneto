@@ -296,7 +296,7 @@ def genera_sql():
         ore_v = float(ore) if ore not in (None, '') else None
         reali_v = float(reali) if reali not in (None, '') else ore_v
         if ore_v is None: continue
-        print(f"insert into mantenimenti (operatore_id, data, tipo, argomento, ore, ore_conteggiate, stato, note_seed) "
+        print("insert into mantenimenti (operatore_id, data, tipo, argomento, ore, ore_conteggiate, stato, note_seed) select id, " + q(data) + ", " + q(tipo) + ", " + q(arg) + ", " + str(ore_v) + ", " + str(reali_v) + ", 'approvato', true from profili where codice_fiscale = " + q(cf) + ";")
         nm += 1
     print(f"-- {nm} mantenimenti")
     print()

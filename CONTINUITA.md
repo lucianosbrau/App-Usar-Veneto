@@ -244,3 +244,9 @@ Skill persistente (v4) sull'account utente: modulo USAR Medium, modello COMPOSIZ
 - L'import usa email come chiave; righe senza email: caricare comunque la scheda (l'utente completerà la mail poi)
 - Il foglio ha ~150 righe con anomalie già mappate (vedi sez. 10); ogni anomalia non prevista → chiedere all'utente, non improvvisare
 - Dopo l'import: i 50 di prova spariscono; i seed non si rieseguono più
+
+### IMPORT v3 — utenti tecnici .pending (24/10, fix errore profili_id_fkey)
+- CAUSA errore "Key (id) not present in table users": le schede in attesa dell'opzione A hanno un id che NON esiste in auth.users (vincolo profili_id_fkey lo rifiuta)
+- SOLUZIONE: l'import crea per OGNI profilo un UTENTE TECNICO in auth.users con lo STESSO uuid: email `.pending@usarveneto.invalid` (inutilizzabile, password casuale). Verificato: 123 coppie auth→profilo con stesso id
+- ALLA REGISTRAZIONE: collega_scheda_importata trasferisce TUTTO (dati + mantenimenti/ferie/squadre) sull'account vero e cancella il profilo tecnico. MANCA: eliminare anche l'auth tecnico (da aggiungere alla RPC: delete from auth.users where id = profilo_vecchio) — Fare alla prima occasione
+- NOTA per il pannello Authentication di Supabase: dopo l'import compariranno 123 utenti "pending" (inutilizzabili, non si loggano). Spariranno man mano che gli operatori si registrano (con la fix della RPC)
