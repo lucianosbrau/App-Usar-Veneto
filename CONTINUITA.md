@@ -164,16 +164,18 @@ Skill persistente (v4) sull'account utente: modulo USAR Medium, modello COMPOSIZ
 - 23/10 (pomeriggio): privacy (informativa+consenso+log consultazioni+admin non modifica), test automatici 20 check, file link progetto, lettura esportazione database + decisioni import (gradi, comandi FVG, turni G, documenti, cani, taglie)
 - 23/10 (sera): **incidente app bianca (test aveva sovrascritto supabase.js) → risolto + sistema anti-disaster 3 livelli**; soglia 24h; PDF in Squadre; avviso ferie; keep-alive bot; ferie tendine in giorni; finestra storico 6 mesi; fix PDF UNDEFINED NAN; contatore nessuna-risposta reale; avviso ATTIVAZIONE CHIUSA dal bot
 
-### Specializzazioni foglio: regole di gestione date dall'utente (23/10/2026 — da implementare)
-- FUNZIONARIO: SI/NO (badge informativo)
-- STAFF: SI/NO (modificabile da admin) — simbolo 📝 carta e penna; PRIORITARI nelle tendine dei posti 4, 5, 6 (Direzione/Staff)
-- LOGISTA: SI/NO (modificabile da admin) — simbolo muletto/carrello elevatore; PRIORITARI nei posti 33-38 (Logistica)
-- NBCR: livelli 0, 1, 2, 3; priorità in tendina come già definito (livello più alto prima per il modulo)
-- ESTENSIONE NBCR (NR/LPG/LNG): NON compare nelle tendine (solo dati anagrafici)
-- SPECIALIZZAZIONE NBCR: valori NR/LPG/LNG (campo informativo)
-- CINOFILO: SI/NO, regole tendina come già definite
-- SAF: valori 1A, 1B-BASICO, 2A-AVANZATO; simbolo 🧗; priorità SOLO a chi ha 2A-AVANZATO
-- TAS: No, 1, 2; icona (🧭) SOLO per livello 2
-- SAPR / MEDICO / INFERMIERE: SI/NO
-- ELIMINARE TPSS (sostituito concettualmente da MEDICO/INFERMIERE)
-- **INCOGRUENZE DA CHIARIRE**: (1) nel foglio NON esistono le colonne STRUTTURISTA e CAPOSQUADRA/ROS che l'app usa per il modulo (posti 7,9 e 17,25): da dove vengono i strutturisti? ROS = dai gradi CRE/CR/CSE/CS (regola attuale)? (2) NBCR foglio ha Liv. 2/3, l'utente ora dice 0-3: il modulo conta solo livello 3? (3) FUNZIONARIO: solo badge o priorità nei posti 1-6?
+### Specializzazioni: TABELLA DEFINITIVA (23/10/2026 — decisioni complete, da implementare)
+- FUNZIONARIO: SI/NO — priorità nei posti 1, 2, 3 (Direzione)
+- STAFF: SI/NO (modificabile da admin) — simbolo 📝; priorità nei posti 4, 5, 6
+- LOGISTA: SI/NO (modificabile da admin) — simbolo muletto/carrello elevatore; priorità nei posti 33-38
+- STRUTTURISTA: SI/NO — NON esiste nel foglio: attributo compilato personalmente dall'operatore o dall'ADMIN (con log di modifica, come le altre modifiche admin)
+- CAPOSQUADRA/ROS: dai gradi CRE/CR/CSE/CS (confermato); nel menù a tendina della programmazione l'omino ROSSO del simbolo vigile (non la ⭐)
+- NBCR: livelli 0, 1, 2, 3 ("Liv. 2"→2, "Liv. 3"→3); icona col numero SOLO per 2 e 3; priorità: prima i 3, poi i 2
+- ESTENSIONE NBCR: valori NR/LPG/LNG (la colonna "SPECIALIZZAZIONE NBCR" del foglio è la stessa cosa — un solo campo); MAI nelle tendine
+- CINOFILO: SI/NO — nell'app il nome resta "Unità cinofila K9"; nel foglio è la colonna CINOFILO (mappa durante l'import)
+- SAF: 1A, 1B-BASICO, 2A-AVANZATO; simbolo 🧗; priorità SOLO 2A-AVANZATO
+- TAS: No, 1, 2; icona 🧭 SOLO livello 2
+- SAPR: SI/NO — simbolo DRONE
+- MEDICO / INFERMIERE: SI/NO — SENZA simbolo
+- ELIMINARE TPSS (sostituito da MEDICO/INFERMIERE)
+- Modifiche admin a specializzazioni/attributi: sempre con LOG di modifica
