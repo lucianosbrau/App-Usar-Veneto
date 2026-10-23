@@ -29,6 +29,7 @@ window.confirm = () => true;
 
 // ---- database finto FEDELE alla libreria supabase (thenable, no .catch) ----
 const OP = [
+  { id: 'op0', nome: 'Anna', cognome: 'Verdi', email: 'a@v.it', ruolo: 'admin', comando: 'Padova', grado: 'CS', turno: 'B', salto_turno: 'B3', patente: null, foto_path: null, cellulare: null, gruppo_sanguigno: null },
   { id: 'op1', nome: 'Mario', cognome: 'Rossi', email: 'm@r.it', ruolo: 'operatore', comando: 'Venezia', sede: 'Mestre', grado: 'VC', turno: 'A', salto_turno: 'A2', patente: '3°', foto_path: null, cellulare: '333', gruppo_sanguigno: '0+' },
   { id: 'op2', nome: 'Anna', cognome: 'Verdi', email: 'a@v.it', ruolo: 'admin', comando: 'Padova', sede: 'Padova', grado: 'CS', turno: 'B', salto_turno: 'B3', patente: null, foto_path: 'op2/foto', cellulare: null, gruppo_sanguigno: null },
 ];
@@ -37,7 +38,7 @@ const chain = (data) => {
   const o = {};
   const ris = { data, error: null };
   for (const m of ['select','eq','order','limit','upsert','insert','update','delete','gte','lte','not','in','ilike']) o[m] = () => chain(data);
-  o.maybeSingle = async () => ris; o.single = async () => ris;
+  o.maybeSingle = async () => ris; o.single = async () => ({ data: Array.isArray(ris.data) ? ris.data[0] : ris.data, error: null });
   o.then = (ok, ko) => Promise.resolve(ris).then(ok, ko);
   return o;
 };
@@ -53,7 +54,7 @@ globalThis.__SB = {
   },
   rpc: () => thenable({ data: null, error: null }),
   storage: { from: () => ({ remove: () => thenable({}), createSignedUrl: async () => ({ data: { signedUrl: 'https://finta/foto' }, error: null }), upload: async () => ({ error: null }) }) },
-  auth: { getSession: async () => ({ data: { session: { user: { id: 'op2', email: 'a@v.it' } } } }), signInWithPassword: async () => ({ data: { session: {} }, error: null }) },
+  auth: { getSession: async () => ({ data: { session: { user: { id: 'op0', email: 'a@v.it' } } } }), signInWithPassword: async () => ({ data: { session: {} }, error: null }) },
   removeChannel: () => {},
   channel: () => ({ on: () => ({ on: () => ({ subscribe: () => {} }) }) }),
 };
@@ -84,12 +85,12 @@ try {
   window.dispatchEvent(new window.Event('popstate'));
   await attesa(700);
   const cards = window.document.querySelectorAll('[data-op]');
-  check('card operatori renderizzate', cards.length === 2);
+  check('card operatori renderizzate', cards.length === 3);
   check('barra di ricerca presente', !!window.document.getElementById('op-cerca'));
   check('pulsante filtri presente', !!window.document.getElementById('fil-tutti'));
 
   console.log('\n[3] Apertura scheda singolo operatore (regressione del bug .catch)');
-  cards[0].click();
+  window.document.querySelector('[data-op="op1"]').click();
   await attesa(700);
   const c = window.document.getElementById('contenuto');
   check('hash aggiornato (#/operatori/op1)', window.location.hash === '#/operatori/op1');
@@ -102,7 +103,7 @@ try {
   console.log('\n[4] Torna all\'elenco');
   window.document.getElementById('op-indietro').click();
   await attesa(600);
-  check('tornato all\'elenco', window.document.querySelectorAll('[data-op]').length === 2);
+  check('tornato all\'elenco', window.document.querySelectorAll('[data-op]').length === 3);
 
   console.log('\n[5] Ricerca operatore');
   const cerca = window.document.getElementById('op-cerca');

@@ -78,6 +78,40 @@ window.addEventListener('popstate', async () => {
   render();
 });
 
+
+// ============ SPECIALIZZAZIONI (nuovo schema sp_*) ============
+const SPEC_SIGLE = { funzionario: 'FUNZ', staff: 'STAFF', logista: 'LOG', strutturista: 'STRUT', k9: 'K9', sapr: 'SAPR', medico: 'MED', infermiere: 'INF' };
+function specIcone(o, conTesto) {
+  let out = '';
+  if (o.sp_strutturista) out += ' 🏗️';
+  if (o.sp_nbcr >= 2) out += ` ☣️${o.sp_nbcr}`;
+  if (o.sp_k9) out += ' 🐕';
+  if (o.sp_saf) out += ' 🧗';
+  if (o.sp_staff) out += ' 📝';
+  if (o.sp_logista) out += ' 🚜';
+  if (o.sp_funzionario) out += ' 💼';
+  if (o.tas === 2) out += ' 🧭';
+  if (o.sapr) out += ' 🛸';
+  if (o.sp_medico) out += ' ⚕️';
+  if (o.sp_infermiere) out += ' 💉';
+  if (conTesto) {
+    const nomi = [];
+    if (o.sp_strutturista) nomi.push('Strutturista');
+    if (o.sp_nbcr >= 2) nomi.push(`NBCR ${o.sp_nbcr}`);
+    if (o.sp_k9) nomi.push('Unità cinofila K9');
+    if (o.sp_saf) nomi.push(`SAF ${o.sp_saf}`);
+    if (o.sp_staff) nomi.push('Staff');
+    if (o.sp_logista) nomi.push('Logista');
+    if (o.sp_funzionario) nomi.push('Funzionario');
+    if (o.tas === 2) nomi.push('TAS 2');
+    if (o.sapr) nomi.push('SAPR');
+    if (o.sp_medico) nomi.push('Medico');
+    if (o.sp_infermiere) nomi.push('Infermiere');
+    return { icone: out, nomi };
+  }
+  return out;
+}
+
 function iniziali(nome, cognome) {
   return ((nome?.[0] || '') + (cognome?.[0] || '')).toUpperCase() || '?';
 }
@@ -514,7 +548,7 @@ async function pagOperatori(el) {
   el.innerHTML = `<div class="pagina-titolo">👥 Gestione Operatori</div><div class="pagina-sotto">Specializzazioni e abilitazioni</div><div id="op-cont">Caricamento…</div>`;
   const cont = document.getElementById('op-cont');
   const [opRes, specRes, mantRes] = await Promise.all([
-    supabase.from('profili').select('*').order('cognome'),
+    supabase.from('profili').select('*, sp_funzionario, sp_staff, sp_logista, sp_strutturista, sp_nbcr, sp_nbcr_est, sp_k9, sp_saf, sp_sapr, sp_medico, sp_infermiere, tas').order('cognome'),
     supabase.from('operatori_specializzazioni').select('operatore_id, specializzazione_id, specializzazioni(nome)'),
     caricaOreMantenimenti()
   ]);
@@ -529,21 +563,7 @@ async function pagOperatori(el) {
     (specPerOp[s.operatore_id] = specPerOp[s.operatore_id] || []).push(s.specializzazioni?.nome);
   });
 
-  const iconeSpec = (o) => {
-    const nomi = specPerOp[o.id] || [];
-    let icone = '';
-    if (nomi.includes('Strutturista')) icone += ' <span title="Strutturista">🏗️</span>';
-    if (nomi.includes('NBCR 3° livello')) icone += ' <span title="NBCR 3° livello">☣️</span>';
-    if (nomi.includes('Unità cinofila K9')) icone += ' <span title="Unità cinofila K9">🐕</span>';
-    if (nomi.includes('SAF 2A (corda)')) icone += ' <span title="SAF 2A">🧗</span>';
-    if (nomi.includes('Caposquadra/Caporeparto')) icone += ' <span title="Caposquadra/Caporeparto">⭐</span>';
-    nomi.forEach(n => {
-      if (!['Strutturista', 'NBCR 3° livello', 'Unità cinofila K9', 'SAF 2A (corda)', 'Caposquadra/Caporeparto'].includes(n)) {
-        icone += ` <span title="${esc(n)}" class="pill" style="font-size:10px; background:#F1F5F9; color:var(--grigio);">${esc(n)}</span>`;
-      }
-    });
-    return icone;
-  };
+  const iconeSpec = (o) => specIcone(o) + (o.grado && ['CRE','CR','CSE','CS'].includes(o.grado) ? ' <span title="Caposquadra/Caporeparto">⭐</span>' : '');
   const simboloVigileImg = (o) => simboloVigile(o, 20);
   const iconeAbilitazioni = (o) => {
     let icone = '';
@@ -1095,7 +1115,7 @@ async function apriProgramma(cont, programmi) {
   const [y, mo] = progMese.split('-').map(Number);
   const meseFine = `${y}-${String(mo).padStart(2, '0')}-${String(new Date(y, mo, 0).getDate()).padStart(2, '0')}`;
   const [pers, membri, storico, ferie, mantRes] = await Promise.all([
-    supabase.from('profili').select('id, nome, cognome, patente, grado, comando, estensioni_patente, tpss, tas').order('cognome'),
+    supabase.from('profili').select('id, nome, cognome, patente, grado, comando, estensioni_patente, tas, sp_funzionario, sp_staff, sp_logista, sp_strutturista, sp_nbcr, sp_k9, sp_saf').order('cognome'),
     supabase.from('programmi_membri').select('*, profili(nome, cognome, patente, grado, estensioni_patente)').eq('programma_id', prog.id),
     supabase.from('programmi_membri').select('operatore_id, programmi_mensili!inner(mese)')
       .lt('programmi_mensili.mese', progMese).gte('programmi_mensili.mese', seiMesiFa).order('programmi_mensili.mese', { ascending: true }),
@@ -1135,7 +1155,6 @@ async function apriProgramma(cont, programmi) {
   };
 
   const idCapi = new Set(SPEC_IDS['Caposquadra/Capireparto'] || []);
-  const idSpec = (s) => new Set(SPEC_IDS[SPEC_DB[s]] || []);
 
   const patenteSigla = (o) => {
     let s = '';
@@ -1143,29 +1162,13 @@ async function apriProgramma(cont, programmi) {
     if (o.tas) s += ' 📍' + o.tas;
     return s;
   };
-  const iconeSpecPdf = (opId) => {
-    let icone = '';
-    if ((SPEC_IDS['Strutturista'] || []).includes(opId)) icone += ' \u{1F3D7}\u{FE0F}';
-    if ((SPEC_IDS['NBCR 3° livello'] || []).includes(opId)) icone += ' \u{2623}\u{FE0F}';
-    if ((SPEC_IDS['Unità cinofila K9'] || []).includes(opId)) icone += ' \u{1F415}';
-    if ((SPEC_IDS['SAF 2A (corda)'] || []).includes(opId)) icone += ' \u{1F9D7}';
-    if ((SPEC_IDS['Caposquadra/Capireparto'] || []).includes(opId)) icone += ' \u{2B50}';
-    return icone;
-  };
-  const iconeSpec = (opId) => {
-    let icone = '';
-    if ((SPEC_IDS['Strutturista'] || []).includes(opId)) icone += '🏗️';
-    if ((SPEC_IDS['NBCR 3° livello'] || []).includes(opId)) icone += '☣️';
-    if ((SPEC_IDS['Unità cinofila K9'] || []).includes(opId)) icone += '🐕';
-    if ((SPEC_IDS['SAF 2A (corda)'] || []).includes(opId)) icone += '🧗';
-    if ((SPEC_IDS['Caposquadra/Capireparto'] || []).includes(opId)) icone += '⭐';
-    return icone ? ' ' + icone : '';
-  };
+  const iconeSpecPdf = (o) => specIcone(o);
+  const iconeSpec = (o) => (o ? ' ' + specIcone(o).trim() : '');
   const candidato = (o) => ({
     ...o,
     giorniFerie: giorniFeriePerOp[o.id] || 0,
     sottoMan: sottoSogliaMan(o.id),
-    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.grado ? ` [${o.grado}]` : '') + iconeSpec(o.id) + patenteSigla(o) + ((giorniFeriePerOp[o.id] || 0) ? ` 🏖 ${giorniFeriePerOp[o.id]} gg ferie` : '') + (sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''),
+    etichetta: `${o.cognome} ${o.nome}`.trim() + (o.grado ? ` [${o.grado}]` : '') + iconeSpec(o) + patenteSigla(o) + ((giorniFeriePerOp[o.id] || 0) ? ` 🏖 ${giorniFeriePerOp[o.id]} gg ferie` : '') + (sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''),
     gruppo: gruppoDi(o.id)
   });
 
@@ -1173,10 +1176,11 @@ async function apriProgramma(cont, programmi) {
   const autisti3 = (membri.data || []).filter(m => m.profili?.patente === '3°');
   const autisti4 = (membri.data || []).filter(m => m.profili?.patente === '4°');
   const inSquadra = (set) => (membri.data || []).filter(m => set.has(m.operatore_id)).length;
-  const nStrutt = inSquadra(new Set(SPEC_IDS['Strutturista'] || []));
-  const nNbcr = inSquadra(new Set(SPEC_IDS['NBCR 3° livello'] || []));
-  const nK9 = inSquadra(new Set(SPEC_IDS['Unità cinofila K9'] || []));
-  const nSaf = inSquadra(new Set(SPEC_IDS['SAF 2A (corda)'] || []));
+  const inSquadraSp = (f) => (membri.data || []).filter(m => { const o = (pers.data || []).find(x => x.id === m.operatore_id); return o && f(o); }).length;
+  const nStrutt = inSquadraSp(o => o.sp_strutturista);
+  const nNbcr = inSquadraSp(o => (o.sp_nbcr || 0) >= 2);
+  const nK9 = inSquadraSp(o => o.sp_k9);
+  const nSaf = inSquadraSp(o => (o.sp_saf || '').includes('2A'));
 
   cont.innerHTML = `
     <button class="link" id="prog-indietro" style="padding:0; margin-bottom:10px;">← Cambia squadra</button>
@@ -1212,7 +1216,13 @@ async function apriProgramma(cont, programmi) {
           const occ = perPosto[p.n];
           const idonei = tutti.filter(o => {
             if (occupati.has(o.id)) return false;
-            if (p.spec) return idSpec(p.spec).has(o.id);
+            if (p.spec) {
+              if (p.spec === 'strutturista') return !!o.sp_strutturista;
+              if (p.spec === 'nbcr') return (o.sp_nbcr || 0) >= 2;
+              if (p.spec === 'k9') return !!o.sp_k9;
+              if (p.spec === 'saf') return (o.sp_saf || '').includes('2A') || (o.sp_saf || '').includes('AVANZATO');
+            }
+            return true;
             return true;
           }).map(candidato);
           (window.__idoneiPosto = window.__idoneiPosto || {})[p.n] = idonei;
@@ -1221,7 +1231,7 @@ async function apriProgramma(cont, programmi) {
             <span style="width:28px; font-weight:800; color:${p.spec || p.ros ? 'var(--rosso)' : 'var(--grigio)'};">${p.n}</span>
             <span style="flex:1; font-size:14px;">${esc(p.t)}${p.spec || p.ros ? ' <span style="color:var(--rosso); font-size:11px;">● OBBL.</span>' : ''}</span>
             ${occ
-              ? `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpec(occ.operatore_id)}${occ.profili?.patente ? ` <span class="pill giallo" style="font-size:10px;">🚚 ${esc(occ.profili.patente)}</span>` : ''}${simboloVigile({ grado: occ.profili?.grado }, 16)}</span>
+              ? `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpec(occ.profili)}${occ.profili?.patente ? ` <span class="pill giallo" style="font-size:10px;">🚚 ${esc(occ.profili.patente)}</span>` : ''}${simboloVigile({ grado: occ.profili?.grado }, 16)}</span>
                  <button class="pill rosso" data-vuota="${occ.id}" style="border:none; cursor:pointer;">✕</button>`
               : `<div style="display:flex; gap:6px; align-items:center; max-width:400px;">
                    <div style="position:relative; flex:1;">
@@ -1695,14 +1705,22 @@ async function pagAttivazioneAdmin(el) {
       .select('id, programmi_membri(operatore_id, posto)')
       .eq('mese', meseCorrente).eq('team', aperta.team).maybeSingle();
     const inProgramma = new Set((progMese?.programmi_membri || []).map(m => m.operatore_id));
-    const idonei = (spec) => si.filter(r => (SPEC_IDS[spec] || []).includes(r.operatore_id));
+    const idonei = (spec) => si.filter(r => {
+    const o = tutti.find(x => x.id === r.operatore_id) || {};
+    if (spec === 'Strutturista') return !!o.sp_strutturista;
+    if (spec === 'NBCR 3° livello') return (o.sp_nbcr || 0) >= 2;
+    if (spec === 'Unità cinofila K9') return !!o.sp_k9;
+    if (spec === 'SAF 2A (corda)') return (o.sp_saf || '').includes('2A');
+    if (spec === 'Caposquadra/Caporeparto') return o.grado && ['CRE','CR','CSE','CS'].includes(o.grado);
+    return false;
+  });
     const copre = (spec, min) => { const n = idonei(spec).length; return n >= min; };
     const righeCop = [
-      ['🏗️ Strutturisti', idonei('Strutturista').length, 2],
-      ['☣️ NBCR 3°', idonei('NBCR 3° livello').length, 2],
-      ['🐕 Unità cinofile', idonei('Unità cinofila K9').length, 4],
-      ['⭐ Capi squadra', idonei('Caposquadra/Caporeparto').length, 2],
-      ['🧗 SAF 2A', idonei('SAF 2A (corda)').length, 2],
+      ['🏗️ Strutturisti', tutti.filter(o => o.sp_strutturista).length, 2],
+      ['☣️ NBCR 2+', tutti.filter(o => (o.sp_nbcr || 0) >= 2).length, 2],
+      ['🐕 Unità cinofile', tutti.filter(o => o.sp_k9).length, 4],
+      ['⭐ Capi squadra', tutti.filter(o => o.id && idCapi.has(o.id)).length, 2],
+      ['🧗 SAF 2A', tutti.filter(o => (o.sp_saf || '').includes('2A')).length, 2],
       ['👥 Personale (totale)', si.length, 38]
     ];
 
@@ -1832,23 +1850,14 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
   const perPosto = {};
   (membri.data || []).forEach(m => { perPosto[m.posto] = m; });
   const occupati = new Set((membri.data || []).map(m => m.operatore_id));
-  const idCapi = new Set(SPEC_IDS['Caposquadra/Caporeparto'] || []);
-  const idSpec = (s) => new Set(SPEC_IDS[SPEC_DB[s]] || []);
-  const iconeSpecAtt = (opId) => {
-    let icone = '';
-    if ((SPEC_IDS['Strutturista'] || []).includes(opId)) icone += '🏗️';
-    if ((SPEC_IDS['NBCR 3° livello'] || []).includes(opId)) icone += '☣️';
-    if ((SPEC_IDS['Unità cinofila K9'] || []).includes(opId)) icone += '🐕';
-    if ((SPEC_IDS['SAF 2A (corda)'] || []).includes(opId)) icone += '🧗';
-    if ((SPEC_IDS['Caposquadra/Caporeparto'] || []).includes(opId)) icone += '⭐';
-    return icone ? ' ' + icone : '';
-  };
+  const idCapi = new Set((tutti.filter(o => o.grado && ['CRE','CR','CSE','CS'].includes(o.grado))).map(o => o.id));
+  const iconeSpecAtt = (o) => (o ? specIcone(o) : '');
 
   const rigaPosto = (p) => {
     const occ = perPosto[p.n];
     let cella = '';
     if (occ) {
-      cella = `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpecAtt(occ.operatore_id)}</span>
+      cella = `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpecAtt(occ.profili)}</span>
         <button class="pill rosso" data-mvuota="${occ.id}" style="border:none; cursor:pointer;">✖</button>`;
     } else {
       cella = `<div style="position:relative; width:min(460px, 68%);">
@@ -1915,7 +1924,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
           ultimoCapo = capo;
         }
         const pat = o.patente ? ' 🚚' + esc(o.patente) : '';
-        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:10px 12px; font-size:15px; cursor:pointer; border-top:1px solid #F1F5F9; ${sottoSogliaMan(o.id) ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o.id)}${pat}${sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''} ${simboloVigile(o, 20)}</div>`;
+        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:10px 12px; font-size:15px; cursor:pointer; border-top:1px solid #F1F5F9; ${sottoSogliaMan(o.id) ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o)}${pat}${sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''} ${simboloVigile(o, 20)}</div>`;
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
       lista.style.display = 'block';
@@ -2124,6 +2133,9 @@ function rigaCoda(m) {
 }
 
 async function schedaOperatore(el, o, oreMan) {
+  const sonoAdmin = utente.ruolo === 'admin';
+  // PRIVACY (regola utente 24/10): chi NON è admin vede solo i dati non sensibili
+
   if (utente.ruolo === 'admin' && o.id !== utente.id) {
     supabase.rpc('registra_consultazione', { target: o.id }).then(() => {}, () => {});
   }
@@ -2139,9 +2151,6 @@ async function schedaOperatore(el, o, oreMan) {
   }
   const anno = new Date().getFullYear();
   const oreAnno = (mantRes.data || []).filter(m => String(m.data).startsWith(anno)).reduce((s, m) => s + Number(m.ore_conteggiate ?? m.ore), 0);
-  const specNomi = (specRes.data || []).map(s => s.specializzazioni?.nome).filter(Boolean);
-  const inValore = specNomi.filter(n => ['Strutturista', 'NBCR 3° livello', 'Unità cinofila K9', 'SAF 2A (corda)', 'Caposquadra/Caporeparto'].includes(n));
-  const altreSpec = specNomi.filter(n => !inValore.includes(n));
 
   const riga = (label, valore) => valore ? `<tr><td style="padding:7px 10px; color:var(--grigio); font-size:13px; white-space:nowrap; border-top:1px solid var(--bordo);">${label}</td><td style="padding:7px 10px; border-top:1px solid var(--bordo); font-weight:600;">${esc(valore)}</td></tr>` : '';
 
@@ -2157,18 +2166,19 @@ async function schedaOperatore(el, o, oreMan) {
             <div style="color:var(--grigio); font-size:13px;">${o.grado ? esc(o.grado) + ' · ' : ''}${o.ruolo === 'admin' ? '⭐ Amministratore' : 'Operatore'}</div>
           </div>
         </div>
-        ${o.ruolo !== 'admin' ? `<button class="btn-primary" id="op-promuovi" style="background:var(--rosso); height:44px;">⭐ RENDI AMMINISTRATORE</button>` : `<button class="btn-primary" id="op-revoca" style="background:var(--grigio-ch); height:44px;">➖ REVOCA ADMIN</button>`}
+        ${sonoAdmin ? (o.ruolo !== 'admin' ? `<button class="btn-primary" id="op-promuovi" style="background:var(--rosso); height:44px;">⭐ RENDI AMMINISTRATORE</button>` : `<button class="btn-primary" id="op-revoca" style="background:var(--grigio-ch); height:44px;">➖ REVOCA ADMIN</button>`) : ''}
       </div>
 
+      ${sonoAdmin ? `
       <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
         <button class="btn-primary" id="op-elimina" style="background:#fff; color:var(--rosso); border:1px solid var(--rosso); height:40px; font-size:13px;">🗑️ ELIMINA ACCOUNT</button>
         <button class="btn-primary" id="op-log" style="background:#fff; color:var(--grigio); border:1px solid var(--bordo); height:40px; font-size:13px;">📋 Registro attività admin</button>
-      </div>
+      </div>` : ''}
       <div id="op-log-box" style="display:none; margin-top:12px; padding:10px; border:1px solid var(--bordo); border-radius:10px; overflow-x:auto;"></div>
 
       <table style="width:100%; border-collapse:collapse;">
         ${riga('Email', o.email)}
-        ${riga('Cellulare', o.cellulare)}
+        ${sonoAdmin ? `${riga('Cellulare', o.cellulare)}` : ''}
         ${riga('Comando', o.comando)}
         ${riga('Sede di servizio', o.sede)}
         ${riga('Turno / salto', o.salto_turno || o.turno)}
@@ -2176,13 +2186,13 @@ async function schedaOperatore(el, o, oreMan) {
         ${riga('Patente', o.patente ? o.patente + (o.estensioni_patente?.length ? ' + ' + o.estensioni_patente.join(', ') : '') : '')}
         ${riga('TPSS (soccorso sanitario)', o.tpss ? 'Sì' : '')}
         ${riga('TAS', o.tas ? 'Livello ' + o.tas : '')}
-        ${riga('Gruppo sanguigno', o.gruppo_sanguigno)}
-        ${riga('Indirizzo', o.indirizzo)}
-        ${riga('Medico curante', o.medico_curante)}
-        ${riga('Contatto ICE', o.contatto_ice_nome ? `${o.contatto_ice_nome} (${esc(o.contatto_ice_relazione || '')}) · ${o.contatto_ice_telefono || ''}` : '')}
-        ${riga('Specializzazioni', inValore.concat(altreSpec).join(', '))}
-        ${riga('Telegram', o.telegram_chat_id ? '✅ Collegato' : '')}
-        ${riga('Mantenimenti ' + anno, oreAnno ? oreAnno + ' ore approvate' + ((oreMan[o.id] || 0) < 24 ? ' ⚠️ sotto soglia' : ' ✅ in linea') : '')}
+        ${sonoAdmin ? `${riga('Gruppo sanguigno', o.gruppo_sanguigno)}` : ''}
+        ${sonoAdmin ? `${riga('Indirizzo', o.indirizzo)}` : ''}
+        ${sonoAdmin ? `${riga('Medico curante', o.medico_curante)}` : ''}
+        ${sonoAdmin ? `${riga('Contatto ICE', o.contatto_ice_nome ? `${o.contatto_ice_nome} (${esc(o.contatto_ice_relazione || '')}) · ${o.contatto_ice_telefono || ''}` : '')}` : ''}
+        ${riga('Specializzazioni', specIcone(o, true).nomi.join(', '))}
+        ${sonoAdmin ? `${riga('Telegram', o.telegram_chat_id ? '✅ Collegato' : '')}` : ''}
+        ${sonoAdmin ? `${riga('Mantenimenti ' + anno, oreAnno ? oreAnno + ' ore approvate' + ((oreMan[o.id] || 0) < 24 ? ' ⚠️ sotto soglia' : ' ✅ in linea') : '')}` : ''}
       </table>
 
       ${(progRes.data || []).length ? `

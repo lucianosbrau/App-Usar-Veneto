@@ -250,3 +250,10 @@ Skill persistente (v4) sull'account utente: modulo USAR Medium, modello COMPOSIZ
 - SOLUZIONE: l'import crea per OGNI profilo un UTENTE TECNICO in auth.users con lo STESSO uuid: email `.pending@usarveneto.invalid` (inutilizzabile, password casuale). Verificato: 123 coppie auth→profilo con stesso id
 - ALLA REGISTRAZIONE: collega_scheda_importata trasferisce TUTTO (dati + mantenimenti/ferie/squadre) sull'account vero e cancella il profilo tecnico. MANCA: eliminare anche l'auth tecnico (da aggiungere alla RPC: delete from auth.users where id = profilo_vecchio) — Fare alla prima occasione
 - NOTA per il pannello Authentication di Supabase: dopo l'import compariranno 123 utenti "pending" (inutilizzabili, non si loggano). Spariranno man mano che gli operatori si registrano (con la fix della RPC)
+
+### PASSO 6 COMPLETATO: app sulle nuove specializzazioni + privacy schede (24/10)
+- **specIcone(o)**: nuovo helper globale che genera icone dalle colonne sp_* (🏗️ strut, ☣️+livello NBCR 2/3, 🐕 K9, 🧗 SAF, 📝 STAFF, 🚜 LOGISTA, 💼 FUNZ, 🧭 TAS2, ⚕️ MED, 💉 INF) + ⭐ dai gradi CRE/CR/CSE/CS. Sostituisce SPEC_IDS (vecchia tabella) ovunque: card Operatori, scheda, tendine Programmazione/Attivazione (etichette e PDF), contatori testata, copertura requisiti attivazione
+- **Idoneità tendine per posto**: strutturista→sp_strutturista; NBCR→sp_nbcr≥2; K9→sp_k9; SAF→solo 2A-AVANZATO
+- **PRIVACY SCHEDE (regola utente)**: chi NON è admin nella scheda operatore vede SOLO: nome, cognome, grado, turno/salto, comando, sede, specializzazioni, patenti, telefono personale, email, FOTO. NIENTE: cellulare? NB — telefono personale SÌ (richiesto), cellulare/ICE/gruppo sanguigno/indirizzo/medico/Telegram/mantenimenti NO; pulsanti admin (promuovi/revoca/elimina/registro) nascosti ai non-admin
+- Test aggiornati: login simulato ora come ADMIN (op0), 20/20 verdi
+- NB: la vecchia tabella specializzazioni/operatori_specializzazioni non è più usata dall'app (resta nel DB: pulizia a fine fase)
