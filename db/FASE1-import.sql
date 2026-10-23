@@ -1,4 +1,3 @@
-Scarico il foglio Google...
 -- ================================================================
 -- IMPORT FASE 1 — generato il 2026-10-23 da import-fase1.py
 -- ESEGUIRE NELLA FINESTRA DI QUIETE (10 min, nessuno inserisce)

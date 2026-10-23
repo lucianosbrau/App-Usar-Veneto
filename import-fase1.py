@@ -157,7 +157,8 @@ def genera_sql():
     """Genera l'SQL di import completo (passo 5 del runbook)."""
     import datetime
     oggi = datetime.date.today().isoformat()
-    print('Scarico il foglio Google...')
+    import sys as _s
+    print('Scarico il foglio Google...', file=_s.stderr)
     wb = scarica()
 
     # specializzazioni (come nel main)
