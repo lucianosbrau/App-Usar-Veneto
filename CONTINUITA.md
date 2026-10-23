@@ -614,3 +614,9 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 ### Notifiche PWA: ESCLUSE per decisione di costo (23/10/2026)
 - L'utente ha DECISO DI NON implementare le notifiche push PWA: richiederebbero l'account Apple Developer (99 €/anno) per gli iPhone. **Non riproporre e non presentare le notifiche PWA come pianificate** — Telegram è il canale di allerta definitivo
 - Il canale ufficiale resta: bot Telegram (gruppo "Allerta USAR VENETO" + chat private) + risposta dall'app (pagina 🚨 Attivazione, ora visibile a tutti)
+
+### Infografica collegamento Telegram REALIZZATA (23/10/2026)
+- File: `infografica-telegram.html` (pubblicata su GitHub Pages) — stile progetto (rosso #B22222, tricolore, solo logo USAR)
+- 6 fasi con gli SCREENSHOT REALI caricati dall'utente in `assets/`: Pagina login.png (fase 1), Pagina codice collegamento.png (fase 2), Pagina codice 6 cifre.png (fase 3), Pagina ricerca bot.png + Pagina avvia bot.png (fase 4). Fase 5: bolla stilizzata col codice. Fase 6: messaggio "✅ Account collegato" ricreato in stile chat (utente non aveva lo screenshot)
+- Sezione "📱 Ricevere le allerte anche in silenzioso" (requisito vecchio soddisfatto): impostazioni Android e iPhone a colonne (notifiche attive, suono Avviso, popup/priorità, eccezione Non disturbare) + nota sul limite tecnico del silenzioso
+- NB: gli screenshot si riferiscono a un codice esempio (871-556); la pagina login e il profilo sono dell'utente admin
