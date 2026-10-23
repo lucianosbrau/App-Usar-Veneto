@@ -43,7 +43,10 @@ def data_iso(x):
     if '/' in s:
         p = s.split('/')
         if len(p) == 3 and len(p[2]) == 4:
-            return f"{p[2]}-{int(p[1]):02d}-{int(p[0]):02d}"
+            g, m, a = int(p[0]), int(p[1]), p[2]
+            if m > 12:
+                return None  # refuso tipo '19/025/2021': gestito dal chiamante
+            return f"{a}-{m:02d}-{g:02d}"
     return None
 
 def scarica():
@@ -292,7 +295,16 @@ def genera_sql():
         arg = pulisci(ws.cell(row=r, column=8).value)
         ore = ws.cell(row=r, column=9).value
         reali = ws.cell(row=r, column=10).value
-        if not data: continue
+        if not data:
+            # REFUSO NOTO (confermato dall'utente 24/10): '19/025/2021' = 19 febbraio 2021 (zero in più nel mese)
+            grezzo = str(ws.cell(row=r, column=7).value or '').strip()
+            m_refuso = __import__('re').match(r'^(\d{1,2})/0(\d)5/(\d{4})$', grezzo)
+            if m_refuso:
+                data = f"{m_refuso.group(3)}-0{m_refuso.group(2)}-{int(m_refuso.group(1)):02d}"
+                print("-- CORRETTA data refusa '" + grezzo + "' -> " + data + " (zero in piu' nel mese, confermato dall'utente)")
+            else:
+                print("-- SALTATA una riga di mantenimenti con data illeggibile: cf=" + str(cf) + " tipo=" + str(tipo_raw) + " valore='" + grezzo + "'")
+                continue
         ore_v = float(ore) if ore not in (None, '') else None
         reali_v = float(reali) if reali not in (None, '') else ore_v
         if ore_v is None: continue
