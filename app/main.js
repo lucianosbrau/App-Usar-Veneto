@@ -415,7 +415,7 @@ async function pagDashboard(el) {
     if (!String(m.data).startsWith(anno)) return;
     orePerOp[m.operatore_id] = (orePerOp[m.operatore_id] || 0) + Number(m.ore);
   });
-  const soglia = 36;
+  const soglia = 24;
   const inLinea = tutti.filter(o => (orePerOp[o.id] || 0) >= soglia).length;
   const sottoSoglia = tutti.filter(o => (orePerOp[o.id] || 0) < soglia).length;
 
@@ -540,7 +540,7 @@ async function pagOperatori(el) {
   const soloSottoSoglia = localStorage.getItem('op-filtro') === 'sottosoglia';
   let testoCerca = localStorage.getItem('op-cerca') || '';
   const filtraPer = () => {
-    let lista = soloSottoSoglia ? operatori.filter(o => (oreMan[o.id] || 0) < 36) : operatori;
+    let lista = soloSottoSoglia ? operatori.filter(o => (oreMan[o.id] || 0) < 24) : operatori;
     const q = testoCerca.trim().toLowerCase();
     if (q) lista = lista.filter(o => `${o.cognome} ${o.nome}`.toLowerCase().includes(q));
     return lista;
@@ -555,7 +555,7 @@ async function pagOperatori(el) {
     </div>
     <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
       <button class="pill ${!soloSottoSoglia ? 'verde' : ''}" id="fil-tutti" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">👥 Tutti (${operatori.length})</button>
-      <button class="pill ${soloSottoSoglia ? 'rosso' : ''}" id="fil-sottosoglia" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">⚠️ Sotto soglia mantenimenti (${operatori.filter(o => (oreMan[o.id] || 0) < 36).length})</button>
+      <button class="pill ${soloSottoSoglia ? 'rosso' : ''}" id="fil-sottosoglia" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">⚠️ Sotto soglia mantenimenti (${operatori.filter(o => (oreMan[o.id] || 0) < 24).length})</button>
     </div>
     <div class="grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px;">
       ${(await Promise.all(daMostrare.map(async o => `
@@ -565,7 +565,7 @@ async function pagOperatori(el) {
             ${await avatarHtml(o, 56, 18)}
             ${o.ruolo === 'admin'
               ? '<span class="pill rosso">⭐ Admin</span>'
-              : ((oreMan[o.id] || 0) >= 36
+              : ((oreMan[o.id] || 0) >= 24
                 ? '<span class="pill verde">🟢 In linea</span>'
                 : '<span class="pill giallo">🟡 Sotto soglia</span>')}
           </div>
@@ -659,6 +659,7 @@ async function pagSquadre(el) {
               ${utente.ruolo === 'admin' ? `<button class="btn-primary" data-attiva-sq="${p.team}" style="height:38px; font-size:13px; background:var(--rosso);">🚨 ATTIVA</button>` : ''}
               <button class="btn-primary" data-visualizza="${p.id}" style="height:38px; font-size:13px;">👁️ VISUALIZZA</button>
               ${utente.ruolo === 'admin' ? `<button class="btn-primary" data-modifica="${p.id}" style="height:38px; font-size:13px; background:var(--grigio-ch);">✏️ MODIFICA</button>` : ''}
+              <button class="btn-primary" data-pdf-sq="${p.id}" style="height:38px; font-size:13px;">📄 GENERA PDF</button>
             </div>
           </div>
           <div class="dettaglio-sq" style="display:none; margin-top:12px; border-top:1px solid var(--bordo); padding-top:12px;">
@@ -688,6 +689,15 @@ async function pagSquadre(el) {
     localStorage.setItem('att-preferita', b.dataset.attivaSq);
     pagina = 'attivazione';
     render();
+  });
+  // GENERA PDF: manifesto della squadra pubblicata (per admin, come in Programmazione)
+  cont.querySelectorAll('[data-pdf-sq]').forEach(b => b.onclick = async (e) => {
+    e.stopPropagation();
+    const p = progs.find(x => x.id === Number(b.dataset.pdfSq));
+    if (!p) return;
+    const { data: membri } = await supabase.from('programmi_membri')
+      .select('posto, profili(nome, cognome, grado)').eq('programma_id', p.id);
+    generaPdfManifesto(p, membri || []).catch(err => alert('Errore PDF: ' + err.message));
   });
   // MODIFICA: alla programmazione
   cont.querySelectorAll('[data-modifica]').forEach(b => b.onclick = (e) => {
@@ -850,6 +860,7 @@ async function disegnaCalendario(el, anno, mese) {
   el.innerHTML = `
     <div class="pagina-titolo">📅 Calendario</div>
     <div class="pagina-sotto">Turni e salti turno — il tuo salto è evidenziato in giallo — clicca sul turno per inserire/eliminare le tue ferie.</div>
+    <div id="avviso-ferie" style="display:none; max-width:420px; margin:0 auto 14px; padding:10px 16px; background:#D1FAE5; color:#065F46; border-radius:10px; font-weight:700; text-align:center;"></div>
     <div class="card" style="margin-bottom:18px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <button class="pill" id="cal-indietro" style="border:1px solid var(--bordo); cursor:pointer; background:#fff;">◀ Mese prima</button>
@@ -917,13 +928,22 @@ async function disegnaCalendario(el, anno, mese) {
 async function toggleFerie(data, turno, el, anno, mese) {
   const chiave = data + '|' + turno;
   const esistenteId = mieFerieGlobali[chiave] || mieFerieGlobali[data + '|intera'];
+  let msg;
   if (esistenteId) {
     await supabase.from('disponibilita').delete().eq('id', esistenteId);
+    msg = 'Ferie rimosse (' + fmtData(data) + (turno === 'giorno' ? ' ☀️' : ' 🌙') + ')';
   } else {
     const { error } = await supabase.from('disponibilita').insert({ operatore_id: utente.id, data, tipo: 'ferie', turno_ferie: turno });
     if (error) { alert('Errore: ' + error.message); return; }
+    msg = '🏖️ Ferie inserite: ' + fmtData(data) + (turno === 'giorno' ? ' (turno giorno ☀️)' : ' (turno notte 🌙)');
   }
   await disegnaCalendario(el, anno, mese);
+  const avviso = document.getElementById('avviso-ferie');
+  if (avviso) {
+    avviso.textContent = msg;
+    avviso.style.display = 'block';
+    setTimeout(() => avviso.style.display = 'none', 3000);
+  }
 }
 
 
@@ -1066,7 +1086,7 @@ async function apriProgramma(cont, programmi) {
     caricaOreMantenimenti()
   ]);
   const oreMan = mantRes || {};
-  const sottoSogliaMan = (opId) => (oreMan[opId] || 0) < 36;
+  const sottoSogliaMan = (opId) => (oreMan[opId] || 0) < 24;
   const feriePerOp = {};
   (ferie.data || []).forEach(f => {
     (feriePerOp[f.operatore_id] = feriePerOp[f.operatore_id] || []).push(f.data);
@@ -1767,7 +1787,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
     caricaOreMantenimenti()
   ]);
   const oreMan = mantRes || {};
-  const sottoSogliaMan = (opId) => (oreMan[opId] || 0) < 36;
+  const sottoSogliaMan = (opId) => (oreMan[opId] || 0) < 24;
   const idSi = new Set((risposte.data || []).map(r => r.operatore_id));
   const tutti = (pers.data || []).filter(o => !soloRispondentiSi || idSi.has(o.id) || (membri.data || []).some(m => m.operatore_id === o.id));
   const perPosto = {};
@@ -1893,7 +1913,7 @@ async function pagMantenimenti(el) {
     supabase.from('impostazioni').select('valore').eq('chiave', 'soglia_ore_mantenimenti').limit(1).maybeSingle(),
     supabase.from('mantenimenti').select('*, profili!mantenimenti_operatore_id_fkey(nome, cognome)').order('data', { ascending: false })
   ]);
-  const soglia = Number(impo?.data?.valore) || 36;
+  const soglia = Number(impo?.data?.valore) || 24;
   const cont = document.getElementById('man-cont');
   if (tutti.error) {
     cont.innerHTML = `<div class="card" style="border-left:4px solid var(--rosso);">
@@ -2123,7 +2143,7 @@ async function schedaOperatore(el, o, oreMan) {
         ${riga('Contatto ICE', o.contatto_ice_nome ? `${o.contatto_ice_nome} (${esc(o.contatto_ice_relazione || '')}) · ${o.contatto_ice_telefono || ''}` : '')}
         ${riga('Specializzazioni', inValore.concat(altreSpec).join(', '))}
         ${riga('Telegram', o.telegram_chat_id ? '✅ Collegato' : '')}
-        ${riga('Mantenimenti ' + anno, oreAnno ? oreAnno + ' ore approvate' + ((oreMan[o.id] || 0) < 36 ? ' ⚠️ sotto soglia' : ' ✅ in linea') : '')}
+        ${riga('Mantenimenti ' + anno, oreAnno ? oreAnno + ' ore approvate' + ((oreMan[o.id] || 0) < 24 ? ' ⚠️ sotto soglia' : ' ✅ in linea') : '')}
       </table>
 
       ${(progRes.data || []).length ? `
