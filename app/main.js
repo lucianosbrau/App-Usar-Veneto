@@ -81,13 +81,22 @@ window.addEventListener('popstate', async () => {
 function iniziali(nome, cognome) {
   return ((nome?.[0] || '') + (cognome?.[0] || '')).toUpperCase() || '?';
 }
-function urlFoto(o) {
-  if (!o?.foto_path) return null;
-  return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/foto-profili/${o.foto_path}`;
-}
-function avatarHtml(o, px, fontPx) {
-  const u = urlFoto(o);
-  if (u) return `<div class="avatar" style="width:${px}px;height:${px}px; background:#fff; overflow:hidden;"><img src="${u}" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.remove()"></div>`;
+const cacheUrlFoto = {};
+async function avatarHtml(o, px, fontPx) {
+  let u = null;
+  if (o?.foto_path) {
+    const c = cacheUrlFoto[o.foto_path];
+    if (c && c.scadenza > Date.now() + 60000) {
+      u = c.url;
+    } else {
+      const { data } = await supabase.storage.from('foto-profili').createSignedUrl(o.foto_path, 3600);
+      if (data?.signedUrl) {
+        cacheUrlFoto[o.foto_path] = { url: data.signedUrl, scadenza: Date.now() + 3600 * 1000 };
+        u = data.signedUrl;
+      }
+    }
+  }
+  if (u) return `<div class="avatar" style="width:${px}px;height:${px}px; background:#fff; overflow:hidden;"><img src="${u}" alt="" style="width:100%;height:100%;object-fit:cover;"></div>`;
   return `<div class="avatar" style="width:${px}px;height:${px}px;font-size:${fontPx || Math.round(px / 3)}px;">${esc(iniziali(o?.nome, o?.cognome))}</div>`;
 }
 function fmtData(d) {
@@ -529,11 +538,11 @@ async function pagOperatori(el) {
       <button class="pill ${soloSottoSoglia ? 'rosso' : ''}" id="fil-sottosoglia" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">⚠️ Sotto soglia mantenimenti (${operatori.filter(o => (oreMan[o.id] || 0) < 36).length})</button>
     </div>
     <div class="grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px;">
-      ${daMostrare.map(o => `
+      ${(await Promise.all(daMostrare.map(async o => `
         <div class="card" data-op="${o.id}" style="border-left:4px solid ${o.ruolo === 'admin' ? 'var(--rosso)' : 'var(--royal)'}; cursor:pointer; position:relative;">
           <div style="position:absolute; top:10px; right:12px; font-size:11px; color:var(--grigio);">➤</div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            ${avatarHtml(o, 56, 18)}
+            ${await avatarHtml(o, 56, 18)}
             ${o.ruolo === 'admin'
               ? '<span class="pill rosso">⭐ Admin</span>'
               : ((oreMan[o.id] || 0) >= 36
@@ -548,7 +557,7 @@ async function pagOperatori(el) {
           <div style="font-size:15px; line-height:2; margin-top:4px;">
             <span style="font-size:11px; font-weight:700; color:var(--grigio); text-transform:uppercase;">Abilitazioni:</span> ${iconeAbilitazioni(o) || '<span style="color:var(--grigio); font-size:13px;">—</span>'}
           </div>
-        </div>`).join('')}
+        </div>`))).join('')}
     </div>`;
   document.getElementById('fil-tutti').onclick = () => { localStorage.setItem('op-filtro', 'tutti'); pagOperatori(el); };
   document.getElementById('fil-sottosoglia').onclick = () => { localStorage.setItem('op-filtro', 'sottosoglia'); pagOperatori(el); };
@@ -1625,10 +1634,10 @@ async function pagAttivazioneAdmin(el) {
 
       <div class="card" style="margin-top:14px;">
         <div style="font-weight:800; margin-bottom:10px;">✅ RISPOSTE — SÌ (${si.length})</div>
-        ${si.length ? si.map(r => `<div style="padding:7px 0; border-top:1px solid var(--bordo); display:flex; justify-content:space-between;">
-          <span><b>${esc(r.profili?.cognome)} ${esc(r.profili?.nome)}</b>${inProgramma.has(r.operatore_id) ? ' <span class="pill verde" style="font-size:10px;">IN PROGRAMMA</span>' : ''}</span>
+        ${si.length ? (await Promise.all(si.map(async r => `<div style="padding:7px 0; border-top:1px solid var(--bordo); display:flex; justify-content:space-between;">
+          <span>${await avatarHtml(r.profili, 32, 11)} <b>${esc(r.profili?.cognome)} ${esc(r.profili?.nome)}</b>${inProgramma.has(r.operatore_id) ? ' <span class="pill verde" style="font-size:10px;">IN PROGRAMMA</span>' : ''}</span>
           <span style="color:var(--grigio); font-size:12px;">${new Date(r.risposto_il).toLocaleTimeString('it-IT')}</span>
-        </div>`).join('') : '<div style="color:var(--grigio);">Nessuna risposta positiva finora.</div>'}
+        </div>`))).join('') : '<div style="color:var(--grigio);">Nessuna risposta positiva finora.</div>'}
         ${no.length ? `<div style="font-weight:800; margin:14px 0 6px;">✖️ NO (${no.length})</div>
         ${no.map(r => `<div style="padding:7px 0; border-top:1px solid var(--bordo); color:var(--grigio);">${esc(r.profili?.cognome)} ${esc(r.profili?.nome)}</div>`).join('')}` : ''}
       </div>
@@ -2036,7 +2045,7 @@ async function schedaOperatore(el, o, oreMan) {
     <div class="card" style="max-width:680px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
         <div style="display:flex; align-items:center; gap:14px;">
-          ${avatarHtml(o, 72, 24)}
+          ${await avatarHtml(o, 72, 24)}
           <div>
             <div style="font-size:24px; font-weight:800;">${esc(o.cognome)} ${esc(o.nome)} ${simboloVigile(o, 24)}</div>
             <div style="color:var(--grigio); font-size:13px;">${o.grado ? esc(o.grado) + ' · ' : ''}${o.ruolo === 'admin' ? '⭐ Amministratore' : 'Operatore'}</div>

@@ -620,3 +620,9 @@ Esiste una **skill persistente** (documenti di conoscenza collegati all'account 
 - 6 fasi con gli SCREENSHOT REALI caricati dall'utente in `assets/`: Pagina login.png (fase 1), Pagina codice collegamento.png (fase 2), Pagina codice 6 cifre.png (fase 3), Pagina ricerca bot.png + Pagina avvia bot.png (fase 4). Fase 5: bolla stilizzata col codice. Fase 6: messaggio "✅ Account collegato" ricreato in stile chat (utente non aveva lo screenshot)
 - Sezione "📱 Ricevere le allerte anche in silenzioso" (requisito vecchio soddisfatto): impostazioni Android e iPhone a colonne (notifiche attive, suono Avviso, popup/priorità, eccezione Non disturbare) + nota sul limite tecnico del silenzioso
 - NB: gli screenshot si riferiscono a un codice esempio (871-556); la pagina login e il profilo sono dell'utente admin
+
+### FIX errore upload foto ("new row violates row-level security") (23/10/2026)
+- CAUSA: in un bucket PUBBLICO Supabase accetta le scritture SOLO con la service key — l'upload dell'utente autenticato veniva rifiutato dalla policy interna
+- SOLUZIONE: bucket `foto-profili` reso PRIVATO + lettura per autenticati + policy delete propria cartella; l'app ora genera **URL firmati (1 ora, in cache)** con createSignedUrl per mostrare le foto. Migrazione: `db/fix-bucket-foto.sql` (**DA ESEGUIRE in SQL Editor**)
+- NOTA: la foto accanto ai nomi in pagina Attivazione era stata PERSA da un replace fallito (stessa lezione); ripristinata ora con avatarHtml async
+- LEZIONE RIPETUTA: verificare SEMPRE con grep dopo i replace su blocchi template multi-riga
