@@ -225,7 +225,7 @@ Skill persistente (v4) sull'account utente: modulo USAR Medium, modello COMPOSIZ
 - ✅ Tutte le regole decise: specializzazioni (sez. 6 + tabella definitiva), gradi, comandi/sedi (12 + lista), turni G, dedup livello-alto, eccezioni pulizia (admin + TENAN + CONTESSO + IPPOLITO), mantenimenti (ore=prestate, conteggiate=reali, tutti approvati)
 
 ### Passi della FASE 1 (in ordine — spuntare man mano)
-- [ ] **1. BACKUP DATABASE (fa l'utente)**: Supabase → Database → Backups → scaricare l'ultimo backup (o Settings → General → Export). Senza questo NON si procede
+- [x] **1. BACKUP DATABASE ✅ FATTO (24/10)**: piano Free senza backup nativi → export via query di sola lettura (db/BACKUP-export-letture.sql): 4 CSV su Drive ("Esportazione database - backup supabase": profili 52KB, mantenimenti 43KB, ferie/squadre 6KB, specializzazioni/impostazioni/sedi 4KB) + schema tabelle. Documentazione in backup-db/2026-10-23/. NB: password login non esportabili (ok), disponibilita era vuota all'export
 - [ ] 2. **Eseguire `db/FASE1-migrazione-specializzazioni.sql`** (fa l'utente in SQL Editor): aggiunge colonne e tabelle nuove senza toccare nulla di esistente
 - [ ] 3. **Script di import** (costruisce l'AI): legge il foglio Google (DATI ANAGRAFICI + SPECIALIZZAZIONI + MANTENIMENTI via gviz CSV), applica le regole (gradi FF.TT.→D, M→G, comando→i 12, sede→lista ufficiale, NBCR Liv.→numero, SAF normalizzato, TAS, dedup livello-alto) e genera SQL di import (INSERT ... ON CONFLICT DO UPDATE, email come chiave di collegamento)
 - [ ] 4. **SIMULAZIONE su 3 operatori campione: BUBOLA FRIDA, ZANAGA STEFANO, RUBIN MARCO** (scelti dall'utente): mostrare la riga trasformata (foglio → app) e farla VERIFICARE prima di importare tutto
