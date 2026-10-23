@@ -75,7 +75,7 @@ async function inserisciFerie(chatId, testo) {
 }
 
 const sessioniMan = {};
-const TIPI_MAN = ['Mantenimento', 'Manovra', 'Intervento', 'Lavorazione', 'Tutor Mantenimento', 'Tutor Corso', 'Altra formazione'];
+const TIPI_MAN = ['Mantenimento', 'Manovra', 'Intervento', 'Lavorazione', 'Manutenzione e magazzino', 'Tutor Mantenimento', 'Tutor Corso', 'Altra formazione'];
 
 function domandaStepMan(s) {
   if (s.step === 'data') return '\U0001F4C5 Scrivi la DATA (gg/mm/aaaa):';

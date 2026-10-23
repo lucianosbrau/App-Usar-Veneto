@@ -23,7 +23,7 @@ async function caricaSpecializzazioni() {
   });
 }
 
-const TIPI_MAN = ['Mantenimento', 'Manovra', 'Intervento', 'Lavorazione', 'Tutor Mantenimento', 'Tutor Corso', 'Altra formazione'];
+const TIPI_MAN = ['Mantenimento', 'Manovra', 'Intervento', 'Lavorazione', 'Manutenzione e magazzino', 'Tutor Mantenimento', 'Tutor Corso', 'Altra formazione'];
 
 function esc(t) {
   return String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -950,11 +950,11 @@ async function toggleFerie(data, turno, el, anno, mese) {
 async function caricaOreMantenimenti() {
   const anno = new Date().getFullYear();
   const { data } = await supabase.from('mantenimenti')
-    .select('operatore_id, ore, data').eq('stato', 'approvato');
+    .select('operatore_id, ore, ore_conteggiate, data').eq('stato', 'approvato');
   const ore = {};
   (data || []).forEach(m => {
     if (!String(m.data).startsWith(anno)) return;
-    ore[m.operatore_id] = (ore[m.operatore_id] || 0) + Number(m.ore);
+    ore[m.operatore_id] = (ore[m.operatore_id] || 0) + Number(m.ore_conteggiate ?? m.ore);
   });
   return ore;
 }
@@ -2122,7 +2122,7 @@ async function schedaOperatore(el, o, oreMan) {
     return;
   }
   const anno = new Date().getFullYear();
-  const oreAnno = (mantRes.data || []).filter(m => String(m.data).startsWith(anno)).reduce((s, m) => s + Number(m.ore), 0);
+  const oreAnno = (mantRes.data || []).filter(m => String(m.data).startsWith(anno)).reduce((s, m) => s + Number(m.ore_conteggiate ?? m.ore), 0);
   const specNomi = (specRes.data || []).map(s => s.specializzazioni?.nome).filter(Boolean);
   const inValore = specNomi.filter(n => ['Strutturista', 'NBCR 3° livello', 'Unità cinofila K9', 'SAF 2A (corda)', 'Caposquadra/Caporeparto'].includes(n));
   const altreSpec = specNomi.filter(n => !inValore.includes(n));
@@ -2270,7 +2270,7 @@ async function salvaMantenimento() {
 }
 
 async function pagProfilo(el) {
-  const TURNI = ['A', 'B', 'C', 'D'];
+  const TURNI = ['A', 'B', 'C', 'D', 'G'];
   const SALTI = [];
   for (const t of TURNI) for (let n = 1; n <= 8; n++) SALTI.push(t + n);
   const mioAvatar = await avatarHtml(utente, 72, 24);
