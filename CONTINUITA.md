@@ -163,3 +163,8 @@ Skill persistente (v4) collegata all'account utente: struttura del modulo USAR M
 - 21/10/2026: bot Telegram scritto; PDF manifesto jsPDF sul modello COMPOSIZIONE TEAM (4 iterazioni di layout); tendine rinnovate con ricerca
 - 22/10/2026: bot ONLINE su Render; gruppo "Allerta USAR VENETO" configurato; allerte con pulsanti ✅/❌; COLLAUDO END-TO-END dell'attivazione; resoconti con turni di ferie effettivi; simbolo vigile per grado; scheda operatore con promozione admin; migrazioni e seed completati (DB in pari)
 - 23/10/2026: fix back del telefono (pushState perduto); foto profilo (bucket privato con URL firmati dopo fix RLS); eliminazione account con password; log azioni admin; pagina Attivazione visibile a tutti; pulsante cambia risposta; ricerca in Operatori con ✕; revisione codice (pulsanti bot duplicati); infografica Telegram (HTML+PDF) e piano migrazione 2 fasi; fix registrazione (Confirm email spento); informativa privacy bozza + consenso registrato + log consultazioni + admin non modifica profili; file "Link del progetto" (repo + Drive)
+
+### Segnalazione "schede non si aprono" (23/10/2026, verificata)
+- Riprodotta l'apertura scheda con test automatico (jsdom + DB simulato): il codice CORRENTE funziona — click → hash #/operatori/<id> → scheda renderizzata con tutti i dati
+- Se l'utente vede l'hash cambiare ma la scheda non aprirsi: quasi certamente CACHE del telefono con versione precedente. Istruzioni: chiudere l'app, riaprire e ricaricare; se persiste, svuotare la cache del browser o reinstallare la PWA
+- Test eseguito con jsdom: script temporaneo non committato
