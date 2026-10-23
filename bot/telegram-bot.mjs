@@ -146,7 +146,25 @@ async function controllaAttivazioni() {
   const { data: aperta } = await sb.from('attivazioni')
     .select('id, team, messaggio, creata_il').eq('chiusa', false)
     .order('creata_il', { ascending: false }).limit(1).maybeSingle();
-  if (!aperta) { ultimaAttivazioneVista = null; return; }
+  if (!aperta) {
+    // l'attivazione che stavamo seguendo è stata CHIUSA: avvisa sul gruppo e chiude
+    if (ultimaAttivazioneVista !== null) {
+      const { data: chiusa } = await sb.from('attivazioni')
+        .select('id, team').eq('id', ultimaAttivazioneVista).limit(1).maybeSingle();
+      const teamTxt = chiusa?.team === 'alpha' ? 'TEAM ALPHA' : chiusa?.team === 'bravo' ? 'TEAM BRAVO' : 'ATTIVAZIONE PERSONALIZZATA';
+      const testoChiusura = `✅✅✅ ATTIVAZIONE CHIUSA ✅✅✅\n\n${teamTxt}\n\nLe risposte non sono più accettate. Grazie a tutti.`;
+      if (ALERT_GROUP) {
+        await tg('sendMessage', { chat_id: ALERT_GROUP, text: testoChiusura }).catch(e => console.error('Invio chiusura gruppo fallito:', e.message));
+      }
+      const { data: collegatiChiusura } = await sb.from('profili')
+        .select('telegram_chat_id').not('telegram_chat_id', 'is', null);
+      for (const p of (collegatiChiusura || [])) {
+        await tg('sendMessage', { chat_id: p.telegram_chat_id, text: testoChiusura }).catch(() => {});
+      }
+      ultimaAttivazioneVista = null;
+    }
+    return;
+  }
   if (aperta.id === ultimaAttivazioneVista) return;
   const giaVista = ultimaAttivazioneVista !== null;
   ultimaAttivazioneVista = aperta.id;

@@ -264,3 +264,8 @@ Skill persistente (v4) collegata all'account utente: struttura del modulo USAR M
 ### Attivazione: contatore "Nessuna risposta" vero (23/10/2026, richiesta utente)
 - Prima il pill "⏳ Nessuna risposta: —" era fisso (non contava nulla)
 - Ora: NESSUNA RISPOSTA = allertati − chi ha risposto. Allertati = chi ha Telegram collegato (il bot manda lì) ∪ personale del programma del mese del team attivato (fallback alpha per personalizzata). Sotto i contatori: riga "⏳ In attesa: Cognome Nome, ..." con i nomi di chi non ha ancora risposto — aggiornata in tempo reale come il resto
+
+### Bot: avviso ATTIVAZIONE CHIUSA (23/10/2026, richiesta utente)
+- Quando l'admin chiude l'attivazione dalla PWA, il bot (al giro successivo di controllaAttivazioni, ~1 secondo) rileva che non ci sono più attivazioni aperte e quella che seguiva è chiusa → invia sul GRUPPO "Allerta USAR VENETO" e in privata ai collegati: "✅✅✅ ATTIVAZIONE CHIUSA ✅✅✅ — <TEAM> — Le risposte non sono più accettate. Grazie a tutti."
+- NB: richiede il **deploy su Render** (Manual Deploy → Deploy latest commit) per entrare in funzione
+- Contatore "nessuna risposta": confermato dall'utente che va bene così (tutti gli allertati)
