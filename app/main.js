@@ -633,11 +633,8 @@ async function pagOperatori(el) {
     testoCerca = '';
     localStorage.setItem('op-cerca', '');
     cercaX.style.display = 'none';
-    const lista = filtraPer();
-    cont.querySelectorAll('[data-op]').forEach(c => {
-      c.style.display = lista.some(o => o.id === c.dataset.op) ? '' : 'none';
-    });
-    cercaInput.focus();
+    // riparte dall'elenco GIUSTO: tutti, o solo i sotto-soglia se quel filtro è attivo
+    pagOperatori(el);
   };
   document.getElementById('fil-tutti').onclick = () => { localStorage.setItem('op-filtro', 'tutti'); pagOperatori(el); };
   document.getElementById('fil-sottosoglia').onclick = () => { localStorage.setItem('op-filtro', 'sottosoglia'); pagOperatori(el); };
