@@ -1,0 +1,18 @@
+# KEEP-ALIVE BOT: ogni 10 minuti bussa alla porta del bot su Render per
+# impedire che il piano Free lo sospenda (15 min di inattivita').
+# L'URL del bot va messo nel secret BOT_URL (es. https://usar-veneto-bot.onrender.com).
+name: Keep-alive bot Telegram
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [ -z "$BOT_URL" ]; then echo "BOT_URL non impostato: saltato"; exit 0; fi
+          curl -s -m 20 "$BOT_URL" > /dev/null && echo "Bot svegliato" || echo "Bot non raggiungibile"
+        env:
+          BOT_URL: ${{ secrets.BOT_URL }}
