@@ -1,0 +1,31 @@
+LINK DEL PROGETTO — App USAR Veneto
+(aggiornato al 23/10/2026 — tutte le pagine sono pubbliche, nessun login richiesto)
+
+APP E SISTEMA
+- App (PWA): https://lucianosbrau.github.io/App-Usar-Veneto/
+- Repository GitHub (codice): https://github.com/lucianosbrau/App-Usar-Veneto
+- Bot Telegram: @Usar_veneto_bot
+- Gruppo allerte: "Allerta USAR VENETO" (inserimento solo via admin)
+
+DOCUMENTAZIONE OPERATIVA
+- Documento di continuità (lavoro, decisioni, regole): https://github.com/lucianosbrau/App-Usar-Veneto/blob/main/CONTINUITA.md
+- Guida migrazione account (fase 1): https://github.com/lucianosbrau/App-Usar-Veneto/blob/main/MIGRAZIONE-ACCOUNT.md
+- Guida migrazione server Corpo (fase 2): https://github.com/lucianosbrau/App-Usar-Veneto/blob/main/MIGRAZIONE-SERVER-CORPO.md
+- Informativa privacy (bozza, da validare dal Corpo): https://github.com/lucianosbrau/App-Usar-Veneto/blob/main/INFORMATIVA-PRIVACY.md
+
+INFOGRAFICHE (pagine web)
+- Collegamento bot Telegram (guida operatori, 6 fasi + gruppo + silenzioso): https://lucianosbrau.github.io/App-Usar-Veneto/infografica-telegram.html
+- Piano di migrazione in 2 fasi (account nucleo + server CNVVF): https://lucianosbrau.github.io/App-Usar-Veneto/infografica-migrazione-2fasi.html
+- Flusso operativo (come funziona l'attivazione end-to-end): https://lucianosbrau.github.io/App-Usar-Veneto/infografica-flusso.html
+- Migrazione account (versione precedente, solo fase 1): https://lucianosbrau.github.io/App-Usar-Veneto/infografica-migrazione.html
+
+PDF STAMPABILI
+- Collegamento bot Telegram (A4, 3 pagine, per stampa/appendere): https://lucianosbrau.github.io/App-Usar-Veneto/infografica-telegram.pdf
+
+PAGINE PRESENTAZIONE
+- Panoramica del progetto: https://lucianosbrau.github.io/App-Usar-Veneto/presentazione.html
+- Anteprima schermate (mockup): https://lucianosbrau.github.io/App-Usar-Veneto/anteprima-schermate.html
+- Informativa privacy (versione web per gli operatori): https://lucianosbrau.github.io/App-Usar-Veneto/informativa-privacy.html
+
+NB: le pagine informative vivono nella cartella index-extra/ del repository; per pubblicarne
+di nuove vanno messe lì (vedi CONTINUITA.md, regola del build).

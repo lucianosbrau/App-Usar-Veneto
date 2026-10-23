@@ -200,6 +200,13 @@ function renderRegistrazione() {
           <input id="pw" type="password" placeholder="Password (minimo 6 caratteri)" autocomplete="new-password">
           <button class="toggle-pw" id="toggle">👁</button>
         </div>
+        <div style="display:flex; align-items:flex-start; gap:8px; margin:4px 0 8px; text-align:left;">
+          <input type="checkbox" id="privacy-ok" style="margin-top:3px; width:16px; height:16px;">
+          <label for="privacy-ok" style="font-size:12px; color:#475569; line-height:1.5;">
+            Ho letto l'<a href="https://lucianosbrau.github.io/App-Usar-Veneto/informativa-privacy.html" target="_blank" style="color:var(--rosso); font-weight:600;">informativa privacy</a>
+            e accetto il trattamento dei miei dati come descritto
+          </label>
+        </div>
         <button class="btn-primary" id="reg">REGISTRATI</button>
         <button class="link" id="indietro">← Torna al login</button>
       </div>
@@ -235,6 +242,7 @@ async function registrati() {
     return mostraErrore('Compila tutti i campi evidenziati');
   }
   if (pw.length < 6) return mostraErrore('La password deve avere almeno 6 caratteri');
+  if (!document.getElementById('privacy-ok').checked) return mostraErrore('Devi accettare l\'informativa privacy per registrarti');
   const { data, error } = await supabase.auth.signUp({
     email, password: pw,
     options: { data: { nome, cognome } }
@@ -244,6 +252,8 @@ async function registrati() {
     mostraSuccesso('Registrazione riuscita: conferma l\'email ricevuta, poi torna qui ad accedere.');
   } else {
     await caricaUtente(data.user);
+    await supabase.from('profili').update({ privacy_consenso_il: new Date().toISOString() }).eq('id', utente.id);
+    utente.privacy_consenso_il = new Date().toISOString();
     render();
   }
 }
@@ -2055,6 +2065,9 @@ function rigaCoda(m) {
 }
 
 async function schedaOperatore(el, o, oreMan) {
+  if (utente.ruolo === 'admin' && o.id !== utente.id) {
+    supabase.rpc('registra_consultazione', { target: o.id }).catch(() => {});
+  }
   const [specRes, mantRes, progRes] = await Promise.all([
     supabase.from('operatori_specializzazioni').select('specializzazioni(nome)').eq('operatore_id', o.id),
     supabase.from('mantenimenti').select('ore, data, stato').eq('operatore_id', o.id).eq('stato', 'approvato'),
@@ -2323,6 +2336,15 @@ async function pagProfilo(el) {
     document.getElementById('p-ok').style.display = 'block';
     setTimeout(() => document.getElementById('p-ok').style.display = 'none', 2500);
   };
+  (async () => {
+    const box = document.getElementById('p-consultazioni');
+    const { data } = await supabase.from('log_consultazioni')
+      .select('creato_il, profili!log_cons_admin_fkey(cognome, nome)')
+      .eq('operatore_id', utente.id).order('creato_il', { ascending: false }).limit(10);
+    box.innerHTML = (data || []).length
+      ? `<ul style="margin-left:18px; line-height:1.9;">${data.map(c => `<li><b>${esc((c.profili?.cognome || '') + ' ' + (c.profili?.nome || ''))}</b> — ${new Date(c.creato_il).toLocaleString('it-IT')}</li>`).join('')}</ul>`
+      : 'Nessun amministratore ha consultato la tua scheda finora.';
+  })();
   document.getElementById('gen-codice').onclick = async () => {
     const n = String(Math.floor(100000 + Math.random() * 900000));
     const codice = `${n.slice(0,3)}-${n.slice(3)}`;
