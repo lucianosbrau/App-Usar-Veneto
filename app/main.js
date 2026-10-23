@@ -538,8 +538,11 @@ async function pagOperatori(el) {
   const daMostrare = filtraPer();
 
   cont.innerHTML = `
-    <input id="op-cerca" placeholder="🔍 Cerca per nome o cognome…" autocomplete="off"
-      style="width:100%; max-width:420px; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 14px; font-size:14px; margin-bottom:12px;">
+    <div style="position:relative; width:100%; max-width:420px; margin-bottom:12px;">
+      <input id="op-cerca" placeholder="🔍 Cerca per nome o cognome…" autocomplete="off"
+        style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 38px 0 14px; font-size:14px;">
+      <button id="op-cerca-x" title="Cancella la ricerca" style="position:absolute; right:4px; top:50%; transform:translateY(-50%); border:none; background:#F1F5F9; color:#64748B; width:28px; height:28px; border-radius:50%; font-size:15px; font-weight:700; cursor:pointer; display:none; line-height:1;">✕</button>
+    </div>
     <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
       <button class="pill ${!soloSottoSoglia ? 'verde' : ''}" id="fil-tutti" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">👥 Tutti (${operatori.length})</button>
       <button class="pill ${soloSottoSoglia ? 'rosso' : ''}" id="fil-sottosoglia" style="border:1px solid var(--bordo); cursor:pointer; background:#fff; padding:8px 16px;">⚠️ Sotto soglia mantenimenti (${operatori.filter(o => (oreMan[o.id] || 0) < 36).length})</button>
@@ -567,14 +570,28 @@ async function pagOperatori(el) {
         </div>`))).join('')}
     </div>`;
   const cercaInput = document.getElementById('op-cerca');
+  const cercaX = document.getElementById('op-cerca-x');
   cercaInput.value = testoCerca;
+  cercaX.style.display = testoCerca ? 'block' : 'none';
   cercaInput.oninput = () => {
     testoCerca = cercaInput.value;
     localStorage.setItem('op-cerca', testoCerca);
+    cercaX.style.display = testoCerca ? 'block' : 'none';
     const lista = filtraPer();
     cont.querySelectorAll('[data-op]').forEach(c => {
       c.style.display = lista.some(o => o.id === c.dataset.op) ? '' : 'none';
     });
+  };
+  cercaX.onclick = () => {
+    cercaInput.value = '';
+    testoCerca = '';
+    localStorage.setItem('op-cerca', '');
+    cercaX.style.display = 'none';
+    const lista = filtraPer();
+    cont.querySelectorAll('[data-op]').forEach(c => {
+      c.style.display = lista.some(o => o.id === c.dataset.op) ? '' : 'none';
+    });
+    cercaInput.focus();
   };
   document.getElementById('fil-tutti').onclick = () => { localStorage.setItem('op-filtro', 'tutti'); pagOperatori(el); };
   document.getElementById('fil-sottosoglia').onclick = () => { localStorage.setItem('op-filtro', 'sottosoglia'); pagOperatori(el); };
