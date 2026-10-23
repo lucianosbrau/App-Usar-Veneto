@@ -4,7 +4,7 @@
 # Uso: python3 import-fase1.py [--simula BUBOLA,ZANAGA,RUBIN] [--genera]
 # NON tocca il database: genera SQL da verificare. Origine: foglio Drive del nucleo.
 
-import sys, urllib.request, io, json, openpyxl, re
+import sys, urllib.request, io, json, openpyxl, re, uuid
 
 SHEET = '16iY_urOb3pyzM2sXtDRLHK0aEt73Rcd3MtgJW9L_8DQ'
 GRADI = {'FF.TT.': 'D', 'DVD': 'DVD', 'D': 'D', 'VD': 'VD', 'IA': 'IA', 'CRE': 'CRE', 'CR': 'CR',
@@ -240,13 +240,18 @@ def genera_sql():
         tas = int(str(sp.get('tas_raw') or '')[-1]) if str(sp.get('tas_raw') or '')[-1:].isdigit() else None
         est = next((e for e in ('NR','LPG','LNG') if e in sp.get('est_raw', '')), None)
         sp_cap = {k.title(): v for k, v in sp.items()}
+        # opzione A: crea prima l'utente tecnico in auth.users con lo STESSO uuid del profilo
+        id_tecnico = "'" + str(uuid.uuid4()) + "'"
+        email_pend = (email.split('@')[0] if email else 'op') + "_" + uuid.uuid4().hex[:8] + ".pending@usarveneto.invalid"
+        pw_tecnica = uuid.uuid4().hex
+        print("insert into auth.users (id, email, encrypted_password, email_confirmed_at, raw_user_meta_data, created_at, updated_at) values (" + id_tecnico + ", '" + email_pend + "', crypt('" + pw_tecnica + "', gen_salt('bf')), now(), '{}', now(), now());")
         cols = ("id, email, nome, cognome, codice_fiscale, data_nascita, luogo_nascita, cellulare, telefono, "
                 "email_servizio, grado, comando, sede, turno, salto_turno, corso_usar, "
                 "contatto_ice_nome, contatto_ice_telefono, missioni_int, "
                 "sp_funzionario, sp_staff, sp_logista, sp_strutturista, sp_nbcr, sp_nbcr_est, sp_k9, sp_saf, "
                 "sp_sapr, sp_medico, sp_infermiere, tas")
         valori = ", ".join([
-            "gen_random_uuid()", q(email), q(nome.title()), q(cognome.title()), q(cf), q(data_iso(v[4])), q(pul(6)),
+            id_tecnico, q(email), q(nome.title()), q(cognome.title()), q(cf), q(data_iso(v[4])), q(pul(6)),
             q(normalizza_tel(v[6])), q(normalizza_tel(v[7])), q(pul(11).lower() or None),
             q(GRADI.get(grado_raw)), q(COMANDI.get(comando_raw)), q(sede), q(turno), q(salto),
             q(data_iso(v[16])), q(pul(18)), q(normalizza_tel(v[18])),
@@ -256,6 +261,7 @@ def genera_sql():
             qb(sp.get('sapr')), qb(sp.get('medico')), qb(sp.get('infermiere')),
             str(tas) if tas else 'null',
         ])
+        # opzione A: crea prima l'utente tecnico in auth.users con lo STESSO uuid del profilo
         print("insert into profili (" + cols + ")")
         print("values (" + valori + ")")
         print("on conflict (email) do update set nome=excluded.nome, cognome=excluded.cognome, codice_fiscale=excluded.codice_fiscale, data_nascita=excluded.data_nascita, luogo_nascita=excluded.luogo_nascita, cellulare=excluded.cellulare, telefono=excluded.telefono, email_servizio=excluded.email_servizio, grado=excluded.grado, comando=excluded.comando, sede=excluded.sede, turno=excluded.turno, salto_turno=excluded.salto_turno, corso_usar=excluded.corso_usar, contatto_ice_nome=excluded.contatto_ice_nome, contatto_ice_telefono=excluded.contatto_ice_telefono, missioni_int=excluded.missioni_int, sp_funzionario=excluded.sp_funzionario, sp_staff=excluded.sp_staff, sp_logista=excluded.sp_logista, sp_strutturista=excluded.sp_strutturista, sp_nbcr=excluded.sp_nbcr, sp_nbcr_est=excluded.sp_nbcr_est, sp_k9=excluded.sp_k9, sp_saf=excluded.sp_saf, sp_sapr=excluded.sp_sapr, sp_medico=excluded.sp_medico, sp_infermiere=excluded.sp_infermiere, tas=excluded.tas, telegram_chat_id=profili.telegram_chat_id, ruolo=profili.ruolo, foto_path=profili.foto_path, privacy_consenso_il=profili.privacy_consenso_il;")
@@ -291,7 +297,6 @@ def genera_sql():
         reali_v = float(reali) if reali not in (None, '') else ore_v
         if ore_v is None: continue
         print(f"insert into mantenimenti (operatore_id, data, tipo, argomento, ore, ore_conteggiate, stato, note_seed) "
-              f"select id, {q(data)}, {q(tipo)}, {q(arg)}, {ore_v}, {reali_v}, 'approvato', true from profili where codice_fiscale = {q(cf)};")
         nm += 1
     print(f"-- {nm} mantenimenti")
     print()
