@@ -243,6 +243,11 @@ async function registrati() {
   }
   if (pw.length < 6) return mostraErrore('La password deve avere almeno 6 caratteri');
   if (!document.getElementById('privacy-ok').checked) return mostraErrore('Devi accettare l\'informativa privacy per registrarti');
+  // AVVISO: email non presente nelle schede importate → profilazione vuota
+  const { data: esiste } = await supabase.from('profili').select('id').eq('email', email).limit(1);
+  if (!esiste || !esiste.length) {
+    if (!confirm('Attenzione: questa email NON risulta nell\'elenco del nucleo.\nSe hai un\'altra email (quella data all\'amministrazione), ANNULLA e usa quella: troverai il tuo profilo già compilato.\n\nVuoi continuere comunque con questa email (profilo da compilare a mano)?')) return;
+  }
   const { data, error } = await supabase.auth.signUp({
     email, password: pw,
     options: { data: { nome, cognome } }
@@ -252,6 +257,17 @@ async function registrati() {
     mostraSuccesso('Registrazione riuscita: conferma l\'email ricevuta, poi torna qui ad accedere.');
   } else {
     await caricaUtente(data.user);
+    // COLLEGAMENTO SCHEDA IMPORTATA: se esiste una scheda "in attesa" con questa email,
+    // l'account appena creato ne prende il posto (aggiorna l'id della riga)
+    const { data: scheda } = await supabase.from('profili').select('id').eq('email', email).limit(2);
+    const inAttesa = (scheda || []).find(x => x.id !== utente.id);
+    if (inAttesa) {
+      const { error: errLink } = await supabase.rpc('collega_scheda_importata', { profilo_vecchio: inAttesa.id, utente_nuovo: utente.id });
+      if (!errLink) {
+        await caricaUtente(data.user);
+        alert('✅ Benvenuto! Il tuo profilo è stato caricato: dati, specializzazioni e storico mantenimenti sono già al loro posto.');
+      }
+    }
     await supabase.from('profili').update({ privacy_consenso_il: new Date().toISOString() }).eq('id', utente.id);
     utente.privacy_consenso_il = new Date().toISOString();
     render();

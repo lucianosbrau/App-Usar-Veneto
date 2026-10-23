@@ -240,13 +240,13 @@ def genera_sql():
         tas = int(str(sp.get('tas_raw') or '')[-1]) if str(sp.get('tas_raw') or '')[-1:].isdigit() else None
         est = next((e for e in ('NR','LPG','LNG') if e in sp.get('est_raw', '')), None)
         sp_cap = {k.title(): v for k, v in sp.items()}
-        cols = ("email, nome, cognome, codice_fiscale, data_nascita, luogo_nascita, cellulare, telefono, "
+        cols = ("id, email, nome, cognome, codice_fiscale, data_nascita, luogo_nascita, cellulare, telefono, "
                 "email_servizio, grado, comando, sede, turno, salto_turno, corso_usar, "
                 "contatto_ice_nome, contatto_ice_telefono, missioni_int, "
                 "sp_funzionario, sp_staff, sp_logista, sp_strutturista, sp_nbcr, sp_nbcr_est, sp_k9, sp_saf, "
                 "sp_sapr, sp_medico, sp_infermiere, tas")
         valori = ", ".join([
-            q(email), q(nome.title()), q(cognome.title()), q(cf), q(data_iso(v[4])), q(pul(6)),
+            "gen_random_uuid()", q(email), q(nome.title()), q(cognome.title()), q(cf), q(data_iso(v[4])), q(pul(6)),
             q(normalizza_tel(v[6])), q(normalizza_tel(v[7])), q(pul(11).lower() or None),
             q(GRADI.get(grado_raw)), q(COMANDI.get(comando_raw)), q(sede), q(turno), q(salto),
             q(data_iso(v[16])), q(pul(18)), q(normalizza_tel(v[18])),
