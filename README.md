@@ -55,6 +55,7 @@ db/schema.sql        schema completo del database (primo setup)
 db/migrazione-*.sql  migrazioni successive (vedi CONTINUITA per lo stato di esecuzione)
 db/FASE1-*.sql       migrazione FASE 1 import (eseguire SOLO secondo il runbook in CONTINUITA sez. 15)
 db/VERIFICA-*.sql    script di verifica in sola lettura
+import-fase1.py      script di import FASE 1 dal foglio Google (simulazione: --simula COGNOME)
 db/seed-*.sql        dati di prova (operatori fittizi, email prova.*, cancellabili)
 bot/telegram-bot.mjs bot Telegram (collegamento account, /ferie, mantenimenti, allerte)
 public/              file statici pubblicati (logo, manifest PWA, service worker, screenshot)
