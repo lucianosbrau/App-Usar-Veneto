@@ -179,3 +179,10 @@ Skill persistente (v4) sull'account utente: modulo USAR Medium, modello COMPOSIZ
 - MEDICO / INFERMIERE: SI/NO — SENZA simbolo
 - ELIMINARE TPSS (sostituito da MEDICO/INFERMIERE)
 - Modifiche admin a specializzazioni/attributi: sempre con LOG di modifica
+
+### Tendine più grandi + decisioni SAPR/K9 + strategia import (23/10/2026 sera)
+- TENDINE PROGRAMMAZIONE/ATTIVAZIONE: righe più alte (padding 10px 12px), testo 15px (era 13), simbolo vigile 20px (era 16), casella di ricerca leggermente più larga (min(460px,68%))
+- UNITÀ CINOFILE K9: già obbligatorie nei posti 11, 12, 14, 15 (tendina mostra solo idonei + "● OBBL.") — confermato dall'utente, nessuna modifica necessaria
+- SAPR: simbolo DRONE (non elicottero) — da usare nell'implementazione
+- **STRATEGIA IMPORT (proposta all'utente, in attesa di conferma)**: FASE 1 = sezioni con IMPATTO sulle funzioni (DATI ANAGRAFICI + SPECIALIZZAZIONI + MANTENIMENTI) — perché cambiano tendine, priorità, badge, conteggi; FASE 2 = sezioni di sola CONSULTAZIONE (DOCUMENTI, MEDICA, VACCINAZIONI, VACCINI, ANAGRAFICA CANI, VACCINAZIONI CANI, RILEVAZIONE TAGLIE) — nessun impatto su programmazione, si importano dopo con le card dedicate
+- NB: i fogli MEDICA e VACCINAZIONI (persone) non ancora letti — leggerli in fase 2

@@ -1247,7 +1247,7 @@ async function apriProgramma(cont, programmi) {
           ultimoG = o.gruppo.t;
         }
         const pref = ros && idCapi.has(o.id) ? '⭐ ' : '';
-        html += `<div data-scelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9; ${o.sottoMan ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${pref}${esc(o.etichetta)} ${simboloVigile(o, 16)}</div>`;
+        html += `<div data-scelta="${o.id}" data-n="${n}" style="padding:10px 12px; font-size:15px; cursor:pointer; border-top:1px solid #F1F5F9; ${o.sottoMan ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${pref}${esc(o.etichetta)} ${simboloVigile(o, 20)}</div>`;
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
       selezioneTouch(lista, '[data-scelta]', (d) => {
@@ -1835,7 +1835,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
       cella = `<span style="font-weight:700;">${esc(occ.profili?.cognome)} ${esc(occ.profili?.nome)}${iconeSpecAtt(occ.operatore_id)}</span>
         <button class="pill rosso" data-mvuota="${occ.id}" style="border:none; cursor:pointer;">✖</button>`;
     } else {
-      cella = `<div style="position:relative; width:min(420px, 62%);">
+      cella = `<div style="position:relative; width:min(460px, 68%);">
           <input id="mcerca-${p.n}" placeholder="Cerca nome…" autocomplete="off"
             style="width:100%; height:38px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; font-size:13px;">
           <div id="mlista-${p.n}" style="display:none; position:absolute; top:40px; left:0; right:0; background:#fff; border:1px solid var(--bordo); border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.15); z-index:40; max-height:240px; overflow-y:auto;"></div>
@@ -1899,7 +1899,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
           ultimoCapo = capo;
         }
         const pat = o.patente ? ' 🚚' + esc(o.patente) : '';
-        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:8px 10px; font-size:13px; cursor:pointer; border-top:1px solid #F1F5F9; ${sottoSogliaMan(o.id) ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o.id)}${pat}${sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''} ${simboloVigile(o, 16)}</div>`;
+        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:10px 12px; font-size:15px; cursor:pointer; border-top:1px solid #F1F5F9; ${sottoSogliaMan(o.id) ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o.id)}${pat}${sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''} ${simboloVigile(o, 20)}</div>`;
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
       lista.style.display = 'block';
