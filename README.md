@@ -6,10 +6,10 @@ Gestione squadre, mantenimenti e attivazioni di emergenza per il **Nucleo USAR V
 
 ## Cos'è
 
-Sistema per la gestione operativa del nucleo:
+Sistema per la gestione operativa del nucleo (**dati reali importati — 124 profili, specializzazioni e storico mantenimenti**):
 - **Programmazione mensile** dei manifesti Alpha e Bravo (38 unità su modello USAR Medium, rotazione del personale, ricerca nominativi, ferie, contatori, **PDF nativo del manifesto scaricabile da mobile** — jsPDF; layout a sezioni: Direzione blu, Valutazione oro #FFD700, Operazioni rosso #FF0000, Logistica giallo)
 - **Calendario turni** ciclico (salti turno giorno/notte, vista personale, ferie con inserimento a click e avviso di conferma, range 2024-2028)
-- **Mantenimenti**: registro ore con validazione admin (anche da Telegram), soglia annua (24 h) configurabile
+- **Mantenimenti**: registro ore con validazione admin (anche da Telegram), soglia annua 24 h su ore conteggiate, causale "Manutenzione e magazzino" al 50%
 - **Attivazioni di emergenza** ✅ collaudate end-to-end: allerta ALPHA/BRAVO/**personalizzata** → gruppo Telegram "Allerta USAR VENETO" + chat private → risposte ✅/❌ dai pulsanti → **tempo reale** nella pagina admin (contatori, copertura requisiti, nomi), compilazione automatica/manuale del manifesto, PDF
 - **Dashboard**: contatori mantenimenti (in linea / sotto soglia) e grafici a torta per Comando e Turno
 - **Operatori** (admin): ricerca per nome/cognome, filtro sotto-soglia, schede complete con icone specializzazioni e abilitazioni, foto profilo, simbolo vigile per grado
@@ -41,7 +41,8 @@ Sistema per la gestione operativa del nucleo:
 | Frontend | **PWA** (Vite, installabile, aggiornamento automatico) |
 | PDF | **jsPDF** (generazione lato client, mobile-friendly) |
 | Database/Auth/Realtime | **Supabase** — regione Frankfurt (UE) |
-| Comunicazioni | **Bot Telegram** con keep-alive (le notifiche push PWA sono escluse: richiederebbero account Apple a pagamento) |
+| Comunicazioni | **Bot Telegram** con keep-alive (notifiche push PWA escluse: account Apple a pagamento) |
+| Registrazione | Self-service: l'operatore si registra con la sua email Gmail e riceve la scheda già compilata |
 | Foto profilo | **Supabase Storage** (bucket privato `foto-profili`, URL firmati) |
 | Hosting | **GitHub Pages** (deploy automatico via GitHub Actions a ogni push su `main`) |
 
@@ -53,9 +54,10 @@ test-app.mjs         test automatici (20 check) — da eseguire prima di ogni pu
 verifica-build.mjs   verifica del pacchetto costruito — gira anche su GitHub prima di ogni deploy
 db/schema.sql        schema completo del database (primo setup)
 db/migrazione-*.sql  migrazioni successive (vedi CONTINUITA per lo stato di esecuzione)
-db/FASE1-*.sql       migrazione FASE 1 import (eseguire SOLO secondo il runbook in CONTINUITA sez. 15)
+db/FASE1-*.sql       migrazione FASE 1 import (schema) — ESEGUITA
+db/FASE1-import.sql  import dati reali — ESEGUITO (24/10: 124 profili, 1873 mantenimenti)
 db/VERIFICA-*.sql    script di verifica in sola lettura
-import-fase1.py      script di import FASE 1 dal foglio Google (simulazione: --simula COGNOME)
+import-fase1.py      script di import dal foglio Google (XLSX): --simula COGNOME per simulare, --genera per l'SQL
 db/seed-*.sql        dati di prova (operatori fittizi, email prova.*, cancellabili)
 bot/telegram-bot.mjs bot Telegram (collegamento account, /ferie, mantenimenti, allerte)
 public/              file statici pubblicati (logo, manifest PWA, service worker, screenshot)
