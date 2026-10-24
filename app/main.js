@@ -1787,6 +1787,7 @@ async function pagAttivazioneAdmin(el) {
           <button class="btn-primary" id="att-manuale" style="height:44px;">✏️ COMPILAZIONE MANUALE</button>
           <button class="btn-primary" id="att-pdf" style="height:44px;">📄 GENERA PDF COMPILAZIONE</button>
           <button class="btn-primary" id="att-usar20" style="height:44px; background:#065F46;">📆 GENERA MANIFESTO — USAR.20</button>
+          <button class="btn-primary" id="att-usar12" style="height:44px; background:#1D4ED8;">📝 GENERA FACT SHEET — SCHEDA USAR.12</button>
         </div>
         <div id="att-manifesto"></div>
       </div>`;
@@ -1801,6 +1802,10 @@ async function pagAttivazioneAdmin(el) {
       const membri = await caricaManifestoAttivazione(aperta.id);
       if (!membri.length) { alert('Il manifesto Composizione è vuoto: fai prima la compilazione (automatica o manuale).'); return; }
       generaPdfManifesto({ team: aperta.team }, membri).catch(err => alert('Errore PDF: ' + err.message));
+    };
+    document.getElementById('att-usar12').onclick = async () => {
+      const membri = await caricaManifestoAttivazione(aperta.id);
+      generaPdfUsar12(aperta, membri).catch(err => alert('Errore PDF USAR.12: ' + err.message));
     };
     document.getElementById('att-usar20').onclick = async () => {
       const membri = await caricaManifestoAttivazione(aperta.id);
@@ -1895,6 +1900,126 @@ async function generaPdfUsar20(att, membri) {
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(100,116,139);
   doc.text('Data generazione: ' + new Date().toLocaleString('it-IT') + ' — App USAR Veneto', 148.5, 200, { align: 'center' });
   doc.save(`${nomeModulo ? nomeModulo + '-' : ''}manifesto-personale-usar20.pdf`);
+}
+
+async function generaPdfUsar12(att, membri) {
+  // SCHEDA INFORMATIVA modulo USAR.12 (DCESTAB): precompilata, 2 colonne, UNA pagina
+  const { jsPDF } = await import('jspdf');
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const nomeModulo = att.team === 'alpha' ? 'MO.USARM.VEN.01' : att.team === 'bravo' ? 'MO.USARM.VEN.02' : '';
+  const conProfili = membri.filter(m => m.operatore_id);
+  const dettagli = [];
+  if (conProfili.length) {
+    const { data: prof } = await supabase.from('profili')
+      .select('id, sp_k9, sp_nbcr, sp_strutturista, sp_medico, sp_infermiere')
+      .in('id', conProfili.map(m => m.operatore_id));
+    dettagli.push(...(prof || []));
+  }
+  const nPersone = conProfili.length;
+  const nK9 = dettagli.filter(p => p.sp_k9).length;
+  const nStrutt = dettagli.filter(p => p.sp_strutturista).length;
+
+  const [logoVvf, logoUsar] = await Promise.all([
+    caricaImmaginePdf('/App-Usar-Veneto/assets/Logo vvf.png').catch(() => null),
+    caricaImmaginePdf('/App-Usar-Veneto/assets/logo-usar.jpg').catch(() => null)
+  ]);
+  if (logoVvf) doc.addImage(logoVvf, 'JPEG', 10, 8, 12, 12);
+  if (logoUsar) doc.addImage(logoUsar, 'JPEG', 188, 8, 12, 12);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(30,41,59);
+  doc.text('Scheda Modulo/Squadra USAR', 105, 13, { align: 'center' });
+  doc.setFontSize(8); doc.setTextColor(71,85,105);
+  doc.text("Scheda informativa da compilare e inviare prima della partenza e da consegnare all'arrivo all'unità RDC", 105, 17.5, { align: 'center' });
+  doc.text('DCESTAB — Sistema di gestione operativa USAR · Modulo USAR.12 · Rev. 1.0 · 06/08/2021', 105, 21.5, { align: 'center' });
+
+  const colW = 92;
+  const Xs = [10, 10 + colW + 4];
+  let ys = [27, 27];
+  const sezione = (ci, t) => {
+    const X = Xs[ci];
+    doc.setFillColor(226,232,240);
+    doc.rect(X, ys[ci], colW, 5.5, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(30,41,59);
+    doc.text(t, X + 1.5, ys[ci] + 3.8);
+    ys[ci] += 6.8;
+  };
+  const campo = (ci, c, l, v) => {
+    const X = Xs[ci]; const labelW = 52; const valX = X + labelW;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(6); doc.setTextColor(71,85,105);
+    doc.text(String(c), X + 0.5, ys[ci] + 3);
+    doc.setFontSize(6.5);
+    doc.text(String(l), X + 8, ys[ci] + 3);
+    const vb = String(v ?? '');
+    if (vb) {
+      doc.setFont('helvetica', 'normal'); doc.setTextColor(15,23,42);
+      const righe = doc.splitTextToSize(vb, colW - labelW - 3);
+      doc.text(righe.slice(0, 2), valX, ys[ci] + 3);
+      ys[ci] += righe.length > 1 ? 4 : 0;
+    } else {
+      doc.setDrawColor(148,163,184); doc.setLineWidth(0.18);
+      doc.line(valX, ys[ci] + 3.8, X + colW - 1, ys[ci] + 3.8);
+    }
+    ys[ci] += 4.6;
+  };
+
+  sezione(0, 'A. INFORMAZIONI SQUADRA/MODULO');
+  campo(0, 'A0', 'ID Squadra/Modulo', nomeModulo);
+  campo(0, 'A1', 'Provenienza', 'DIREZIONE REGIONALE VENETO');
+  campo(0, 'A2', 'Nome squadra/modulo', nomeModulo ? 'USAR Medium — ' + (att.team === 'alpha' ? 'Team Alpha' : 'Team Bravo') : '');
+  campo(0, 'A3', 'Quantità personale n°', String(nPersone));
+  campo(0, 'A4', 'N° unità UU.CC./K9', String(nK9));
+  campo(0, 'A5', 'Tipologia assetto', 'MEDIUM');
+  campo(0, 'A6', 'Classificata INSARAG/IRNAP/NAP?', '');
+  sezione(0, 'CAPACITÀ TECNICHE');
+  campo(0, 'A7', 'Ricerca tecnica', 'SI');
+  campo(0, 'A8', 'Ricerca unità cinofile K9', nK9 > 0 ? 'SI' : 'NO');
+  campo(0, 'A9', 'Soccorso', 'SI');
+  campo(0, 'A10', 'Sanità/medici', dettagli.some(p => p.sp_medico || p.sp_infermiere) ? 'SI' : '');
+  campo(0, 'A11', 'Valutazione rischi/NBCR', dettagli.some(p => (p.sp_nbcr || 0) >= 2) ? 'SI' : '');
+  campo(0, 'A12', 'Ingegneri strutturisti', nStrutt > 0 ? 'SI — n° ' + nStrutt : '');
+  campo(0, 'A13', 'Supporto RDC/Coordinamento', 'SI');
+  campo(0, 'A14', 'Supporto UCC/SCC', 'SI');
+  campo(0, 'A15', 'Altre capacità', '');
+  sezione(0, 'ARRIVO STIMATO');
+  campo(0, 'A16', 'Data arrivo previsto', '');
+  campo(0, 'A17', 'Ora arrivo previsto', '');
+  campo(0, 'A18', 'Punto/luogo di ingresso', '');
+  campo(0, 'A19', 'Aeromobile/Eli', '');
+
+  sezione(1, 'B. NECESSITÀ LOGISTICHE');
+  campo(1, 'B1', 'Acqua (giorni)', '');
+  campo(1, 'B2', 'Cibo (giorni)', '');
+  sezione(1, 'ASSISTENZA AGGIUNTIVA PER:');
+  campo(1, 'B3', 'Trasporto via terra', '');
+  campo(1, 'B4', 'Rifornimenti', '');
+  sezione(1, 'TRASPORTO (se SI sopra)');
+  campo(1, 'B5', 'Numero di persone', nPersone ? '' : '');
+  campo(1, 'B6', 'Numero di cani', nK9 > 0 ? String(nK9) : '');
+  campo(1, 'B7', 'Attrezzatura (t)', '');
+  campo(1, 'B8', 'Attrezzatura (m³)', '');
+  sezione(1, 'RIFORNIMENTI (se SI sopra)');
+  campo(1, 'B9', 'Benzina (l/giorno)', '');
+  campo(1, 'B10', 'Diesel (l/giorno)', '');
+  campo(1, 'B11', 'Ossigeno da taglio', '');
+  campo(1, 'B12', 'Propano da taglio', '');
+  campo(1, 'B13', 'Ossigeno medicale', '');
+  campo(1, 'B14', 'Spazio BoO (m²)', '');
+  campo(1, 'B15', 'Altre richieste', '');
+  sezione(1, 'C. CONTATTI SQUADRA/MODULO');
+  campo(1, 'C1', 'Nome referente', '');
+  campo(1, 'C2', 'Mobile', '');
+  campo(1, 'C3', 'Satellite', '');
+  campo(1, 'C4', 'Email', '');
+  sezione(1, 'CAMPO BASE / BoO');
+  campo(1, 'C11', 'Indirizzo', '');
+  campo(1, 'C12', 'Frequenza/canale radio', '');
+  campo(1, 'C13', 'Coordinate GPS', '');
+  sezione(1, 'COMPILATO DA');
+  campo(1, '', 'Nome Cognome', '');
+  campo(1, '', 'Qualifica / posizione', '');
+
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(100,116,139);
+  doc.text('Data generazione: ' + new Date().toLocaleString('it-IT') + ' — App USAR Veneto · USAR.12 Rev. 1.0', 105, 288, { align: 'center' });
+  doc.save(`${nomeModulo ? nomeModulo + '-' : ''}fact-sheet-usar12.pdf`);
 }
 
 async function caricaManifestoAttivazione(attId) {
