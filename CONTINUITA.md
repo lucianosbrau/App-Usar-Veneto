@@ -48,6 +48,8 @@ Account (personali di Luciano Di Lorenzo): GitHub `lucianosbrau`, Supabase, Rend
 
 **Amministratore** (4-5): vede l'anagrafica completa, NON modifica i dati altrui (trigger `trg_blocca_modifiche_admin`) — solo promozione/revoca admin (con log), eliminazione account (con password, RPC + log), validazione mantenimenti. Ogni consultazione di scheda registrata (`log_consultazioni`); azioni su utenti in `log_admin` (append-only).
 
+**AUTO-ELIMINAZIONE ACCOUNT (24/10)**: ogni utente puo' eliminare il PROPRIO account dal Profilo (Zona sensibile, tasto rosso): doppia conferma (avviso + password). Cancella TUTTO a cascata (profilo, foto, mantenimenti, ferie, specializzazioni, risposte) via RPC elimina_operatore (target = se stesso ammesso; admin resta l'unico per gli altri). Migrazione: `db/migrazione-autoelimina-ice.sql`. **CONSENSO ICE (24/10)**: spunta nel Profilo (dati anagrafici): "Dichiaro che il mio contatto ICE e' a conoscenza che i suoi dati sono registrati nell'app e mostrati agli admin per le finalita' di emergenza" con link all'informativa; registrata in `ice_consenso_il` (una volta data, la spunta resta fissa con la data). PRIVACY POLICY: pagina pubblica `index-extra/informativa-privacy.html` (già pubblicata su Pages), linkata dal Profilo e dalla registrazione
+
 **PRIVACY SCHEDE OPERATORI (regola 24/10)**: chi **non è admin** nella scheda di un operatore vede SOLO: nome, cognome, grado, turno/salto, comando, sede, specializzazioni, patenti, telefono personale, email, **foto**. NON vede: ICE, gruppo sanguigno, indirizzo, medico, Telegram, mantenimenti; e nessun pulsante admin.
 
 ## 5. Attivazione di emergenza (collaudata ✅)

@@ -2666,8 +2666,20 @@ async function pagProfilo(el) {
           <input id="p-ice-rel" value="${esc(utente.contatto_ice_relazione || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
         </div>
       </div>
+      <div style="margin-top:14px; padding:12px; border:1px solid var(--bordo); border-radius:10px; background:#F8FAFC;">
+        <label style="display:flex; gap:10px; align-items:flex-start; font-size:13px; cursor:pointer;">
+          <input type="checkbox" id="p-ice-cons" style="margin-top:2px;" ${utente.ice_consenso_il ? 'checked disabled' : ''}>
+          <span>Dichiaro che il mio contatto ICE (la persona da chiamare in emergenza) <b>è a conoscenza</b> che i suoi dati (nome, telefono, rapporto di parentela) sono registrati in questa app e vengono mostrati agli amministratori del nucleo per le sole finalità di emergenza e soccorso, come da <a href="./informativa-privacy.html" target="_blank" style="color:var(--royal);">informativa privacy</a>.</span>
+        </label>
+        ${utente.ice_consenso_il ? `<div style="font-size:11px; color:var(--grigio); margin-top:6px;">Consenso registrato il ${new Date(utente.ice_consenso_il).toLocaleDateString('it-IT')}</div>` : ''}
+      </div>
       <div class="successo" id="p-ok-ana" style="margin-top:14px;">Dati anagrafici salvati.</div>
       <button class="btn-primary" id="p-salva-ana" style="max-width:220px; height:46px; margin-top:14px;">SALVA ANAGRAFICA</button>
+    </div>
+    <div class="card" style="max-width:600px; margin-bottom:20px; border-top:4px solid var(--rosso);">
+      <div style="font-weight:700; margin-bottom:8px;">⚠️ Zona sensibile</div>
+      <div style="font-size:13px; color:var(--grigio); margin-bottom:12px;">Qui puoi eliminare il tuo account e tutti i tuoi dati dall'app. L'operazione è <b>irreversibile</b>.</div>
+      <button class="btn-primary" id="p-elimina" style="background:#fff; color:var(--rosso); border:1px solid var(--rosso); height:44px;">🗑️ ELIMINA IL MIO ACCOUNT</button>
     </div>
     <div class="card" style="max-width:600px; margin-bottom:20px;">
       <div style="font-weight:700; margin-bottom:6px;">🎖 Specializzazioni e patenti</div>
@@ -2877,6 +2889,18 @@ async function pagProfilo(el) {
   };
   document.getElementById('p-ok-ana').style.display = 'none';
   document.getElementById('p-ok-spec').style.display = 'none';
+  document.getElementById('p-elimina').onclick = async () => {
+    if (!confirm('Eliminare DEFINITIVAMENTE il tuo account?\nVerranno cancellati profilo, foto, mantenimenti, ferie, specializzazioni e risposte.\nQuesta azione \u00e8 irreversibile.')) return;
+    const pwd = prompt('Inserisci la tua password per confermare l\'eliminazione definitiva:');
+    if (pwd === null || pwd === '') return;
+    const { data, error: errA } = await supabase.auth.signInWithPassword({ email: utente.email, password: pwd });
+    if (errA || !data?.session) { alert('Password errata: eliminazione annullata.'); return; }
+    const { error: errDel } = await supabase.rpc('elimina_operatore', { target: utente.id });
+    if (errDel) { alert('Eliminazione fallita: ' + errDel.message); return; }
+    alert('Account eliminato. Tutti i tuoi dati sono stati cancellati.');
+    location.hash = '';
+    supabase.auth.signOut();
+  };
   document.getElementById('p-salva-ana').onclick = async () => {
     const { error } = await supabase.from('profili').update({
       grado: document.getElementById('p-grado').value,
@@ -2890,7 +2914,8 @@ async function pagProfilo(el) {
       indirizzo: document.getElementById('p-indirizzo').value.trim() || null,
       contatto_ice_nome: document.getElementById('p-ice-nome').value.trim() || null,
       contatto_ice_telefono: document.getElementById('p-ice-tel').value.trim() || null,
-      contatto_ice_relazione: document.getElementById('p-ice-rel').value.trim() || null
+      contatto_ice_relazione: document.getElementById('p-ice-rel').value.trim() || null,
+      ice_consenso_il: document.getElementById('p-ice-cons').checked ? (utente.ice_consenso_il || new Date().toISOString()) : null
     }).eq('id', utente.id);
     if (error) { alert('Errore: ' + error.message); return; }
     Object.assign(utente, {
