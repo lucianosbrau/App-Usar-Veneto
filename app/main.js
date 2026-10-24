@@ -2674,10 +2674,10 @@ async function pagProfilo(el) {
       <div style="font-size:12px; color:var(--grigio); margin-bottom:14px;">Le specializzazioni sono usate nelle tendine della programmazione e per la copertura dei requisiti del modulo</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
         <div>
-          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Patente (mezzi)</label>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Patente ministeriale (grado massimo)</label>
           <select id="p-patente" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
             <option value="">Nessuna</option>
-            ${['3°','4°'].map(x => `<option ${utente.patente === x ? 'selected' : ''}>${x}</option>`).join('')}
+            ${['1°','2°','3°','4°'].map(x => `<option ${utente.patente === x ? 'selected' : ''}>${x}</option>`).join('')}
           </select>
         </div>
         <div>
