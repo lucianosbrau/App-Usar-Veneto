@@ -73,7 +73,7 @@ Account (personali di Luciano Di Lorenzo): GitHub `lucianosbrau`, Supabase, Rend
 - **Turno G (Giornaliero)**: nel Profilo (A-D-G); **G NON ha salto** (campo disattivato al salvataggio); i G non entrano nel calendario, solo ferie. Nel foglio: M→G, "Giornaliero"→G; chi non ha turno lo imposta da sé
 
 ### Mantenimenti
-- **Soglia 24 ore** su `ore_conteggiate` (import: prestate→ore, reali→ore_conteggiate; causale "Manutenzione e magazzino" conteggia 50% via trigger)
+- **Soglia 24 ore** su `ore_conteggiate` (import: prestate→ore, reali→ore_conteggiate; causale "Manutenzione e magazzino" conteggia 50% via trigger). Scheda operatore: la riga mantenimenti mostra le **ore conteggiate** (base soglia) e, se diverse, le ore approvate piene tra parentesi — stesso criterio ovunque, niente più "41 ore approvate ⚠️ sotto soglia" apparentemente contraddittorio
 - Flusso: in_validazione → admin approva/rifiuta (note); sotto soglia: in fondo alle tendine ⚠️ MAN.
 - 8 causali: Mantenimento, Manovra, Intervento, Lavorazione, Manutenzione e magazzino, Tutor Mantenimento, Tutor Corso, Altra formazione
 
@@ -137,9 +137,11 @@ Skill persistente (v4): modulo USAR Medium, modello COMPOSIZIONE TEAM (sezioni 1
 
 **LEZIONI**: (1) verificare i replace con grep; (2) i file pubblicati in index-extra/ o public/; (3) Confirm email spento dopo interventi Auth; (4) mai .catch sulle query supabase; (5) i test mai sui file veri + verifica in CI; (6) cache del service worker separata dal browser; (7) il foglio Google va letto via export XLSX (il CSV gviz fonde la riga 1 di SPECIALIZZAZIONI); (8) i file SQL generati da script non devono contenere print di log.
 
-## 13. Come lavorare con l'utente
+## 13. Come lavorare con l'utente (MODUS OPERANDI — regola confermata 24/10)
 
-- L'utente **non è programmatore e non lavora su GitHub**: chi sviluppa gestisce Git e spiega in italiano semplice; l'utente esegue le query SQL (indicare SEMPRE il file da eseguire e l'ordine)
+- L'utente **non è un tecnico informatico e non è un programmatore**: chi sviluppa gestisce Git e spiega tutto in **parole semplici**, senza gergo tecnico
+- **Su GitHub fa tutto chi sviluppa**: commit, PR, merge e verifica del deploy — l'utente non tocca GitHub per nulla
+- L'utente esegue solo le query SQL quando serve (indicare SEMPRE il file da eseguire e l'ordine)
 - Ogni decisione va registrata consolidando (niente appendici); chiedere OK esplicito prima di sviluppi non richiesti
 - A ogni modifica del bot: ricordare il deploy Render; a ogni migrazione SQL: ricordare l'esecuzione
 

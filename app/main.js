@@ -2149,7 +2149,7 @@ async function schedaOperatore(el, o, oreMan) {
   }
   const [specRes, mantRes, progRes] = await Promise.all([
     supabase.from('operatori_specializzazioni').select('specializzazioni(nome)').eq('operatore_id', o.id),
-    supabase.from('mantenimenti').select('ore, data, stato').eq('operatore_id', o.id).eq('stato', 'approvato'),
+    supabase.from('mantenimenti').select('ore, ore_conteggiate, data, stato').eq('operatore_id', o.id).eq('stato', 'approvato'),
     supabase.from('programmi_membri').select('posto, programmi_mensili(mese, team)').eq('operatore_id', o.id).limit(50)
   ]);
   if (specRes.error || mantRes.error || progRes.error) {
@@ -2158,7 +2158,9 @@ async function schedaOperatore(el, o, oreMan) {
     return;
   }
   const anno = new Date().getFullYear();
-  const oreAnno = (mantRes.data || []).filter(m => String(m.data).startsWith(anno)).reduce((s, m) => s + Number(m.ore_conteggiate ?? m.ore), 0);
+  const mantAnno = (mantRes.data || []).filter(m => String(m.data).startsWith(anno));
+  const oreAnno = mantAnno.reduce((s, m) => s + Number(m.ore ?? 0), 0);
+  const oreContAnno = mantAnno.reduce((s, m) => s + Number(m.ore_conteggiate ?? m.ore ?? 0), 0);
 
   const riga = (label, valore) => valore ? `<tr><td style="padding:7px 10px; color:var(--grigio); font-size:13px; white-space:nowrap; border-top:1px solid var(--bordo);">${label}</td><td style="padding:7px 10px; border-top:1px solid var(--bordo); font-weight:600;">${esc(valore)}</td></tr>` : '';
 
@@ -2200,7 +2202,7 @@ async function schedaOperatore(el, o, oreMan) {
         ${sonoAdmin ? `${riga('Contatto ICE', o.contatto_ice_nome ? `${o.contatto_ice_nome} (${esc(o.contatto_ice_relazione || '')}) · ${o.contatto_ice_telefono || ''}` : '')}` : ''}
         ${riga('Specializzazioni', specIcone(o, true).nomi.join(', '))}
         ${sonoAdmin ? `${riga('Telegram', o.telegram_chat_id ? '✅ Collegato' : '')}` : ''}
-        ${sonoAdmin ? `${riga('Mantenimenti ' + anno, oreAnno ? oreAnno + ' ore approvate' + ((oreMan[o.id] || 0) < 24 ? ' ⚠️ sotto soglia' : ' ✅ in linea') : '')}` : ''}
+        ${sonoAdmin ? `${riga('Mantenimenti ' + anno, oreContAnno ? oreContAnno + ' ore conteggiate' + (oreContAnno !== oreAnno ? ' (su ' + oreAnno + ' approvate)' : '') + ((oreMan[o.id] || 0) < 24 ? ' ⚠️ sotto soglia' : ' ✅ in linea') : '')}` : ''}
       </table>
 
       ${(progRes.data || []).length ? `
