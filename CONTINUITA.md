@@ -127,7 +127,15 @@ Rosso #B22222, tricolore, sfondo bianco. Grafici: palette varia. PDF: sezioni co
 3. **Collaudo registrazione**: un collega reale si registra con la sua Gmail → deve ricevere la scheda piena ("✅ Benvenuto!")
 4. **Comunicazione al nucleo**: "registratevi con l'email Gmail data all'amministrazione; scegliete la vostra password"
 5. Pulizia finale: vecchia tabella `specializzazioni`/`operatori_specializzazioni` e colonna `tpss` non più usate dall'app (rimozione in migrazione separata DOPO collaudo)
-6. FASE 2: schede consultazione (documenti, medica, vaccinazioni, cani, taglie) con card dedicate — tabelle già create da FASE1-migrazione
+6. FASE 2: schede consultazione (documenti, medica, vaccinazioni, cani, taglie) con card dedicate — tabelle cani/cani_vaccini/taglie_dpi GIA' CREATE da FASE1-migrazione (manca: tabelle documenti/medica/vaccini persone + sezioni app + script import)
+
+**FASE 2 IMPORT — PIANO OPERATIVO (24/10)** — sorgente: foglio Google "Copia di DB ANAGRAFICA PERSONALE" (14 fogli; export XLSX, il CSV gviz fonde le intestazioni). Ogni passo: prima simulazione verificata (--simula COGNOME), poi generazione SQL, poi esecuzione utente, poi sezione app, poi test e deploy
+- PASSO 1 — Migrazione schema: tabelle DOCUMENTI (patente civile/ministeriale/nautica con categoria+scadenza, estensioni, carta identita', tessera ATE, passaporto civile e ministeriale), MEDICA (medico di base+telefono, intolleranze, alimentazione, gruppo sanguigno — quest'ultimo gia' in profili: decidere se tenerlo liu00ec0 e importare qui il resto, allergie, problemi medici), VACCINI_PERSONA (tipo vaccino, data somministrazione, scadenza). Tabelle taglie/cani esistono. Le sezioni sono VISIBILI SOLO AL PROPRIETARIO E ADMIN (dati sensibili)
+- PASSO 2 — Script import-fase2.py: legge i fogli DOCUMENTI, MEDICA, VACCINAZIONI (o VACCINI per persona), RILEVAZIONE TAGLIE, ANAGRAFICA CANI, VACCINAZIONI CANI; aggancio per CODICE FISCALE (come FASE 1); --simula COGNOME mostra cosa finira' nel DB; --genera produce db/FASE2-import.sql
+- PASSO 3 — Esecuzione import (utente in SQL Editor) + query di verifica (conteggi, primi cognomi, celle vuote ammesse)
+- PASSO 4 — Sezioni PROFILO: pulsanti DOCUMENTI, MEDICA, VACCINAZIONI, RILEVAZIONE TAGLIE (tutti) + ANAGRAFICA CANI E VACCINAZIONI (solo K9, due parti: dati cane / vaccini cane). Tutte modificabili dall'operatore. La patente ministeriale resta nella scheda principale (gia' fatto)
+- PASSO 5 — Decorazioni: scadenze in evidenza (rosso se vicine/passate), test 20+, README/CONTINUITA
+- DA DECIDERE prima di partire: (a) dove tenere gruppo sanguigno (profilo o medica: evitare doppioni), (b) foglio VACCINAZIONI (per evento) vs VACCINI (per persona): quale importa, (c) visibilita' admin dei fogli sanitari (probabile SI per emergenze: da confermare col Corpo)
 
 **Domande ancora aperte**: fogli MEDICA e VACCINAZIONI (persone) non ancora letti.
 
