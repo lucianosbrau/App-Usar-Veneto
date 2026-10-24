@@ -778,6 +778,49 @@ async function pagResoconti(el) {
     const nomiMesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 
     let bloccoMieFerie = '';
+
+    // RESOCONTO ATTIVAZIONI del mese: avvenute con operatori SÌ; annullate mostrate a parte
+    let bloccoAttivazioni = '';
+    {
+      const { data: atts } = await supabase.from('attivazioni')
+        .select('id, team, esito, messaggio, creata_il, chiusa, risposte_attivazione(risposta, operatore_id, profili(cognome, nome))')
+        .gte('creata_il', inizioMese).lte('creata_il', fineMese + 'T23:59:59');
+      const avvenute = (atts || []).filter(a => a.esito === 'avvenuta');
+      const annullate = (atts || []).filter(a => a.esito === 'annullata');
+      const conteggioOp = {};
+      avvenute.forEach(a => {
+        (a.risposte_attivazione || []).forEach(r => {
+          if (r.risposta !== 'si') return;
+          const nome = `${r.profili?.cognome || ''} ${r.profili?.nome || ''}`.trim();
+          if (nome) conteggioOp[nome] = (conteggioOp[nome] || 0) + 1;
+        });
+      });
+      const nomiOp = Object.keys(conteggioOp).sort((a, b) => conteggioOp[b] - conteggioOp[a]);
+      const teamNome = (t) => t === 'alpha' ? 'TEAM ALPHA' : t === 'bravo' ? 'TEAM BRAVO' : 'PERSONALIZZATA';
+      bloccoAttivazioni = `
+    <div class="card" style="margin-top:14px;">
+      <div style="font-weight:700; margin-bottom:8px;">📋 Resoconto attivazioni di ${nomiMesi[m - 1]} ${y}</div>
+      <div style="display:flex; gap:14px; flex-wrap:wrap; font-size:14px; margin-bottom:10px;">
+        <span class="pill verde">✔️ Avvenute: ${avvenute.length}</span>
+        <span class="pill giallo">⏳ Aperte: ${(atts || []).filter(a => !a.chiusa).length}</span>
+        <span class="pill rosso">➖ Annullate: ${annullate.length}</span>
+      </div>
+      ${avvenute.length ? `
+      <div style="font-weight:700; margin:10px 0 6px;">🚨 Attivazioni avvenute</div>
+      ${avvenute.map(a => `<div style="padding:7px 0; border-top:1px solid var(--bordo); font-size:14px;">
+        <b>${teamNome(a.team)}</b> — ${new Date(a.creata_il).toLocaleString('it-IT')}
+        <span style="color:var(--grigio);"> · SÌ: ${(a.risposte_attivazione || []).filter(r => r.risposta === 'si').length}</span>
+        <span style="color:var(--grigio);"> · NO: ${(a.risposte_attivazione || []).filter(r => r.risposta === 'no').length}</span>
+      </div>`).join('')}
+      <div style="font-weight:700; margin:12px 0 6px;">👥 Operatori attivati (risposta SÌ, conteggio per attivazione)</div>
+      ${nomiOp.length ? `<table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr style="text-align:left; color:var(--grigio); font-size:12px;"><th style="padding:6px 0;">Operatore</th><th>Attivazioni</th></tr>
+        ${nomiOp.map(n => `<tr style="border-top:1px solid var(--bordo);"><td style="padding:7px 0;">${esc(n)}</td><td><b>${conteggioOp[n]}</b></td></tr>`).join('')}
+      </table>` : '<div style="color:var(--grigio);">Nessun operatore ha risposto SÌ nelle attivazioni avvenute.</div>'}` : '<div style="color:var(--grigio);">Nessuna attivazione avvenuta in questo mese.</div>'}
+      ${annullate.length ? `<div style="font-weight:700; margin:12px 0 6px; color:var(--grigio);">➖ Annullate (non conteggiate)</div>
+      ${annullate.map(a => `<div style="padding:7px 0; border-top:1px solid var(--bordo); font-size:13px; color:var(--grigio);">${teamNome(a.team)} — ${new Date(a.creata_il).toLocaleString('it-IT')}</div>`).join('')}` : ''}
+    </div>`;
+    }
     if (utente.ruolo === 'admin') {
       const { data: mieFerie } = await supabase.from('disponibilita').select('data, turno_ferie')
         .eq('tipo', 'ferie').eq('operatore_id', utente.id).gte('data', inizioMese).lte('data', fineMese);
@@ -829,7 +872,7 @@ async function pagResoconti(el) {
     </div>
 
     ${bloccoMieFerie}
-    <div class="card"><div style="font-weight:700; margin-bottom:8px;">📋 Resoconti attivazioni</div><div style="color:var(--grigio); font-size:14px;">Saranno popolati con le prime attivazioni reali.</div></div>`;
+    ` + bloccoAttivazioni;
     document.getElementById('res-indietro').onclick = () => { m--; if (m < 1) { m = 12; y--; } localStorage.setItem('res-mese', `${y}-${m}`); disegna(); };
     document.getElementById('res-avanti').onclick = () => { m++; if (m > 12) { m = 1; y++; } localStorage.setItem('res-mese', `${y}-${m}`); disegna(); };
   };
@@ -1745,7 +1788,10 @@ async function pagAttivazioneAdmin(el) {
             ${aperta.team === 'alpha' || aperta.team === 'bravo' ? `<div style="font-size:15px; font-weight:800; color:var(--rosso); margin-top:2px;">MODULO ${aperta.team === 'alpha' ? 'MO.USARM.VEN.01' : 'MO.USARM.VEN.02'}</div>` : ''}
             <div style="font-size:13px; color:var(--grigio);">${new Date(aperta.creata_il).toLocaleString('it-IT')} · allertati: in attesa del bot Telegram</div>
           </div>
-          <button class="btn-primary" id="att-chiudi" style="height:44px; background:var(--grigio-ch);">✔️ CHIUDI ATTIVAZIONE</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-primary" id="att-avvenuta" style="height:44px; background:#065F46;">✔️ ATTIVAZIONE AVVENUTA</button>
+            <button class="btn-primary" id="att-annulla" style="height:44px; background:#fff; color:var(--rosso); border:1px solid var(--rosso);">➖ ANNULLA ATTIVAZIONE</button>
+          </div>
         </div>
         <div style="background:#FEF2F2; border-left:4px solid var(--rosso); padding:12px; border-radius:8px; margin:12px 0;">${esc(aperta.messaggio)}</div>
         <div style="display:flex; gap:14px; flex-wrap:wrap; font-size:14px; margin-bottom:12px;">
@@ -1792,9 +1838,15 @@ async function pagAttivazioneAdmin(el) {
         <div id="att-manifesto"></div>
       </div>`;
 
-    document.getElementById('att-chiudi').onclick = async () => {
-      if (!confirm('Chiudere l\'attivazione? Non sarà più possibile rispondere.')) return;
-      await supabase.from('attivazioni').update({ chiusa: true }).eq('id', aperta.id);
+    document.getElementById('att-avvenuta').onclick = async () => {
+      if (!confirm('Confermi che l\'ATTIVAZIONE è AVVENUTA? Verrà conteggiata nel resoconto. Non sarà più possibile rispondere.')) return;
+      await supabase.from('attivazioni').update({ chiusa: true, esito: 'avvenuta' }).eq('id', aperta.id);
+      attivazioneId = null; attivazioneTeam = null;
+      disegna();
+    };
+    document.getElementById('att-annulla').onclick = async () => {
+      if (!confirm('ANNULLARE l\'attivazione? (esercitazione, allerta revocata, errore) NON verrà conteggiata come attivazione avvenuta.')) return;
+      await supabase.from('attivazioni').update({ chiusa: true, esito: 'annullata' }).eq('id', aperta.id);
       attivazioneId = null; attivazioneTeam = null;
       disegna();
     };
