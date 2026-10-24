@@ -137,6 +137,12 @@ Skill persistente (v4): modulo USAR Medium, modello COMPOSIZIONE TEAM (sezioni 1
 
 **LEZIONI**: (1) verificare i replace con grep; (2) i file pubblicati in index-extra/ o public/; (3) Confirm email spento dopo interventi Auth; (4) mai .catch sulle query supabase; (5) i test mai sui file veri + verifica in CI; (6) cache del service worker separata dal browser; (7) il foglio Google va letto via export XLSX (il CSV gviz fonde la riga 1 di SPECIALIZZAZIONI); (8) i file SQL generati da script non devono contenere print di log.
 
+## 12b. Decisione utente 24/10 — PROFILO e SCHEDA OPERATORI
+
+- **Profilo**: OGNUNO (anche operatore) vede e modifica dal proprio Profilo TUTTI i dati importati: anagrafici (grado, nascita, cellulare, email servizio, dati sensibili/ICE) e **specializzazioni + patenti** (le sp_* sono modificabili dall'operatore — supera la vecchia regola "solo admin con log"; nome/cognome restano fissi, gestiti dall'amministrazione). PATENTE: l'import FASE 1 NON l'ha portata (colonne assenti nell'import) — la compilano gli operatori da sé
+- **Scheda Operatori (non-admin)**: vede nome, cognome, grado, comando/sede, telefono, email, patenti, specializzazioni; NON vede ICE, sangue, indirizzo, medico (regola 24/10 invariata)
+- **PROSSIME SOTTOSEZIONI PROFILO** (dopo import FASE 2): VACCINAZIONI, RILEVAZIONE TAGLIE, ANAGRAFICA CANINA e VACCINAZIONI CANI (solo chi è CINOFILO) — tutte modificabili dall'operatore
+
 ## 13. Come lavorare con l'utente (MODUS OPERANDI — regola confermata 24/10)
 
 - L'utente **non è un tecnico informatico e non è un programmatore**: chi sviluppa gestisce Git e spiega tutto in **parole semplici**, senza gergo tecnico

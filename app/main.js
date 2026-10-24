@@ -376,7 +376,7 @@ function render() {
         </div>
         <div style="padding:16px 20px; font-size:12px; color:#94A3B8;">
           ${nomeCompleto}<br>${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'}<br>
-          <span style="font-size:10px; opacity:0.7;">v. 23/10/2026</span>
+          <span style="font-size:10px; opacity:0.7;">v. 24/10/2026</span>
         </div>
       </div>
       <div class="contenuto" id="contenuto"></div>
@@ -398,7 +398,7 @@ function render() {
         <button id="chiudi-menu" style="background:none;border:none;font-size:22px;cursor:pointer;">✕</button>
       </div>
       <div style="padding:0 16px; font-size:12px; color:#64748B; margin-bottom:8px;">
-        ${nomeCompleto} — ${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'} — v. 23/10/2026
+        ${nomeCompleto} — ${utente.ruolo === 'admin' ? 'Amministratore' : 'Operatore'} — v. 24/10/2026
       </div>
       <div class="menu-mobile-lista">
         ${voci.map(v => `<button class="menu-mobile-voce" data-p="${v.id}" data-menu><span>${v.ic}</span> ${v.t}</button>`).join('')}
@@ -2338,6 +2338,170 @@ async function pagProfilo(el) {
       <div id="p-foto-msg" style="display:none; margin-bottom:10px; font-size:13px;"></div>
     </div>
     <div class="card" style="max-width:600px; margin-bottom:20px;">
+      <div style="font-weight:700; margin-bottom:14px;">📄 Dati anagrafici</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div style="grid-column:1 / -1;">
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Nome e cognome</label>
+          <div style="height:44px; display:flex; align-items:center; border:1px dashed var(--bordo); border-radius:10px; padding:0 10px; background:#F8FAFC; font-weight:600;">${esc(((utente.cognome || '') + ' ' + (utente.nome || '')).trim())}</div>
+          <div style="font-size:11px; color:var(--grigio); margin-top:4px;">Nome e cognome sono gestiti dall'amministrazione: per correggerli scrivi a un admin</div>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Grado</label>
+          <select id="p-grado" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="">—</option>
+            ${['D','VD','IA','CRE','CR','CSE','CS','VC','VE','VF'].map(g => `<option ${utente.grado === g ? 'selected' : ''}>${g}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Data di nascita</label>
+          <input type="date" id="p-nascita" value="${esc((utente.data_nascita || '').slice(0,10))}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Luogo di nascita</label>
+          <input id="p-luogo" value="${esc(utente.luogo_nascita || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Cellulare</label>
+          <input id="p-cell" value="${esc(utente.cellulare || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Telefono (fisso)</label>
+          <input id="p-tel" value="${esc(utente.telefono || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Email di servizio</label>
+          <input id="p-email-servizio" value="${esc(utente.email_servizio || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+      </div>
+      <div style="font-weight:700; margin:16px 0 10px;">🩸 Dati sensibili (visibili solo agli amministratori)</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Gruppo sanguigno</label>
+          <input id="p-sangue" value="${esc(utente.gruppo_sanguigno || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Medico curante</label>
+          <input id="p-medico" value="${esc(utente.medico_curante || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+        <div style="grid-column:1 / -1;">
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Indirizzo di residenza</label>
+          <input id="p-indirizzo" value="${esc(utente.indirizzo || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Contatto ICE — nome</label>
+          <input id="p-ice-nome" value="${esc(utente.contatto_ice_nome || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Contatto ICE — telefono</label>
+          <input id="p-ice-tel" value="${esc(utente.contatto_ice_telefono || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Contatto ICE — relazione</label>
+          <input id="p-ice-rel" value="${esc(utente.contatto_ice_relazione || '')}" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px;">
+        </div>
+      </div>
+      <div class="successo" id="p-ok-ana" style="margin-top:14px;">Dati anagrafici salvati.</div>
+      <button class="btn-primary" id="p-salva-ana" style="max-width:220px; height:46px; margin-top:14px;">SALVA ANAGRAFICA</button>
+    </div>
+    <div class="card" style="max-width:600px; margin-bottom:20px;">
+      <div style="font-weight:700; margin-bottom:6px;">🎖 Specializzazioni e patenti</div>
+      <div style="font-size:12px; color:var(--grigio); margin-bottom:14px;">Le specializzazioni sono usate nelle tendine della programmazione e per la copertura dei requisiti del modulo</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Patente (mezzi)</label>
+          <select id="p-patente" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="">Nessuna</option>
+            ${['3°','4°'].map(x => `<option ${utente.patente === x ? 'selected' : ''}>${x}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Estensioni patente</label>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; padding-top:10px;">
+            ${['Autoscala','Autogru','Anfibio'].map(e => `<label style="display:flex; align-items:center; gap:5px; font-size:13px;"><input type="checkbox" class="p-est" value="${e}" ${(utente.estensioni_patente || []).includes(e) ? 'checked' : ''}> ${e}</label>`).join('')}
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Funzionario</label>
+          <select id="p-funz" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="no">No</option><option value="si" ${utente.sp_funzionario ? 'selected' : ''}>Sì</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Staff</label>
+          <select id="p-staff" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="no">No</option><option value="si" ${utente.sp_staff ? 'selected' : ''}>Sì</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Logista</label>
+          <select id="p-log" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="no">No</option><option value="si" ${utente.sp_logista ? 'selected' : ''}>Sì</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Strutturista</label>
+          <select id="p-strutt" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="no">No</option><option value="si" ${utente.sp_strutturista ? 'selected' : ''}>Sì</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">NBCR (livello)</label>
+          <select id="p-nbcr" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="0">Nessuno</option>
+            ${['1','2','3'].map(n => `<option value="${n}" ${String(utente.sp_nbcr || 0) === n ? 'selected' : ''}>${n}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Estensione NBCR</label>
+          <select id="p-nbcr-est" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="">—</option>
+            ${['NR','LPG','LNG'].map(x => `<option ${utente.sp_nbcr_est === x ? 'selected' : ''}>${x}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Unità cinofila K9</label>
+          <select id="p-k9" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="no">No</option><option value="si" ${utente.sp_k9 ? 'selected' : ''}>Sì</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">SAF</label>
+          <select id="p-saf" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="">Nessuno</option>
+            ${['1A','1B - BASICO','2A - AVANZATO'].map(x => `<option ${utente.sp_saf === x ? 'selected' : ''}>${x}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">TAS (soccorso sanitario)</label>
+          <select id="p-tas" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="">No</option>
+            <option value="1" ${String(utente.tas || '') === '1' ? 'selected' : ''}>Livello 1</option>
+            <option value="2" ${String(utente.tas || '') === '2' ? 'selected' : ''}>Livello 2</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">SAPR (drone)</label>
+          <select id="p-sapr" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="no">No</option><option value="si" ${utente.sp_sapr ? 'selected' : ''}>Sì</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Medico</label>
+          <select id="p-med" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="no">No</option><option value="si" ${utente.sp_medico ? 'selected' : ''}>Sì</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:var(--grigio);">Infermiere</label>
+          <select id="p-inf" style="width:100%; height:44px; border:1px solid var(--bordo); border-radius:10px; padding:0 10px; background:#fff;">
+            <option value="no">No</option><option value="si" ${utente.sp_infermiere ? 'selected' : ''}>Sì</option>
+          </select>
+        </div>
+      </div>
+      <div class="successo" id="p-ok-spec" style="margin-top:14px;">Specializzazioni salvate.</div>
+      <button class="btn-primary" id="p-salva-spec" style="max-width:240px; height:46px; margin-top:14px;">SALVA SPECIALIZZAZIONI</button>
+    </div>
+    <div class="card" style="max-width:600px; margin-bottom:20px;">
       <div style="font-weight:700; margin-bottom:14px;">📌 Dati di servizio</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
         <div>
@@ -2444,6 +2608,80 @@ async function pagProfilo(el) {
     if (error) { mostraFotoMsg('Errore: ' + error.message, true); return; }
     utente.foto_path = null;
     pagProfilo(el);
+  };
+  document.getElementById('p-ok-ana').style.display = 'none';
+  document.getElementById('p-ok-spec').style.display = 'none';
+  document.getElementById('p-salva-ana').onclick = async () => {
+    const { error } = await supabase.from('profili').update({
+      grado: document.getElementById('p-grado').value,
+      data_nascita: document.getElementById('p-nascita').value || null,
+      luogo_nascita: document.getElementById('p-luogo').value.trim() || null,
+      cellulare: document.getElementById('p-cell').value.trim() || null,
+      telefono: document.getElementById('p-tel').value.trim() || null,
+      email_servizio: document.getElementById('p-email-servizio').value.trim() || null,
+      gruppo_sanguigno: document.getElementById('p-sangue').value.trim() || null,
+      medico_curante: document.getElementById('p-medico').value.trim() || null,
+      indirizzo: document.getElementById('p-indirizzo').value.trim() || null,
+      contatto_ice_nome: document.getElementById('p-ice-nome').value.trim() || null,
+      contatto_ice_telefono: document.getElementById('p-ice-tel').value.trim() || null,
+      contatto_ice_relazione: document.getElementById('p-ice-rel').value.trim() || null
+    }).eq('id', utente.id);
+    if (error) { alert('Errore: ' + error.message); return; }
+    Object.assign(utente, {
+      grado: document.getElementById('p-grado').value,
+      data_nascita: document.getElementById('p-nascita').value || null,
+      luogo_nascita: document.getElementById('p-luogo').value.trim() || null,
+      cellulare: document.getElementById('p-cell').value.trim() || null,
+      telefono: document.getElementById('p-tel').value.trim() || null,
+      email_servizio: document.getElementById('p-email-servizio').value.trim() || null,
+      gruppo_sanguigno: document.getElementById('p-sangue').value.trim() || null,
+      medico_curante: document.getElementById('p-medico').value.trim() || null,
+      indirizzo: document.getElementById('p-indirizzo').value.trim() || null,
+      contatto_ice_nome: document.getElementById('p-ice-nome').value.trim() || null,
+      contatto_ice_telefono: document.getElementById('p-ice-tel').value.trim() || null,
+      contatto_ice_relazione: document.getElementById('p-ice-rel').value.trim() || null
+    });
+    document.getElementById('p-ok-ana').style.display = 'block';
+    setTimeout(() => document.getElementById('p-ok-ana').style.display = 'none', 2500);
+  };
+  document.getElementById('p-salva-spec').onclick = async () => {
+    const siNo = id => document.getElementById(id).value === 'si';
+    const estPatente = [...document.querySelectorAll('.p-est:checked')].map(c => c.value);
+    const { error } = await supabase.from('profili').update({
+      patente: document.getElementById('p-patente').value || null,
+      estensioni_patente: estPatente,
+      sp_funzionario: siNo('p-funz'),
+      sp_staff: siNo('p-staff'),
+      sp_logista: siNo('p-log'),
+      sp_strutturista: siNo('p-strutt'),
+      sp_nbcr: Number(document.getElementById('p-nbcr').value) || 0,
+      sp_nbcr_est: document.getElementById('p-nbcr-est').value || null,
+      sp_k9: siNo('p-k9'),
+      sp_saf: document.getElementById('p-saf').value || null,
+      tas: document.getElementById('p-tas').value ? Number(document.getElementById('p-tas').value) : null,
+      sp_sapr: siNo('p-sapr'),
+      sp_medico: siNo('p-med'),
+      sp_infermiere: siNo('p-inf')
+    }).eq('id', utente.id);
+    if (error) { alert('Errore: ' + error.message); return; }
+    Object.assign(utente, {
+      patente: document.getElementById('p-patente').value || null,
+      estensioni_patente: estPatente,
+      sp_funzionario: siNo('p-funz'),
+      sp_staff: siNo('p-staff'),
+      sp_logista: siNo('p-log'),
+      sp_strutturista: siNo('p-strutt'),
+      sp_nbcr: Number(document.getElementById('p-nbcr').value) || 0,
+      sp_nbcr_est: document.getElementById('p-nbcr-est').value || null,
+      sp_k9: siNo('p-k9'),
+      sp_saf: document.getElementById('p-saf').value || null,
+      tas: document.getElementById('p-tas').value ? Number(document.getElementById('p-tas').value) : null,
+      sp_sapr: siNo('p-sapr'),
+      sp_medico: siNo('p-med'),
+      sp_infermiere: siNo('p-inf')
+    });
+    document.getElementById('p-ok-spec').style.display = 'block';
+    setTimeout(() => document.getElementById('p-ok-spec').style.display = 'none', 2500);
   };
   document.getElementById('p-salva').onclick = async () => {
     const { error } = await supabase.from('profili').update({
