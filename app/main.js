@@ -1786,6 +1786,7 @@ async function pagAttivazioneAdmin(el) {
           ${aperta.team !== 'personalizzata' ? `<button class="btn-primary" id="att-auto" style="height:44px;">⚡ COMPILAZIONE AUTOMATICA</button>` : ''}
           <button class="btn-primary" id="att-manuale" style="height:44px;">✏️ COMPILAZIONE MANUALE</button>
           <button class="btn-primary" id="att-pdf" style="height:44px;">📄 GENERA PDF COMPILAZIONE</button>
+          <button class="btn-primary" id="att-usar20" style="height:44px; background:#065F46;">📆 GENERA MANIFESTO — USAR.20</button>
         </div>
         <div id="att-manifesto"></div>
       </div>`;
@@ -1801,6 +1802,11 @@ async function pagAttivazioneAdmin(el) {
       if (!membri.length) { alert('Il manifesto Composizione è vuoto: fai prima la compilazione (automatica o manuale).'); return; }
       generaPdfManifesto({ team: aperta.team }, membri).catch(err => alert('Errore PDF: ' + err.message));
     };
+    document.getElementById('att-usar20').onclick = async () => {
+      const membri = await caricaManifestoAttivazione(aperta.id);
+      if (!membri.length) { alert('Il manifesto è vuoto: fai prima la compilazione (automatica o manuale).'); return; }
+      generaPdfUsar20(aperta, membri).catch(err => alert('Errore PDF USAR.20: ' + err.message));
+    };
     const btnAuto = document.getElementById('att-auto');
     if (btnAuto) btnAuto.onclick = () => compilazioneAutomaticaAttivazione(aperta, disegna);
     document.getElementById('att-manuale').onclick = () => apriCompilazioneManualeAttivazione(aperta, cont.querySelector('#att-manifesto'), disegna, aperta.team === 'personalizzata');
@@ -1811,6 +1817,84 @@ async function pagAttivazioneAdmin(el) {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'risposte_attivazione' }, disegna)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'attivazioni' }, disegna)
     .subscribe();
+}
+
+async function generaPdfUsar20(att, membri) {
+  // MANIFESTO DEL PERSONALE — modulo USAR.20 (DCESTAB): orizzontale, come l'excel
+  const { jsPDF } = await import('jspdf');
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'landscape' });
+  const nomeModulo = att.team === 'alpha' ? 'MO.USARM.VEN.01' : att.team === 'bravo' ? 'MO.USARM.VEN.02' : '';
+  const [logoVvf, logoUsar] = await Promise.all([
+    caricaImmaginePdf('/App-Usar-Veneto/assets/Logo vvf.png').catch(() => null),
+    caricaImmaginePdf('/App-Usar-Veneto/assets/logo-usar.jpg').catch(() => null)
+  ]);
+  if (logoVvf) doc.addImage(logoVvf, 'JPEG', 10, 8, 14, 14);
+  if (logoUsar) doc.addImage(logoUsar, 'JPEG', 272, 8, 14, 14);
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(30,41,59);
+  doc.text('MANIFESTO DEL PERSONALE', 148.5, 13, { align: 'center' });
+  doc.setFontSize(8.5); doc.setTextColor(71,85,105);
+  doc.text('DCESTAB — Sistema di gestione operativa USAR · Modulo USAR.20 · Rev. 1.0', 148.5, 18, { align: 'center' });
+  doc.setFontSize(9); doc.setTextColor(178,34,34);
+  doc.text(nomeModulo ? 'MODULO ' + nomeModulo : 'ATTIVAZIONE PERSONALIZZATA', 148.5, 23, { align: 'center' });
+
+  // dati mancanti del personale: cellulare e ICE dal profilo
+  const conProfili = membri.filter(m => m.operatore_id);
+  const dettagli = {};
+  if (conProfili.length) {
+    const { data: prof } = await supabase.from('profili')
+      .select('id, cellulare, contatto_ice_telefono, comando, qualifica, grado')
+      .in('id', conProfili.map(m => m.operatore_id));
+    (prof || []).forEach(p => dettagli[p.id] = p);
+  }
+
+  // tabella
+  const colonne = ['MODULO', 'COMANDO', 'QUALIFICA', 'COGNOME', 'NOME', 'CODICE FISCALE', 'TEL.', 'TEL. EMERGENZA'];
+  const larg = [30, 40, 32, 40, 32, 42, 26, 26];
+  let x = 10;
+  const yTab = 28;
+  const H_R = 7;
+  doc.setFillColor(241,245,249); doc.setDrawColor(0,0,0); doc.setLineWidth(0.3);
+  doc.rect(10, yTab, 277, H_R, 'FD');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(30,41,59);
+  x = 10;
+  colonne.forEach((c, i) => { doc.text(c, x + 1.5, yTab + 4.7); x += larg[i]; });
+
+  membri.slice(0, 38).forEach((m, i) => {
+    const y = yTab + H_R + i * H_R;
+    if (i % 2 === 1) { doc.setFillColor(248,250,252); doc.rect(10, y, 277, H_R, 'F'); }
+    doc.setDrawColor(203,213,225); doc.setLineWidth(0.15);
+    x = 10;
+    larg.forEach(w => { doc.rect(x, y, w, H_R, 'S'); x += w; });
+    const p = m.profili || {}; const d = dettagli[m.operatore_id] || {};
+    const ruolo = TUTTI_POSTI.find(pp => pp.n === m.posto)?.t || '';
+    const riga = [
+      nomeModulo,
+      d.comando || p.comando || '',
+      d.qualifica || ruolo || '',
+      (p.cognome || '').toUpperCase(),
+      (p.nome || '').toUpperCase(),
+      p.codice_fiscale || '',
+      d.cellulare || p.cellulare || '',
+      d.contatto_ice_telefono || p.contatto_ice_telefono || ''
+    ];
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(30,41,59);
+    x = 10;
+    riga.forEach((v, ci) => { doc.text(String(v || '').slice(0, 38), x + 1.5, y + 4.7); x += larg[ci]; });
+  });
+
+  // righe vuote per completare fino a 38
+  for (let i = membri.length; i < 38; i++) {
+    const y = yTab + H_R + i * H_R;
+    doc.setDrawColor(203,213,225); doc.setLineWidth(0.15);
+    x = 10;
+    larg.forEach(w => { doc.rect(x, y, w, H_R, 'S'); x += w; });
+  }
+
+  // pie' di pagina
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(100,116,139);
+  doc.text('Data generazione: ' + new Date().toLocaleString('it-IT') + ' — App USAR Veneto', 148.5, 200, { align: 'center' });
+  doc.save(`${nomeModulo ? nomeModulo + '-' : ''}manifesto-personale-usar20.pdf`);
 }
 
 async function caricaManifestoAttivazione(attId) {
@@ -1852,9 +1936,7 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
   const [pers, membri, risposte, mantRes] = await Promise.all([
     supabase.from('profili').select('id, nome, cognome, patente, grado').order('cognome'),
     supabase.from('manifesti_membri').select('*, profili(nome, cognome, patente, grado)').eq('manifesto_id', manifestId),
-    soloRispondentiSi
-      ? supabase.from('risposte_attivazione').select('operatore_id').eq('attivazione_id', att.id).eq('risposta', 'si')
-      : Promise.resolve({ data: null }),
+    supabase.from('risposte_attivazione').select('operatore_id').eq('attivazione_id', att.id).eq('risposta', 'si'),
     caricaOreMantenimenti()
   ]);
   const oreMan = mantRes || {};
@@ -1933,12 +2015,13 @@ async function apriCompilazioneManualeAttivazione(att, contenitore, dopo, soloRi
       let ultimoCapo = null;
       filtrati.forEach(o => {
         const capo = ros && idCapi.has(o.id);
+        const pillSi = idSi.has(o.id) ? ' <span class="pill verde" style="font-size:9px; padding:1px 6px; border-radius:8px;">✅ SÌ</span>' : '';
         if (ros && capo !== ultimoCapo) {
           html += `<div style="padding:4px 10px; font-size:11px; font-weight:700; color:${capo ? '#059669' : '#94A3B8'};">${capo ? '⭐ CAPI SQUADRA' : 'ALTRI'}</div>`;
           ultimoCapo = capo;
         }
         const pat = o.patente ? ' 🚚' + esc(o.patente) : '';
-        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:10px 12px; font-size:15px; cursor:pointer; border-top:1px solid #F1F5F9; ${sottoSogliaMan(o.id) ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o)}${pat}${sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''} ${simboloVigile(o, 20)}</div>`;
+        html += `<div data-mscelta="${o.id}" data-n="${n}" style="padding:10px 12px; font-size:15px; cursor:pointer; border-top:1px solid #F1F5F9; ${sottoSogliaMan(o.id) ? 'color:var(--rosso); background:#FEF2F2;' : ''}">${capo ? '⭐ ' : ''}${esc(o.cognome)} ${esc(o.nome)}${iconeSpecAtt(o)}${pat}${sottoSogliaMan(o.id) ? ' ⚠️ MAN.' : ''}${pillSi} ${simboloVigile(o, 20)}</div>`;
       });
       lista.innerHTML = html || '<div style="padding:10px; color:var(--grigio); font-size:13px;">Nessun risultato</div>';
       lista.style.display = 'block';
