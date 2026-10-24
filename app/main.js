@@ -1047,7 +1047,7 @@ function meseIt(d) {
 async function pagProgrammazione(el) {
   el.innerHTML = `
     <div class="pagina-titolo">🗓️ Programmazione Mensile</div>
-    <div class="pagina-sotto">Manifesto programmato Alpha e Bravo — 38 unità</div>
+    <div class="pagina-sotto">Manifesto Composizione programmato Alpha e Bravo — 38 unità</div>
     <div id="prog-cont">Caricamento…</div>`;
   const cont = document.getElementById('prog-cont');
   const prog = await supabase.from('programmi_mensili').select('*, programmi_membri(*)').order('mese', { ascending: false });
@@ -1419,6 +1419,7 @@ async function generaPdfManifesto(prog, membri) {
     };
   });
   const team = prog.team === 'alpha' ? 'TEAM ALPHA' : prog.team === 'bravo' ? 'TEAM BRAVO' : 'ATTIVAZIONE PERSONALIZZATA';
+  const nomeModulo = prog.team === 'alpha' ? 'MO.USARM.VEN.01' : prog.team === 'bravo' ? 'MO.USARM.VEN.02' : null;
 
   const BIANCO = [255,255,255];
   const BIANCO_SEZ = [255,255,255];
@@ -1481,10 +1482,14 @@ async function generaPdfManifesto(prog, membri) {
   doc.setFontSize(12); doc.setTextColor(37,99,235);
   const mesePdf = prog.mese ? meseIt(prog.mese) : (progMese ? meseIt(progMese) : meseIt(new Date().toISOString().slice(0, 7) + '-01'));
   doc.text(mesePdf.toUpperCase(), 105, 22.5, { align: 'center' });
+  if (nomeModulo) {
+    doc.setFontSize(10); doc.setTextColor(...ROSSO);
+    doc.text('MODULO ' + nomeModulo, 105, 27.5, { align: 'center' });
+  }
 
   const H = 12, GAP = 1.6, STEP = H + GAP;
   const HS = 10.5, STEPS = HS + 1.4;
-  let y = 26;
+  let y = nomeModulo ? 31 : 26;
 
   function sottoTitolo(yy, testo) {
     doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...ANTRACITE);
@@ -1554,7 +1559,7 @@ async function generaPdfManifesto(prog, membri) {
   doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184);
   doc.text(`Generato il ${new Date().toLocaleString('it-IT')} — Nucleo USAR Veneto`, 105, y + 4, { align: 'center' });
 
-  doc.save(`manifesto-${prog.team}-${progMese}.pdf`);
+  doc.save(`${nomeModulo ? nomeModulo + '-' : ''}manifesto-composizione-${prog.team}.pdf`);
 }
 
 /* ============ ATTIVAZIONE EMERGENZA ============ */
@@ -1737,6 +1742,7 @@ async function pagAttivazioneAdmin(el) {
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
             <div style="font-size:22px; font-weight:800;">🚨 TEAM ${aperta.team === 'alpha' ? 'ALPHA' : aperta.team === 'bravo' ? 'BRAVO' : 'ATTIVAZIONE PERSONALIZZATA'} ATTIVATO</div>
+            ${aperta.team === 'alpha' || aperta.team === 'bravo' ? `<div style="font-size:15px; font-weight:800; color:var(--rosso); margin-top:2px;">MODULO ${aperta.team === 'alpha' ? 'MO.USARM.VEN.01' : 'MO.USARM.VEN.02'}</div>` : ''}
             <div style="font-size:13px; color:var(--grigio);">${new Date(aperta.creata_il).toLocaleString('it-IT')} · allertati: in attesa del bot Telegram</div>
           </div>
           <button class="btn-primary" id="att-chiudi" style="height:44px; background:var(--grigio-ch);">✔️ CHIUDI ATTIVAZIONE</button>
@@ -1772,7 +1778,7 @@ async function pagAttivazioneAdmin(el) {
       </div>
 
       <div class="card" style="margin-top:14px;">
-        <div style="font-weight:800;">📋 MANIFESTO DELL'ATTIVAZIONE${aperta.team === 'personalizzata' ? ' — PERSONALIZZATA' : ` — TEAM ${aperta.team === 'alpha' ? 'ALPHA' : 'BRAVO'}`}</div>
+        <div style="font-weight:800;">📋 MANIFESTO COMPOSIZIONE DELL'ATTIVAZIONE${aperta.team === 'personalizzata' ? ' — PERSONALIZZATA' : ` — TEAM ${aperta.team === 'alpha' ? 'ALPHA' : 'BRAVO'}`}</div>
         <div style="color:var(--grigio); font-size:13px; margin:6px 0 12px;">${aperta.team === 'personalizzata'
           ? 'Compila i 38 posti scegliendo <b>ruolo e nominativo</b> tra chi ha risposto SÌ.'
           : 'Compila i 38 posti: <b>automaticamente</b> dal programma del mese (ogni pressione aggiorna la maschera, non invia nulla) o <b>manualmente</b> con gli stessi criteri della Programmazione.'}</div>
@@ -1792,7 +1798,7 @@ async function pagAttivazioneAdmin(el) {
     };
     document.getElementById('att-pdf').onclick = async () => {
       const membri = await caricaManifestoAttivazione(aperta.id);
-      if (!membri.length) { alert('Il manifesto è vuoto: fai prima la compilazione (automatica o manuale).'); return; }
+      if (!membri.length) { alert('Il manifesto Composizione è vuoto: fai prima la compilazione (automatica o manuale).'); return; }
       generaPdfManifesto({ team: aperta.team }, membri).catch(err => alert('Errore PDF: ' + err.message));
     };
     const btnAuto = document.getElementById('att-auto');
@@ -1837,7 +1843,7 @@ async function compilazioneAutomaticaAttivazione(att, dopo) {
   const { error } = await supabase.from('manifesti_membri')
     .insert(prog.programmi_membri.map(m => ({ manifesto_id: manifestId, operatore_id: m.operatore_id, posto: m.posto })));
   if (error) { alert('Errore: ' + error.message); return; }
-  alert(`⚡ Manifesto precompilato dal programma ${att.team === 'alpha' ? 'ALPHA' : 'BRAVO'} di ${meseIt(meseCorrente)}: ${prog.programmi_membri.length}/38 posti.\n\nPuoi ripremere COMPILAZIONE AUTOMATICA per aggiornarlo, correggerlo con la manuale, o generare il PDF.`);
+  alert(`⚡ Manifesto Composizione precompilato dal programma ${att.team === 'alpha' ? 'ALPHA' : 'BRAVO'} di ${meseIt(meseCorrente)}: ${prog.programmi_membri.length}/38 posti.\n\nPuoi ripremere COMPILAZIONE AUTOMATICA per aggiornarlo, correggerlo con la manuale, o generare il PDF.`);
   if (dopo) dopo();
 }
 
