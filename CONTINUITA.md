@@ -137,9 +137,11 @@ Skill persistente (v4): modulo USAR Medium, modello COMPOSIZIONE TEAM (sezioni 1
 
 **LEZIONI**: (1) verificare i replace con grep; (2) i file pubblicati in index-extra/ o public/; (3) Confirm email spento dopo interventi Auth; (4) mai .catch sulle query supabase; (5) i test mai sui file veri + verifica in CI; (6) cache del service worker separata dal browser; (7) il foglio Google va letto via export XLSX (il CSV gviz fonde la riga 1 di SPECIALIZZAZIONI); (8) i file SQL generati da script non devono contenere print di log.
 
-## 13. Come lavorare con l'utente
+## 13. Come lavorare con l'utente (MODUS OPERANDI — regola confermata 24/10)
 
-- L'utente **non è programmatore e non lavora su GitHub**: chi sviluppa gestisce Git e spiega in italiano semplice; l'utente esegue le query SQL (indicare SEMPRE il file da eseguire e l'ordine)
+- L'utente **non è un tecnico informatico e non è un programmatore**: chi sviluppa gestisce Git e spiega tutto in **parole semplici**, senza gergo tecnico
+- **Su GitHub fa tutto chi sviluppa**: commit, PR, merge e verifica del deploy — l'utente non tocca GitHub per nulla
+- L'utente esegue solo le query SQL quando serve (indicare SEMPRE il file da eseguire e l'ordine)
 - Ogni decisione va registrata consolidando (niente appendici); chiedere OK esplicito prima di sviluppi non richiesti
 - A ogni modifica del bot: ricordare il deploy Render; a ogni migrazione SQL: ricordare l'esecuzione
 
