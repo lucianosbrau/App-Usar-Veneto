@@ -150,9 +150,11 @@ async function controllaAttivazioni() {
     // l'attivazione che stavamo seguendo è stata CHIUSA: avvisa sul gruppo e chiude
     if (ultimaAttivazioneVista !== null) {
       const { data: chiusa } = await sb.from('attivazioni')
-        .select('id, team').eq('id', ultimaAttivazioneVista).limit(1).maybeSingle();
+        .select('id, team, esito').eq('id', ultimaAttivazioneVista).limit(1).maybeSingle();
       const teamTxt = chiusa?.team === 'alpha' ? 'TEAM ALPHA' : chiusa?.team === 'bravo' ? 'TEAM BRAVO' : 'ATTIVAZIONE PERSONALIZZATA';
-      const testoChiusura = `✅✅✅ ATTIVAZIONE CHIUSA ✅✅✅\n\n${teamTxt}\n\nLe risposte non sono più accettate. Grazie a tutti.`;
+      const testoChiusura = chiusa?.esito === 'annullata'
+        ? `➖➖➖ ATTIVAZIONE ANNULLATA ➖➖➖\n\n${teamTxt}\n\nLe risposte non sono più accettate.`
+        : `✅✅✅ CONFERMA ATTIVAZIONE ✅✅✅\n\n${teamTxt}\n\nLe risposte non sono più accettate. Grazie a tutti.\n\n📄 Seguiranno il PDF di compilazione squadra e il manifesto del personale.`;
       if (ALERT_GROUP) {
         await tg('sendMessage', { chat_id: ALERT_GROUP, text: testoChiusura }).catch(e => console.error('Invio chiusura gruppo fallito:', e.message));
       }

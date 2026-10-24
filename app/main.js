@@ -1789,7 +1789,7 @@ async function pagAttivazioneAdmin(el) {
             <div style="font-size:13px; color:var(--grigio);">${new Date(aperta.creata_il).toLocaleString('it-IT')} · allertati: in attesa del bot Telegram</div>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn-primary" id="att-avvenuta" style="height:44px; background:#065F46;">✔️ ATTIVAZIONE AVVENUTA</button>
+            <button class="btn-primary" id="att-avvenuta" style="height:44px; background:#065F46;">✔️ CONFERMA ATTIVAZIONE</button>
             <button class="btn-primary" id="att-annulla" style="height:44px; background:#fff; color:var(--rosso); border:1px solid var(--rosso);">➖ ANNULLA ATTIVAZIONE</button>
           </div>
         </div>
@@ -1839,7 +1839,7 @@ async function pagAttivazioneAdmin(el) {
       </div>`;
 
     document.getElementById('att-avvenuta').onclick = async () => {
-      if (!confirm('Confermi che l\'ATTIVAZIONE è AVVENUTA? Verrà conteggiata nel resoconto. Non sarà più possibile rispondere.')) return;
+      if (!confirm('CONFERMA ATTIVAZIONE? Verrà inviato il messaggio di conferma sul gruppo Telegram e l\'attivazione sarà conteggiata nel resoconto. Non sarà più possibile rispondere.')) return;
       await supabase.from('attivazioni').update({ chiusa: true, esito: 'avvenuta' }).eq('id', aperta.id);
       attivazioneId = null; attivazioneTeam = null;
       disegna();
