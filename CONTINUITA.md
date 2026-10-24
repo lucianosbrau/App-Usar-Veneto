@@ -133,6 +133,10 @@ Rosso #B22222, tricolore, sfondo bianco. Grafici: palette varia. PDF: sezioni co
 
 Skill persistente (v4): modulo USAR Medium, modello COMPOSIZIONE TEAM (sezioni 1-38 per il PDF). **Caricarla a inizio sessione.**
 
+## 11b. Regola di sviluppo (decisione utente 24/10)
+
+Sviluppo in FASE AVANZATA: le modifiche vanno fatte in modo SICURO E VERIFICATO, anche a discapito del tempo. Deve essere tutto RECUPERABILE. In pratica: (1) mai modifiche distruttive senza backup/ripristino possibile (git è la rete di sicurezza: commit frequenti, niente worktree sporco prima di toccare file delicati); (2) prima di editare file grandi (main.js, bot) verificare l'ancora esatta e fare una copia di riferimento (es. git stash o commit prima); (3) dopo ogni edit: sintassi + build + test, SEMPRE; (4) se un edit fallisce a metà, ripristinare dal commit precedente (git checkout HEAD -- file) e rifare con metodo più sicuro, mai lasciare file a metà; (5) le migrazioni SQL sono SEMPRE file versionati, idempotenti (if not exists), testate con SELECT prima di toccare dati; (6) il bot e il DB sono AMBIENTE PRODUTTIVO: ogni modifica va comunicata all'utente con i passi manuali (SQL Editor, Manual Deploy Render)
+
 ## 12. Qualità e anti-disaster — PROCEDURA OBBLIGATORIA
 
 1. **Test blindati** (`test-app.mjs`, 20 check, login simulato come ADMIN): su COPIA temporanea del progetto. `node test-app.mjs`
