@@ -62,7 +62,31 @@ select row_to_json(s)::text from sedi s order by comando, sede;
 select '=== CODICI_TELEGRAM (solo attivi) ===' as sezione;
 select row_to_json(c)::text from codici_telegram c where usato = false;
 
--- 10) STRUTTURA — lo schema per ricreare le tabelle
+-- 10) TABELLE FASE 2 (documenti, medica, vaccini, taglie, cani) — aggiunte 24/10
+select '=== DOCUMENTI (json) ===' as sezione;
+select row_to_json(d)::text from documenti d order by operatore_id;
+select '=== SCHEDA_MEDICA (json) ===' as sezione;
+select row_to_json(m)::text from scheda_medica m order by operatore_id;
+select '=== VACCINI_COPERTURA (json) ===' as sezione;
+select row_to_json(v)::text from vaccini_copertura v order by operatore_id, vaccino;
+select '=== VACCINI_STORICO (json) ===' as sezione;
+select row_to_json(v)::text from vaccini_storico v order by operatore_id, data_somministrazione;
+select '=== TAGLIE_DPI (json) ===' as sezione;
+select row_to_json(t)::text from taglie_dpi t order by operatore_id;
+select '=== CANI (json) ===' as sezione;
+select row_to_json(c)::text from cani c order by operatore_id;
+select '=== CANI_VACCINI (json) ===' as sezione;
+select row_to_json(v)::text from cani_vaccini v order by cane_id, data_somministrazione;
+select '=== MANIFESTI (json) ===' as sezione;
+select row_to_json(m)::text from manifesti m order by id;
+select '=== MANIFESTI_MEMBRI (json) ===' as sezione;
+select row_to_json(m)::text from manifesti_membri m order by manifesto_id, posto;
+select '=== LOG_CONSULTAZIONI (json) ===' as sezione;
+select row_to_json(l)::text from log_consultazioni l order by creato_il;
+select '=== LOG_ADMIN (json) ===' as sezione;
+select row_to_json(l)::text from log_admin l order by creato_il;
+
+-- 11) STRUTTURA — lo schema per ricreare le tabelle
 select '=== SCHEMA TABELLE (definizioni) ===' as sezione;
 select table_name, column_name, data_type, is_nullable, column_default
 from information_schema.columns where table_schema='public' order by table_name, ordinal_position;
