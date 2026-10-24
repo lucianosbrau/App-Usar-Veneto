@@ -56,7 +56,7 @@ Account (personali di Luciano Di Lorenzo): GitHub `lucianosbrau`, Supabase, Rend
 2. Bot allerta il gruppo "Allerta USAR VENETO" (ID `-1004443017442`, var `ALERT_GROUP_CHAT_ID` su Render) + chat private, pulsanti ✅/❌
 3. Risposte in tempo reale nella pagina admin: contatori SÌ/NO/NESSUNA RISPOSTA (= allertati − risposte, con nomi), copertura requisiti (su sp_*), nomi con foto
 4. Compilazione manifesto AUTOMATICA/MANUALE; GENERA PDF (mese sempre corretto); il PDF si gira a mano nel gruppo
-5. **NOME MODULO (24/10)**: Squadra ALPHA = **MO.USARM.VEN.01**, Squadra BRAVO = **MO.USARM.VEN.02**. Visibile nella finestra RealTime sotto il titolo e nel PDF (riga “MODULO MO.USARM.VEN.0x” in rosso sotto il titolo squadra). Il PDF del manifesto si chiama ora **“manifesto Composizione”** (nome file: MO.USARM.VEN.0x-manifesto-composizione-team.pdf). Attivazione personalizzata: nessun nome modulo
+5. **NOME MODULO (24/10)**: Squadra ALPHA = **MO.USARM.VEN.01**, Squadra BRAVO = **MO.USARM.VEN.02**. Visibile nella finestra RealTime sotto il titolo e nel PDF (riga “MODULO MO.USARM.VEN.0x” in rosso sotto il titolo squadra). Il PDF del manifesto si chiama ora **“manifesto Composizione”** (nome file: MO.USARM.VEN.0x-manifesto-composizione-team.pdf); il tasto si chiama **GENERA PDF COMPILAZIONE** in Programmazione, Attivazione e Squadre. Attivazione personalizzata: nessun nome modulo
 6. Chiusura → il bot annuncia "✅ ATTIVAZIONE CHIUSA" sul gruppo e in privata; risposte bloccate
 
 ## 6. Regole di business — NON REINVENTARE

@@ -693,7 +693,7 @@ async function pagSquadre(el) {
               ${utente.ruolo === 'admin' ? `<button class="btn-primary" data-attiva-sq="${p.team}" style="height:38px; font-size:13px; background:var(--rosso);">🚨 ATTIVA</button>` : ''}
               <button class="btn-primary" data-visualizza="${p.id}" style="height:38px; font-size:13px;">👁️ VISUALIZZA</button>
               ${utente.ruolo === 'admin' ? `<button class="btn-primary" data-modifica="${p.id}" style="height:38px; font-size:13px; background:var(--grigio-ch);">✏️ MODIFICA</button>` : ''}
-              <button class="btn-primary" data-pdf-sq="${p.id}" style="height:38px; font-size:13px;">📄 GENERA PDF</button>
+              <button class="btn-primary" data-pdf-sq="${p.id}" style="height:38px; font-size:13px;">📄 GENERA PDF COMPILAZIONE</button>
             </div>
           </div>
           <div class="dettaglio-sq" style="display:none; margin-top:12px; border-top:1px solid var(--bordo); padding-top:12px;">
@@ -1201,7 +1201,7 @@ async function apriProgramma(cont, programmi) {
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn-primary" id="prog-inserisci-tutti" style="height:44px;">➕ INSERISCI TUTTI</button>
           <button class="btn-primary" id="prog-elimina" style="height:44px; background:var(--rosso);">🗑 ELIMINA COMPILAZIONE</button>
-          <button class="btn-primary" id="prog-genera-pdf" style="height:44px;">📄 GENERA PDF</button>
+          <button class="btn-primary" id="prog-genera-pdf" style="height:44px;">📄 GENERA PDF COMPILAZIONE</button>
           <button class="btn-primary" id="prog-pubblica" style="max-width:210px; height:44px; background:${prog.pubblicato ? 'var(--verde)' : 'var(--rosso)'};">${prog.pubblicato ? 'RIPUBBLICA' : 'PUBBLICA'} SU TELEGRAM</button>
           <button class="btn-primary" id="prog-squadre" style="max-width:210px; height:44px; background:${prog.pubblicato_su_squadre ? 'var(--verde)' : 'var(--royal)'};">${prog.pubblicato_su_squadre ? 'AGGIORNA' : 'PUBBLICA'} SU SQUADRE</button>
         </div>
@@ -1785,7 +1785,7 @@ async function pagAttivazioneAdmin(el) {
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           ${aperta.team !== 'personalizzata' ? `<button class="btn-primary" id="att-auto" style="height:44px;">⚡ COMPILAZIONE AUTOMATICA</button>` : ''}
           <button class="btn-primary" id="att-manuale" style="height:44px;">✏️ COMPILAZIONE MANUALE</button>
-          <button class="btn-primary" id="att-pdf" style="height:44px;">📄 GENERA PDF</button>
+          <button class="btn-primary" id="att-pdf" style="height:44px;">📄 GENERA PDF COMPILAZIONE</button>
         </div>
         <div id="att-manifesto"></div>
       </div>`;
