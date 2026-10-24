@@ -553,6 +553,14 @@ async function pagOperatori(el) {
     caricaOreMantenimenti()
   ]);
   const oreMan = mantRes || {};
+  const nSopraSoglia = Object.values(oreMan).filter(v => v >= 24).length;
+  if (!opRes.error && Object.keys(oreMan).length === 0 && nSopraSoglia === 0) {
+    const avviso = document.getElementById('diag-ore');
+    if (avviso) {
+      avviso.style.display = 'block';
+      avviso.textContent = "\u26a0\ufe0f Conteggio ore: nessun dato caricato per l'anno in corso. Se alcuni operatori hanno mantenimenti quest'anno, eseguire in Supabase SQL Editor: NOTIFY pgrst, 'reload schema'; e ricaricare la pagina.";
+    }
+  }
   if (opRes.error) {
     cont.innerHTML = `<div class="card" style="border-left:4px solid var(--rosso);"><b>⚠️ Errore caricamento operatori</b><div style="font-size:13px; color:var(--rosso-tx); margin-top:6px;">${esc(opRes.error.message)}</div><div style="font-size:12px; color:var(--grigio); margin-top:6px;">Codice: ${esc(opRes.error.code || 'n/d')}</div></div>`;
     return;
@@ -603,8 +611,8 @@ async function pagOperatori(el) {
             ${o.ruolo === 'admin'
               ? '<span class="pill rosso">⭐ Admin</span>'
               : ((oreMan[o.id] || 0) >= 24
-                ? '<span class="pill verde">🟢 In linea</span>'
-                : '<span class="pill giallo">🟡 Sotto soglia</span>')}
+                ? `<span class="pill verde">🟢 In linea</span>`
+                : `<span class="pill giallo">🟡 Sotto soglia</span>`) + ` <span style="font-size:11px; color:var(--grigio);">${(oreMan[o.id] || 0).toFixed(0)}h</span>`}
           </div>
           <div style="font-size:18px; font-weight:700;">${esc(o.cognome)} ${esc(o.nome)}${simboloVigile(o, 20)}${o.grado ? ` <span class="pill" style="font-size:10px; background:#F1F5F9; color:var(--grigio);">${esc(o.grado)}</span>` : ''}</div>
           <div style="font-size:13px; color:var(--grigio); margin:4px 0 8px;">${esc(o.comando || '')}${o.sede ? ' · ' + esc(o.sede) : ''}${o.salto_turno ? ' · turno ' + esc(o.salto_turno) : (o.turno ? ' · turno ' + esc(o.turno) : '')}</div>
